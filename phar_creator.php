@@ -6,13 +6,13 @@
  * @example php phar_creator.php
  */
 
-$phar = new Phar('idefix.phar');
+$phar = new Phar('idephix.phar');
 $phar->buildFromDirectory('src');
 
 $stub = <<<ENDSTUB
 <?php
-Phar::mapPhar('idefix.phar');
-require 'phar://idefix.phar/do.php';
+Phar::mapPhar('idephix.phar');
+require 'phar://idephix.phar/do.php';
 __HALT_COMPILER();
 ENDSTUB;
 
