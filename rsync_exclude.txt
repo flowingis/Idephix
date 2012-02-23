@@ -1,0 +1,18 @@
+# Project files
+/app/cache/*
+/app/log/*
+/web/*_dev.php
+/web/uploads/*
+
+/build
+build.xml
+selenium
+
+/nbproject
+
+# SCM files
+.git
+.gitignore
+.svn
+
+.DS_Store
