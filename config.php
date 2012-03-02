@@ -26,11 +26,6 @@ $targets = array(
                                 'remoteBaseFolder' => "/var/sites/casanoi.ideato.it/",
                                 'rsync_exclude_file' => 'rsync_exclude.txt'
                                ),
-                'ci' => array(
-                                'hosts' => array('localhost'),
-                                'localBaseFolder' => $localBaseDir,
-                                'remoteBaseFolder' => "/tmp/idephix_test/"
-                               ),
               );
 
 function deploy($d) {
@@ -39,4 +34,8 @@ function deploy($d) {
   $d->remoteLinkSharedFolders();
   $d->assetic();
   $d->switchToTheNextRelease();
+}
+
+function runTest($d) {
+  $d->runPhpUnit();
 }
