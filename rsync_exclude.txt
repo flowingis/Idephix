@@ -1,8 +1,8 @@
 # Project files
-/app/cache/*
-/app/log/*
+/app/cache
+/app/log
 /web/*_dev.php
-/web/uploads/*
+/web/uploads
 
 /build
 build.xml

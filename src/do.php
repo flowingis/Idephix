@@ -6,34 +6,37 @@
 
 require_once __DIR__.'/lib/Deploy.php';
 require_once __DIR__.'/lib/SshClient.php';
-require_once __DIR__.'/lib/PeclSsh2Proxy.php';
+require_once __DIR__.'/lib/CLISshProxy.php';
+require_once __DIR__.'/lib/PhpFunctionParser.php';
 
+use Ideato\Deploy\PhpFunctionParser;
 use Ideato\Deploy\Deploy;
+use Ideato\Deploy\SshClient;
+use Ideato\Deploy\CLISshProxy;
 
-if (!is_file(getcwd().'/config.php')) {
-    echo getcwd()."/config.php does not exists!\n";
+$configFile = getcwd().'/idxfile.php';
+
+if (!is_file($configFile)) {
+    echo $configFile." does not exists!\n";
 
     exit(1);
 }
 
-include getcwd().'/config.php';
+include $configFile;
 
 $argv = $_SERVER['argv'];
+$parser = new PhpFunctionParser(\file_get_contents($configFile));
+$functions = $parser->getFunctions();
+$functions = \array_reduce($functions, function($r, $v) { $r[] = $v['name']; return $r; });
 
-if (!isset($argv[1]) || !in_array($argv[1], array_keys($targets))) {
-    echo 'Usage: '.$argv[0]." env [bootstrap|deploy]\n";
+if (!isset($argv[1])) {
+    echo 'Usage: '.$argv[0]." [".implode("|", $functions)."]\n";
     echo 'configured env: '.implode(', ', array_keys($targets))."\n";
     exit(1);
 }
 
-$target = $targets[$argv[1]];
+$sshClient = new SshClient(new CLISshProxy());
+$deploy = new Deploy($sshClient, $targets, $ssh_params);
 
-$sshClient = new Ideato\Deploy\SshClient();
-$deploy = new \Ideato\Deploy\Deploy($sshClient, $target, $ssh_params);
-
-if (isset($argv[2]) && 'bootstrap' == $argv[2]) {
-    $deploy->bootstrap();
-} else {
-    $deploy->deploy();
-}
-
+array_shift($argv);
+$deploy->callback($argv);

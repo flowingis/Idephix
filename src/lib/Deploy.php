@@ -18,70 +18,81 @@ class Deploy
     private $dryRun = true;
     private $rsyncExcludeFile;
 
-    public function __construct($sshClient, $target, $ssh_params) {
+    public function __construct($sshClient, $targets, $ssh_params)
+    {
         $this->timestamp = date('YmdHis');
 
         $this->sshClient = $sshClient;
         $this->sshClient->setParams($ssh_params);
-        $this->sshClient->setHost(current($target['hosts']));
-        $this->sshClient->connect();
-
         $this->sshParams = $ssh_params;
-        $this->localBaseFolder = rtrim($target['localBaseFolder'], '/').'/';
-        $this->remoteBaseFolder = rtrim($target['remoteBaseFolder'], '/').'/';
-        $this->releasesFolder = $this->remoteBaseFolder.'releases/';
-        $this->hosts = $target['hosts'];
-        $this->rsyncExcludeFile = $target['rsync_exclude_file'];
+        $this->targets = $targets;
     }
 
-    public function deploy() {
+    public function setEnvironment($env)
+    {
+        $this->sshClient->setHost(current($this->targets[$env]['hosts']));
+        $this->localBaseFolder = rtrim($this->targets[$env]['localBaseFolder'], '/').'/';
+        $this->remoteBaseFolder = rtrim($this->targets[$env]['remoteBaseFolder'], '/').'/';
+        $this->releasesFolder = $this->remoteBaseFolder.'releases/';
+        $this->hosts = $this->targets[$env]['hosts'];
+        $this->rsyncExcludeFile = $this->targets[$env]['rsync_exclude_file'];
+    }
+
+    public function callback($argv)
+    {
         try {
-          deploy($this);
+            $callback = \array_shift($argv);
+            \array_unshift($argv, $this);
+            \call_user_func_array($callback, $argv);
         } catch (\Exception $e) {
-          $this->log("Error: ".$e->getMessage());
+            $this->log("Error: ".$e->getMessage());
         }
     }
 
-    public function getNextReleaseFolder() {
+    public function setDryRun($dryRun)
+    {
+        $this->dryRun = $dryRun;
+    }
+
+    public function getNextReleaseFolder()
+    {
         return $this->releasesFolder.$this->timestamp;
     }
 
-    public function getCurrentReleaseFolder() {
+    public function getCurrentReleaseFolder()
+    {
         return $this->remoteBaseFolder.'current';
     }
 
-    public function remotePrepare() {
+    public function remotePrepare()
+    {
         if (strpos($this->remote('ls '.$this->getCurrentReleaseFolder()), 'No such file or directory') !== false) {
-          throw new \Exception('You have to bootstrap your server first: '.current($this->hosts));
+            throw new \Exception('You have to bootstrap your server first: '.current($this->hosts));
         }
-
+        $this->log("Bootstrap: OK");
         $cmd = "mkdir -p ".$this->getNextReleaseFolder();
-        if ($this->dryRun) {
-          $this->log($cmd);
 
-          return true;
-        }
-
-        return $this->remote($cmd);
+        return $this->remote($cmd, $this->dryRun);
     }
 
-    public function copyCode() {
+    public function copyCode()
+    {
+        $this->log("Remote: copy code to the next release");
         $out = $this->remoteCopyRecursive($this->remoteBaseFolder.'current/.', $this->getNextReleaseFolder());
+        $this->log("Remote: sync code to the next release");
         $out.= $this->rsync($this->localBaseFolder, ($this->dryRun) ? $this->getCurrentReleaseFolder() : $this->getNextReleaseFolder());
 
         return $out;
     }
 
-    public function switchToTheNextRelease() {
-        if ($this->dryRun) {
-          $this->log("Switch to next release...");
-
-          return true;
-        }
-        $this->remote("cd ".$this->remoteBaseFolder." && ln -s releases/".$this->timestamp." next && mv -fT next current");
+    public function switchToTheNextRelease()
+    {
+        $this->log("Switch to next release...");
+        $this->remote("cd ".$this->remoteBaseFolder." && ln -s releases/".$this->timestamp." next && mv -fT next current", $this->dryRun);
     }
 
-    public function rsync($from, $to) {
+    public function rsync($from, $to)
+    {
         $user = $this->sshParams['user'];
         $host = current($this->hosts);
 
@@ -106,26 +117,29 @@ class Deploy
     /**
      * @todo
      */
-    public function assetic() {
-      //php app/console assets:install --symlink web
+    public function assetic()
+    {
+        $this->log("Asset and assetic stuff...");
+        $this->remote('cd '.$this->getNextReleaseFolder().' && php app/console assets:install --symlink web', $this->dryRun);
+        $this->remote('cd '.$this->getNextReleaseFolder().' && php app/console assetic:dump --env=prod', $this->dryRun);
     }
 
-    public function remote($cmd) {
-        return $this->sshClient->exec($cmd);
-    }
-
-    public function remoteCopyRecursive($from, $to) {
-        $cmd = "cp -R '$from' '$to'";
-        if ($this->dryRun) {
-          $this->log($cmd);
-
-          return true;
+    public function remote($cmd, $dryRun = false)
+    {
+        $this->sshClient->connect();
+        $this->log('Remote: '.$cmd);
+        if (!$dryRun) {
+            return $this->sshClient->exec($cmd);
         }
-
-        return $this->sshClient->exec($cmd);
     }
 
-    public function bootstrap() {
+    public function remoteCopyRecursive($from, $to)
+    {
+        return $this->remote("cp -R '$from' '$to'", $this->dryRun);
+    }
+
+    public function bootstrap()
+    {
         $bootstrapFolder = $this->releasesFolder.'bootstrap';
         $out = $this->remote("mkdir -p ".$bootstrapFolder);
         $out.= $this->remote("cd ".$this->remoteBaseFolder." && ln -s releases/bootstrap current");
@@ -138,7 +152,18 @@ class Deploy
         return $out;
     }
 
-    private function log($message) {
-      echo $message."\n";
+    private function log($message)
+    {
+        echo $message."\n";
+    }
+
+    public function runPhpUnit()
+    {
+        passthru('phpunit -c app/ --stderr');
+    }
+
+    public function getLocalBaseFolder()
+    {
+        return $this->localBaseFolder;
     }
 }

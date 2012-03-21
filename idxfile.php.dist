@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * Config example
+ */
+
+$localBaseDir = '/var/www/casanoi';
+
+$ssh_params = array(
+                'user' => 'ideato',
+              );
+
+$targets = array(
+                'prod' => array(
+                                'hosts' => array('localhost'),
+                                'localBaseFolder' => $localBaseDir,
+                                'remoteBaseFolder' => "/tmp/idephix_test/",
+                                'rsync_exclude_file' => 'rsync_exclude.txt'
+                               ),
+                'stage' => array(
+                                'hosts' => array('stage.example.com'),
+                                'localBaseFolder' => $localBaseDir,
+                                'remoteBaseFolder' => "/var/www/stage.example.com/",
+                                'rsync_exclude_file' => 'rsync_exclude.txt'
+                               ),
+              );
+
+function deploy($d, $env, $dryRun = '')
+{
+    if ($dryRun != '--go') {
+        echo "\nDry Run\n";
+    }
+    $d->setEnvironment($env);
+    $d->setDryRun($dryRun != '--go');
+    $d->remotePrepare();
+    $d->copyCode();
+    $d->remoteLinkSharedFolders();
+    $d->assetic();
+    $d->switchToTheNextRelease();
+}
+
+function runTest($d)
+{
+    $d->runPhpUnit();
+}
+
+function update()
+{
+    $cwd = getcwd();
+    passthru("cd /var/www/idephix && php phar_creator.php && cp idephix.phar ".$cwd."/bin/idephix.phar && cp config.php ".$cwd."/");
+}
