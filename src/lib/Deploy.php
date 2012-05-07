@@ -30,23 +30,16 @@ class Deploy
 
     public function setEnvironment($env)
     {
+        if (!isset($this->targets[$env])) {
+            throw new \InvalidArgumentException('Wrong environment "'.$env.'". Available ['.implode(', ', array_keys($this->targets)).']');
+        }
+
         $this->sshClient->setHost(current($this->targets[$env]['hosts']));
         $this->localBaseFolder = rtrim($this->targets[$env]['localBaseFolder'], '/').'/';
         $this->remoteBaseFolder = rtrim($this->targets[$env]['remoteBaseFolder'], '/').'/';
         $this->releasesFolder = $this->remoteBaseFolder.'releases/';
         $this->hosts = $this->targets[$env]['hosts'];
         $this->rsyncExcludeFile = $this->targets[$env]['rsync_exclude_file'];
-    }
-
-    public function callback($argv)
-    {
-        try {
-            $callback = \array_shift($argv);
-            \array_unshift($argv, $this);
-            \call_user_func_array($callback, $argv);
-        } catch (\Exception $e) {
-            $this->log("Error: ".$e->getMessage());
-        }
     }
 
     public function setDryRun($dryRun)
@@ -80,7 +73,7 @@ class Deploy
         $this->log("Remote: copy code to the next release");
         $out = $this->remoteCopyRecursive($this->remoteBaseFolder.'current/.', $this->getNextReleaseFolder());
         $this->log("Remote: sync code to the next release");
-        $out.= $this->rsync($this->localBaseFolder, ($this->dryRun) ? $this->getCurrentReleaseFolder() : $this->getNextReleaseFolder());
+        $out.= $this->rsync($this->localBaseFolder, ($this->dryRun) ? $this->getCurrentReleaseFolder().'/' : $this->getNextReleaseFolder());
 
         return $out;
     }
@@ -99,7 +92,7 @@ class Deploy
         $dryFlag = $this->dryRun ? '--dry-run' : '';
         $exclude = $this->rsyncExcludeFile ? '--exclude-from='.$this->rsyncExcludeFile : '';
 
-        exec("rsync -avz -e ssh $dryFlag $exclude $from $user@$host:$to", $out);
+        exec("rsync -avcz --delete -e ssh $dryFlag $exclude $from $user@$host:$to", $out);
         $this->log(implode("\n", $out));
 
         return $out;
@@ -135,7 +128,31 @@ class Deploy
 
     public function remoteCopyRecursive($from, $to)
     {
-        return $this->remote("cp -R '$from' '$to'", $this->dryRun);
+        return $this->remote("cp -pR '$from' '$to'", $this->dryRun);
+    }
+
+    public function updateSchema()
+    {
+        return $this->remote("cd ".$this->getNextReleaseFolder()." && php app/console doctrine:schema:update --force", $this->dryRun);
+    }
+
+    /**
+     * @todo sudo?
+     */
+    public function deleteOldReleases($releasesToKeep)
+    {
+        return $this->remote("cd ".$this->releasesFolder." && ls | sort | head -n -".$releasesToKeep." | xargs rm -Rf", $this->dryRun);
+    }
+
+    /**
+     * @todo sudo?
+     */
+    public function cacheClear()
+    {
+        $out = $this->remote("cd ".$this->getNextReleaseFolder()." && php app/console cache:clear --env=dev", $this->dryRun);
+        $out .= "\n".$this->remote("cd ".$this->getNextReleaseFolder()." &&  php app/console cache:clear --env=prod --no-debug", $this->dryRun);
+
+        return $out;
     }
 
     public function bootstrap()
@@ -157,9 +174,9 @@ class Deploy
         echo $message."\n";
     }
 
-    public function runPhpUnit()
+    public function runPhpUnit($params_string)
     {
-        passthru('phpunit -c app/ --stderr');
+        passthru('phpunit '.$params_string);
     }
 
     public function getLocalBaseFolder()

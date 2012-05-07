@@ -6,8 +6,11 @@
 
 $localBaseDir = '/var/www/casanoi';
 
-$ssh_params = array(
+$sshParams = array(
                 'user' => 'ideato',
+                'public_key_file' => '/Users/kea/.ssh/id_rsa_ideato.pub',
+                'private_key_file' => '/Users/kea/.ssh/id_rsa_ideato',
+                'private_key_file_pwd' => '1deat0'
               );
 
 $targets = array(
@@ -17,35 +20,49 @@ $targets = array(
                                 'remoteBaseFolder' => "/tmp/idephix_test/",
                                 'rsync_exclude_file' => 'rsync_exclude.txt'
                                ),
-                'stage' => array(
-                                'hosts' => array('stage.example.com'),
+                'stag' => array(
+                                'hosts' => array('192.168.69.106'),
                                 'localBaseFolder' => $localBaseDir,
-                                'remoteBaseFolder' => "/var/www/stage.example.com/",
+                                'remoteBaseFolder' => "/var/sites/casanoi.ideato.it/",
                                 'rsync_exclude_file' => 'rsync_exclude.txt'
                                ),
               );
 
-function deploy($d, $env, $dryRun = '')
-{
-    if ($dryRun != '--go') {
-        echo "\nDry Run\n";
-    }
-    $d->setEnvironment($env);
-    $d->setDryRun($dryRun != '--go');
-    $d->remotePrepare();
-    $d->copyCode();
-    $d->remoteLinkSharedFolders();
-    $d->assetic();
-    $d->switchToTheNextRelease();
-}
+$idx->
+    add('deploy:deploy',
+        /** @Description Esegue il deploy specificando l'environment */
+        function($env, $dryRun = '--dry-run') use ($idx)
+        {
+            if ($dryRun != '--go') {
+                echo "\nDry Run\n";
+            }
+            $idx->setEnvironment($env);
+            $idx->setDryRun($dryRun != '--go');
+            $idx->remotePrepare();
+            $idx->copyCode();
+            $idx->remoteLinkSharedFolders();
+            $idx->assetic();
+            $idx->switchToTheNextRelease();
+        })->
 
-function runTest($d)
-{
-    $d->runPhpUnit();
-}
+    add('test:run',
+        /** @Description Lancia i test di PHPUnit nella directory test */
+        function() use ($idx)
+        {
+            $idx->runPhpUnit(' test');
+        })->
 
-function update()
-{
-    $cwd = getcwd();
-    passthru("cd /var/www/idephix && php phar_creator.php && cp idephix.phar ".$cwd."/bin/idephix.phar && cp config.php ".$cwd."/");
-}
+    add('idephix:update',
+        function ()
+        {
+            $cwd = getcwd();
+            passthru("cd /var/www/idephix && php phar_creator.php && cp idephix.phar ".$cwd."/bin/idephix.phar && cp config.php ".$cwd."/");
+        })->
+    add('idephix:test-params',
+        /** @Description <========== LANCIAMI =========== */
+        function ($param1, $param2, $param3 = 'default')
+        {
+            echo 'Param1: '.$param1."\n";
+            echo 'Param2: '.$param2."\n";
+            echo 'Param3: '.$param3."\n";
+        });
