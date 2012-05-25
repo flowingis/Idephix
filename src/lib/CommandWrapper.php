@@ -19,11 +19,4 @@ class CommandWrapper extends Command
 
         return $this;
     }
-
-    public function __call($name, $arguments)
-    {
-        if (is_callable(array($this->command, $name))) {
-            call_user_func_array(array($this->command, $name), $arguments);
-        }
-    }
 }

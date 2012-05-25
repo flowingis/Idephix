@@ -4,12 +4,16 @@ namespace Ideato\Deploy;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Ideato\Deploy\CommandWrapper;
 
 class Idephix
 {
     private $application;
     private $library = array();
+    private $consoleOutput;
 
     public function __construct()
     {
@@ -47,7 +51,8 @@ class Idephix
 
     public function run()
     {
-        $this->application->run();
+        $this->consoleOutput = new ConsoleOutput();
+        $this->application->run(null, $this->consoleOutput);
     }
 
     public function addLibrary($library)
@@ -55,7 +60,20 @@ class Idephix
         $this->library[] = $library;
     }
 
-    public function __call($name, $arguments)
+    public function runTask($name, InputInterface $arguments = null)
+    {
+        if (!$this->application->has($name)) {
+            throw new \InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));
+        }
+
+        if (empty($arguments)) {
+            $arguments = new ArgvInput();
+        }
+
+        return $this->application->get($name)->run($arguments, $this->consoleOutput);
+    }
+
+    public function __call($name, $arguments = array())
     {
         foreach ($this->library as $library) {
             if (is_callable(array($library, $name))) {
