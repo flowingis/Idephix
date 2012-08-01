@@ -17,6 +17,7 @@ class Deploy
     private $hosts;
     private $dryRun = true;
     private $rsyncExcludeFile;
+    private $rsyncIncludeFile;
 
     public function __construct($sshClient, $targets, $ssh_params)
     {
@@ -39,7 +40,8 @@ class Deploy
         $this->remoteBaseFolder = rtrim($this->targets[$env]['remoteBaseFolder'], '/').'/';
         $this->releasesFolder = $this->remoteBaseFolder.'releases/';
         $this->hosts = $this->targets[$env]['hosts'];
-        $this->rsyncExcludeFile = $this->targets[$env]['rsync_exclude_file'];
+        $this->rsyncExcludeFile = empty($this->targets[$env]['rsync_exclude_file']) ? null : $this->targets[$env]['rsync_exclude_file'];
+        $this->rsyncIncludeFile = empty($this->targets[$env]['rsync_include_file']) ? null : $this->targets[$env]['rsync_include_file'];
     }
 
     public function setDryRun($dryRun)
@@ -55,6 +57,11 @@ class Deploy
     public function getCurrentReleaseFolder()
     {
         return $this->remoteBaseFolder.'current';
+    }
+
+    public function getRemoteBaseFolder()
+    {
+        return $this->remoteBaseFolder;
     }
 
     public function remotePrepare()
@@ -91,8 +98,12 @@ class Deploy
 
         $dryFlag = $this->dryRun ? '--dry-run' : '';
         $exclude = $this->rsyncExcludeFile ? '--exclude-from='.$this->rsyncExcludeFile : '';
+        $include = $this->rsyncIncludeFile ? '--include-from='.$this->rsyncIncludeFile : '';
+        $sshCmd = "-e 'ssh";
+        $sshCmd.= $this->sshParams['ssh_port'] ? " -p ".$this->sshParams['ssh_port'] : "" ;
+        $sshCmd.= "'";
 
-        exec("rsync -avcz --delete -e ssh $dryFlag $exclude $from $user@$host:$to", $out);
+        exec("rsync -rlpDvcz --delete $sshCmd $dryFlag $exclude $include $from $user@$host:$to", $out);
         $this->log(implode("\n", $out));
 
         return $out;
@@ -110,11 +121,12 @@ class Deploy
     /**
      * @todo
      */
-    public function assetic()
+    public function assetic($current = true)
     {
+        $folder = $current ? $this->getCurrentReleaseFolder() : $this->getNextReleaseFolder();
         $this->log("Asset and assetic stuff...");
-        $this->remote('cd '.$this->getNextReleaseFolder().' && php app/console assets:install --symlink web', $this->dryRun);
-        $this->remote('cd '.$this->getNextReleaseFolder().' && php app/console assetic:dump --env=prod', $this->dryRun);
+        $this->remote('cd '.$folder.' && php app/console assets:install --symlink web', $this->dryRun);
+        $this->remote('cd '.$folder.' && php app/console assetic:dump --env=prod', $this->dryRun);
     }
 
     public function remote($cmd, $dryRun = false)
@@ -149,10 +161,7 @@ class Deploy
      */
     public function cacheClear()
     {
-        $out = $this->remote("cd ".$this->getNextReleaseFolder()." && php app/console cache:clear --env=dev", $this->dryRun);
-        $out .= "\n".$this->remote("cd ".$this->getNextReleaseFolder()." &&  php app/console cache:clear --env=prod --no-debug", $this->dryRun);
-
-        return $out;
+        return $this->remote('cd '.$this->getNextReleaseFolder().' && rm -Rf app/cache/*', $this->dryRun);
     }
 
     public function bootstrap()

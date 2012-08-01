@@ -26,7 +26,7 @@ class CLISshProxy
 	public function exec($cmd)
     {
         $user = $this->user ? '-l '.$this->user : '';
-		exec('ssh -p '.$this->port." ".$user." ".$this->host." '".$cmd.' && echo "#RETOK#"\'', $output);
+        exec('ssh -p '.$this->port." ".$user." ".$this->host." '".$cmd.' && echo "#RETOK#"\'', $output);
         $output = implode("\n", $output);
 
         if (strstr($output,'#RETOK#')) {
