@@ -8,8 +8,6 @@
 build.xml
 selenium
 
-/nbproject
-
 # SCM files
 .git
 .gitignore

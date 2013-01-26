@@ -7,7 +7,7 @@
  */
 
 $phar = new Phar('idephix.phar');
-$phar->buildFromDirectory('src');
+$phar->buildFromDirectory('.');
 
 $stub = <<<ENDSTUB
 <?php

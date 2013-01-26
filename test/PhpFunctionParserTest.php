@@ -1,9 +1,9 @@
 <?php
 namespace Ideato\Deploy\Test;
 
-require_once __DIR__.'/../src/lib/PhpFunctionParser.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
-use Ideato\Deploy\PhpFunctionParser;
+use Ideato\Util\PhpFunctionParser;
 
 class PhpFunctionParserTest extends \PHPUnit_Framework_TestCase
 {

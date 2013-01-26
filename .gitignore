@@ -1,5 +1,3 @@
-/nbproject
 /pecl
-.idea
+/vendor
 idxfile.php
-/src/vendor

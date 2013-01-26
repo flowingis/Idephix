@@ -1,0 +1,10 @@
+{
+    "require": {
+        "symfony/console": "2.0.*",
+        "phpseclib/phpseclib": "dev-master"
+    },
+
+    "autoload": {
+        "psr-0": {"Ideato": "src/"}
+    }
+}
