@@ -18,6 +18,8 @@ class Deploy
     private $dryRun = true;
     private $rsyncExcludeFile;
     private $rsyncIncludeFile;
+    private $timestamp;
+    private $targets;
 
     public function __construct($sshClient, $targets, $ssh_params)
     {
@@ -181,11 +183,6 @@ class Deploy
     private function log($message)
     {
         echo $message."\n";
-    }
-
-    public function runPhpUnit($params_string)
-    {
-        passthru('phpunit '.$params_string);
     }
 
     public function getLocalBaseFolder()

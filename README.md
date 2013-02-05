@@ -1,12 +1,17 @@
 Idephix automator
 =================
 
+Appunti:
+--------
+
+Mettere gli utenti sudoer sui server di destinazione senza password ma su comandi specifici (es. "php-fpm restart")
+# /etc/sudoers
+kea ALL = PASSWD:ALL, NOPASSWD: /usr/bin/php-fpm 
+
 Installazione
 -------------
 
 1. Librerie
-
-Scarica Symfony/Command
 
 ``` sh
 $ cd src && php composer.phar install

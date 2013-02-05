@@ -2,7 +2,7 @@
 
 namespace Ideato\SSH;
 
-class PeclSsh2Proxy
+class PeclSsh2Proxy implements ProxyInterface
 {
     protected $connection = null;
 
@@ -16,12 +16,23 @@ class PeclSsh2Proxy
         return $this->connection;
     }
 
+    public function authByPassword($user, $password)
+    {
+        return ssh2_auth_password($this->connection, $user, $password);
+    }
+
     public function authByPublicKey($user, $public_key_file, $private_key_file, $pwd)
     {
-		return ssh2_auth_pubkey_file($this->connection, $user, $public_key_file, $private_key_file, $pwd);
+        return ssh2_auth_pubkey_file($this->connection, $user, $public_key_file, $private_key_file, $pwd);
+    }
+
+    public function authByAgent($user)
+    {
+		return ssh2_auth_agent($this->connection, $user);
 	}
 
-	public function disconnect($reason, $message, $language) {
+	public function disconnect($reason, $message, $language)
+    {
 		$this->connection = NULL;
 	}
 
@@ -36,8 +47,8 @@ class PeclSsh2Proxy
 		stream_set_blocking($stdout, true);
 		$output = stream_get_contents($stdout);
 
-        if (strstr($output,'RETOK')) {
-			$output = substr($output, 0, strpos($output,'RETOK'));
+        if (strstr($output, 'RETOK')) {
+			$output = substr($output, 0, strpos($output, 'RETOK'));
 		}
 
 		return $output.$errors;

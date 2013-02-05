@@ -11,10 +11,9 @@ class SshClient
     /**
      * Constructor
      *
-     * @param array $options array('user', 'public_key_file', 'private_key_file', 'private_key_file_pwd', 'ssh_port')
-     * @param Ssh2Proxy $proxy
+     * @param ProxyInterface $proxy
      */
-    public function __construct($proxy = null)
+    public function __construct(ProxyInterface $proxy = null)
     {
         $this->proxy = $proxy;
 
@@ -28,13 +27,19 @@ class SshClient
         $this->host = $host;
     }
 
+    /**
+     * @param array $options array('user', 'password', 'public_key_file', 'private_key_file', 'private_key_file_pwd', 'ssh_port')
+     */
     public function setParams($params)
     {
-        $this->params = array_merge(array('user'                 => '',
-                                          'public_key_file'      => '',
-                                          'private_key_file'     => '',
-                                          'private_key_file_pwd' => '',
-                                          'ssh_port'             => '22'), $params);
+        $this->params = array_merge(array(
+                                        'user'                 => '',
+                                        'password'             => '',
+                                        'public_key_file'      => '',
+                                        'private_key_file'     => '',
+                                        'private_key_file_pwd' => '',
+                                        'ssh_port'             => '22'),
+                                    $params);
     }
 
     /**
@@ -43,13 +48,23 @@ class SshClient
      */
     public function connect()
     {
-        if (!$this->proxy->connect($this->host, $this->params['ssh_port'], $this->params['user'])) {
+        if (!$this->proxy->connect($this->host, $this->params['ssh_port'])) {
             throw new \Exception("Unable to connect");
         }
 
-        if (!$this->proxy->authByPublicKey($this->params['user'], $this->params['public_key_file'], $this->params['private_key_file'], $this->params['private_key_file_pwd'])) {
-            throw new \Exception("Unable to authenticate");
+        if (!empty($this->params['password']) && !$this->proxy->authByPassword($this->params['user'], $this->params['password'])) {
+            throw new \Exception("Unable to authenticate via password");
         }
+
+        if (!empty($this->params['public_key_file']) && !$this->proxy->authByPublicKey($this->params['user'], $this->params['public_key_file'], $this->params['private_key_file'], $this->params['private_key_file_pwd'])) {
+            throw new \Exception("Unable to authenticate via public/private keys");
+        }
+
+        if (!$this->proxy->authByAgent($this->params['user'])) {
+            throw new \Exception("Unable to authenticate via agent");
+        }
+
+        return true;
     }
 
     public function exec($cmd)
