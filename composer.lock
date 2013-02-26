@@ -1,29 +1,28 @@
 {
-    "hash": "3ee62a60ab4ff867286f316b80f4903e",
+    "hash": "11bbb4eb95d4ec2428af89e2d02ffe99",
     "packages": [
         {
             "name": "phpseclib/phpseclib",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/phpseclib/phpseclib",
-                "reference": "d774476bcfd2eda5b07bf97c9acf75372a4b525a"
+                "url": "https://github.com/phpseclib/phpseclib.git",
+                "reference": "1231f58aa3ea59eb16b8d87ee0bd5c8e876d9651"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/phpseclib/phpseclib/archive/d774476bcfd2eda5b07bf97c9acf75372a4b525a.zip",
-                "reference": "d774476bcfd2eda5b07bf97c9acf75372a4b525a",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/1231f58aa3ea59eb16b8d87ee0bd5c8e876d9651",
+                "reference": "1231f58aa3ea59eb16b8d87ee0bd5c8e876d9651",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.0.0"
             },
             "suggest": {
-                "ext-mcrypt": "Install the Mcrypt extension in order to speed up a wide variety of cryptographic operations.",
                 "ext-gmp": "Install the GMP (GNU Multiple Precision) extension in order to speed up arbitrary precision integer arithmetic operations.",
+                "ext-mcrypt": "Install the Mcrypt extension in order to speed up a wide variety of cryptographic operations.",
                 "pear-pear/PHP_Compat": "Install PHP_Compat to get phpseclib working on PHP >= 4.3.3."
             },
-            "time": "2013-01-26 17:16:42",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -33,7 +32,7 @@
                     "Net": "phpseclib/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "include-path": [
                 "phpseclib/"
             ],
@@ -50,22 +49,23 @@
             "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
             "homepage": "http://phpseclib.sourceforge.net",
             "keywords": [
-                "security",
-                "cryptography",
-                "ssh",
-                "encryption",
+                "BigInteger",
+                "aes",
+                "asn.1",
+                "asn1",
                 "crypto",
+                "cryptography",
+                "encryption",
+                "rsa",
+                "security",
+                "sftp",
                 "signature",
                 "signing",
-                "rsa",
-                "aes",
-                "sftp",
-                "x509",
+                "ssh",
                 "x.509",
-                "asn1",
-                "asn.1",
-                "BigInteger"
-            ]
+                "x509"
+            ],
+            "time": "2013-02-22 07:50:46"
         },
         {
             "name": "symfony/console",
@@ -85,7 +85,6 @@
             "require": {
                 "php": ">=5.3.2"
             },
-            "time": "2012-04-29 19:28:50",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -110,7 +109,50 @@
                 }
             ],
             "description": "Symfony Console Component",
-            "homepage": "http://symfony.com"
+            "homepage": "http://symfony.com",
+            "time": "2012-04-29 19:28:50"
+        },
+        {
+            "name": "symfony/process",
+            "version": "v2.1.8",
+            "target-dir": "Symfony/Component/Process",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Process.git",
+                "reference": "v2.1.8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Process/zipball/v2.1.8",
+                "reference": "v2.1.8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Process": ""
+                }
+            },
+            "notification-url": "http://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Process Component",
+            "homepage": "http://symfony.com",
+            "time": "2013-02-18 21:27:57"
         }
     ],
     "packages-dev": null,

@@ -15,6 +15,10 @@ class SshClient
      */
     public function __construct(ProxyInterface $proxy = null)
     {
+        if (null === $proxy) {
+            $proxy = function_exists('ssh2_auth_agent') ? new PeclSsh2Proxy() : new CLISshProxy();
+        }
+
         $this->proxy = $proxy;
 
         if (is_null($proxy)) {
@@ -71,4 +75,16 @@ class SshClient
     {
         return $this->proxy->exec($cmd);
     }
+
+    public function getUser()
+    {
+        return $this->params['user'];
+    }
+    
+    public function getPort()
+    {
+        return $this->params['ssh_port'];
+    }
+
+
 }

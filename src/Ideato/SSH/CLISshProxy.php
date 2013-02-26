@@ -7,13 +7,14 @@ class CLISshProxy implements ProxyInterface
     protected $executable = 'ssh';
     protected $connection = null;
     protected $host;
-    protected $port = 21;
+    protected $port = 22;
     protected $user = '';
     protected $password = '';
+    protected $private_key_file = null;
 
     private function canConnect()
     {
-        if ('connected' == $this->exec('echo "connected"')) {
+        if ('connected' == trim($this->exec('echo "connected"'))) {
 
             return true;
         }
@@ -24,7 +25,7 @@ class CLISshProxy implements ProxyInterface
         $this->executable = $executable;
     }
 
-    public function connect($host, $port = 21)
+    public function connect($host, $port = 22)
     {
         $this->host = $host;
         $this->port = $port;
@@ -39,6 +40,8 @@ class CLISshProxy implements ProxyInterface
 
     public function authByAgent($user)
     {
+        $this->user = $user;
+
         return $this->canConnect();
     }
 
@@ -52,18 +55,8 @@ class CLISshProxy implements ProxyInterface
 
 	public function exec($cmd)
     {
-        $user = $this->user ? '-l '.$this->user : '';
-        $key_file = $this->private_key_file ? '-i '.$this->private_key_file : '';
-        exec(
-            sprintf(
-                "%s -p %s %s %s %s '%s && echo \"#RETOK#\"'",
-                $this->executable,
-                $this->port,
-                $key_file,
-                $user,
-                $this->host,
-                $cmd),
-            $output);
+        exec($this->prepareCommand($cmd), $output);
+
         $output = implode("\n", $output);
 
         if (strstr($output,'#RETOK#')) {
@@ -72,4 +65,19 @@ class CLISshProxy implements ProxyInterface
 
 		return $output;
 	}
+
+    private function prepareCommand($cmd)
+    {
+        $user = $this->user ? '-l '.$this->user : '';
+        $key_file = $this->private_key_file ? '-i '.$this->private_key_file : '';
+
+        return sprintf(
+                "%s -p %s %s %s %s '%s && echo \"#RETOK#\"'",
+                $this->executable,
+                $this->port,
+                $key_file,
+                $user,
+                $this->host,
+                $cmd);
+    }
 }

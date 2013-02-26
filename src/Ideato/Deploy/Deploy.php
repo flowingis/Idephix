@@ -10,7 +10,6 @@ namespace Ideato\Deploy;
 class Deploy
 {
     private $sshClient;
-    private $sshParams;
     private $localBaseFolder;
     private $remoteBaseFolder;
     private $releasesFolder;
@@ -21,13 +20,10 @@ class Deploy
     private $timestamp;
     private $targets;
 
-    public function __construct($sshClient, $targets, $ssh_params)
+    public function __construct($sshClient, $targets)
     {
         $this->timestamp = date('YmdHis');
-
         $this->sshClient = $sshClient;
-        $this->sshClient->setParams($ssh_params);
-        $this->sshParams = $ssh_params;
         $this->targets = $targets;
     }
 
@@ -95,14 +91,14 @@ class Deploy
 
     public function rsync($from, $to)
     {
-        $user = $this->sshParams['user'];
+        $user = $this->sshClient->getUser();
         $host = current($this->hosts);
 
         $dryFlag = $this->dryRun ? '--dry-run' : '';
         $exclude = $this->rsyncExcludeFile ? '--exclude-from='.$this->rsyncExcludeFile : '';
         $include = $this->rsyncIncludeFile ? '--include-from='.$this->rsyncIncludeFile : '';
         $sshCmd = "-e 'ssh";
-        $sshCmd.= $this->sshParams['ssh_port'] ? " -p ".$this->sshParams['ssh_port'] : "" ;
+        $sshCmd.= $this->sshClient->getPort() ? " -p ".$this->sshClient->getPort() : "";
         $sshCmd.= "'";
 
         exec("rsync -rlpDvcz --delete $sshCmd $dryFlag $exclude $include $from $user@$host:$to", $out);

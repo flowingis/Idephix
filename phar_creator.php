@@ -7,7 +7,7 @@
  */
 
 $phar = new Phar('idephix.phar');
-$phar->buildFromDirectory('.');
+$phar->buildFromDirectory('.', '/\.(php|dist)$/');
 
 $stub = <<<ENDSTUB
 <?php
@@ -17,5 +17,3 @@ __HALT_COMPILER();
 ENDSTUB;
 
 $phar->setStub($stub);
-
-?>

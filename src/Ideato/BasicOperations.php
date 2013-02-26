@@ -12,12 +12,12 @@ class BasicOperations
 {
     private $target;
 
-    public function __construct($target)
+    public function __construct($target = null)
     {
         $this->target = $target;
     }
 
-    public function run($cmd, $dryRun = false)
+    public function remote($cmd, $dryRun = false)
     {
         if (!$dryRun) {
 
