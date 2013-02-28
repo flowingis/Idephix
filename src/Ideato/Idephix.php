@@ -3,32 +3,40 @@
 namespace Ideato;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
+use Ideato\Application;
 use Ideato\CommandWrapper;
+use Ideato\SSH\SshClient;
 
 class Idephix
 {
     private $application;
     private $library = array();
     private $output;
+    private $sshClient;
+    private $targets = array();
 
-    public function __construct()
+    public function __construct(SshClient $sshClient = null, array $targets = null)
     {
         $this->application = new Application();
+        $definition = $this->application->getDefinition();
+        $definition->addOption(new InputOption('--env', null, InputOption::VALUE_REQUIRED, 'Set remote environment.'));
         $this->output = new ConsoleOutput();
+        $this->sshClient = $sshClient;
+        $this->targets = $targets;
     }
 
     /**
      * Per i parametri tipo "--go" devono essere definiti come "bool $go=null"
-     * @param $name
+     *
+     * @param string  $name
      * @param Closure $code
+     *
+     * @return Idephix
      */
     public function add($name, \Closure $code)
     {
@@ -44,10 +52,10 @@ class Idephix
             if ($parameter->isOptional()) {
                 if ($this->isParameterBoolean($parameter)) {
                     $command->addOption(
-                       $parameter->getName(),
-                       null,
-                       InputOption::VALUE_NONE
-                    );                    
+                        $parameter->getName(),
+                        null,
+                        InputOption::VALUE_NONE
+                    );
                 } else {
                     $command->addArgument(
                         $parameter->getName(),
@@ -71,7 +79,20 @@ class Idephix
 
     public function run()
     {
-        $this->application->run(null, $this->output);
+        $input = new ArgvInput();
+        $env = $input->getParameterOption(array('--env'));
+        if (false !== $env && !empty($env)) {
+            if (!isset($this->targets[$env])) {
+                $this->output->writeln(
+                    '<error>Wrong environment "'.$env.'". Available ['.implode(', ', array_keys($this->targets)).']</error>');
+
+                return;
+            }
+
+            $this->currentTarget = $this->targets[$env];
+        }
+
+        $this->application->run($input, $this->output);
     }
 
     public function addLibrary($library)
@@ -81,8 +102,8 @@ class Idephix
 
     /**
      * runTask
-     * @param  string $name the name of the task you want to call
-     * @param  (...) arbitrary number of parameter maching the target task interface
+     * @param string $name the name of the task you want to call
+     * @param (...)  arbitrary number of parameter maching the target task interface
      */
     public function runTask($name)
     {
@@ -110,8 +131,8 @@ class Idephix
     private function isParameterBoolean(\ReflectionParameter $parameter)
     {
         return
-            strpos((string)$parameter, ' bool or NULL $'.$parameter->getName())|
-            strpos((string)$parameter, ' boolean or NULL $'.$parameter->getName());
+            strpos((string) $parameter, ' bool or NULL $'.$parameter->getName())|
+            strpos((string) $parameter, ' boolean or NULL $'.$parameter->getName());
     }
 
     public function __get($name)

@@ -36,18 +36,19 @@ class SshClient
      */
     public function setParams($params)
     {
-        $this->params = array_merge(array(
-                                        'user'                 => '',
-                                        'password'             => '',
-                                        'public_key_file'      => '',
-                                        'private_key_file'     => '',
-                                        'private_key_file_pwd' => '',
-                                        'ssh_port'             => '22'),
-                                    $params);
+        $this->params = array_merge(
+            array(
+                'user'                 => '',
+                'password'             => '',
+                'public_key_file'      => '',
+                'private_key_file'     => '',
+                'private_key_file_pwd' => '',
+                'ssh_port'             => '22'),
+            $params
+        );
     }
 
     /**
-     *
      * @throws \Exception
      */
     public function connect()
@@ -80,7 +81,7 @@ class SshClient
     {
         return $this->params['user'];
     }
-    
+
     public function getPort()
     {
         return $this->params['ssh_port'];
