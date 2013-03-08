@@ -2,7 +2,7 @@
 
 namespace Ideato\SSH;
 
-class FakeSsh2Proxy implements ProxyInterface
+class FakeSsh2Proxy extends BaseProxy
 {
     public function __construct($test)
     {
@@ -11,6 +11,10 @@ class FakeSsh2Proxy implements ProxyInterface
 
     public function connect($host, $port)
     {
+        if ('fail_connection' === $host) {
+            return false;
+        }
+
         $this->test->assertTrue(true);
 
         return true;
@@ -37,13 +41,11 @@ class FakeSsh2Proxy implements ProxyInterface
         return true;
     }
 
-    private function disconnect($reason, $message, $language)
-    {
-    }
-
-    function exec($cmd)
+    public function exec($cmd)
     {
         $this->test->assertTrue(true);
+        $this->lastOutput = 'test out '.$cmd;
+        $this->lastError = 'test err '.$cmd;
 
         return $cmd;
     }

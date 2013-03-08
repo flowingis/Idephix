@@ -21,6 +21,13 @@ class CLISshProxy extends BaseProxy
         }
     }
 
+    private function assertConnected()
+    {
+        if (empty($this->host)) {
+            throw new \Exception("You first need to connect");
+        }
+    }
+
     public function setExecutable($executable)
     {
         $this->executable = $executable;
@@ -41,6 +48,7 @@ class CLISshProxy extends BaseProxy
 
     public function authByAgent($user)
     {
+        $this->assertConnected();
         $this->user = $user;
 
         return $this->canConnect();
@@ -48,6 +56,7 @@ class CLISshProxy extends BaseProxy
 
     public function authByPublicKey($user, $public_key_file, $privateKeyFile, $pwd)
     {
+        $this->assertConnected();
         $this->user = $user;
         $this->privateKeyFile = $privateKeyFile;
 

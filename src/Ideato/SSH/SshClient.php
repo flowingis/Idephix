@@ -20,10 +20,6 @@ class SshClient
         }
 
         $this->proxy = $proxy;
-
-        if (is_null($proxy)) {
-            $this->proxy = new PeclSsh2Proxy();
-        }
     }
 
     /**
