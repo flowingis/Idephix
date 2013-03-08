@@ -1,4 +1,5 @@
 {
+    "name": "ideato/idephix",
     "require": {
         "symfony/console": "2.0.*",
         "symfony/process": "2.1.*",
