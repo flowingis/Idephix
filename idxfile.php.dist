@@ -1,65 +1,116 @@
 <?php
 
-/**
- * Config example
- */
+use Ideato\Idephix;
+use Ideato\Deploy\Deploy;
+use Ideato\PHPUnit\PHPUnit;
+use Ideato\SSH\SshClient;
 
-$localBaseDir = '/var/www/casanoi';
+$localBaseDir = __DIR__;
 
 $sshParams = array(
-                'user' => 'ideato',
-              );
+    'user' => 'ideato',
+);
 
 $targets = array(
-                'prod' => array(
-                                'hosts' => array('localhost'),
-                                'localBaseFolder' => $localBaseDir,
-                                'remoteBaseFolder' => "/tmp/idephix_test/",
-                                'rsync_exclude_file' => 'rsync_exclude.txt'
-                               ),
-                'stag' => array(
-                                'hosts' => array('192.168.69.106'),
-                                'localBaseFolder' => $localBaseDir,
-                                'remoteBaseFolder' => "/var/sites/idephix.ideato.it/",
-                                'rsync_exclude_file' => 'rsync_exclude.txt'
-                               ),
-              );
+    'prod' => array(
+        'hosts' => array('12.12.12.12'),
+        'local_base_folder' => $localBaseDir,
+        'remote_base_folder' => "/var/www/my-project/",
+        'rsync_exclude_file' => 'rsync_exclude.txt',
+        'ssh_params' => $sshParams
+    ),
+    'stage' => array(
+        'hosts' => array('192.168.169.170'),
+        'local_base_folder' => $localBaseDir,
+        'remote_base_folder' => "/var/sites/my-project.ideato.it/",
+        'rsync_exclude_file' => 'rsync_exclude.txt',
+        'ssh_params' => $sshParams
+    ),
+    'test' => array(
+        'hosts' => array('127.0.0.1'),
+        'local_base_folder' => $localBaseDir,
+        'remote_base_folder' => "/tmp/my-project.ideato.it/",
+        'rsync_exclude_file' => 'rsync_exclude.txt',
+        'ssh_params' => array('user' => 'kea')
+    ),
+);
+
+$idx = new Idephix(new SshClient(), $targets);
 
 $idx->
-    add('deploy:deploy',
-        /** @Description Esegue il deploy specificando l'environment */
-        function($env, $dryRun = '--dry-run') use ($idx)
+    /**
+     * Esegue il deploy specificando l'environment
+     * @param bool $go se specificato esegue il deploy, altrimenti dry-run
+     */
+    add('project:deploy',
+        function ($go = false) use ($idx)
         {
-            if ($dryRun != '--go') {
+            if (!$go) {
                 echo "\nDry Run\n";
             }
-            $idx->setEnvironment($env);
-            $idx->setDryRun($dryRun != '--go');
-            $idx->remotePrepare();
+            $idx->setUpEnvironment();
+            $idx->setDryRun(!$go);
+            $idx->remotePrepare(true);
             $idx->copyCode();
             $idx->remoteLinkSharedFolders();
-            $idx->assetic();
+            $idx->cacheClear();
             $idx->switchToTheNextRelease();
+            $idx->assetic();
+            if ($idx->getCurrentTargetName() == 'stage') {
+                $idx->updateSchema();
+            }
+            $idx->deleteOldReleases(6);
         })->
-
+    /**
+     * Esegue tutti i test compresi quelli di Selenium
+     * @param bool $log Se specificato, questo flag attiva il log su file
+     */
     add('test:run',
-        /** @Description Lancia i test di PHPUnit nella directory test */
-        function() use ($idx)
+        function ($log = false) use ($idx)
         {
-            $idx->runPhpUnit(' test');
+            $log = $log ? ' --log-junit junit.xml' : '';
+            $idx->runTask('test:start-selenium-server');
+            $idx->runPhpUnit('-c app/ --stderr'.$log);
+            $idx->runTask('test:stop-selenium-server');
         })->
-
-    add('idephix:update',
+    add('test:run-selenium',
+        function ($filter = '') use ($idx)
+        {
+            if (!empty($filter)) {
+                $filter = ' --filter '.$filter;
+            }
+            $idx->runTask('test:start-selenium-server');
+            $idx->runPhpUnit('-c app/ --stderr '.$filter.' src/Ideato/CasanoiBundle/Tests/Selenium/ --log-junit junit-selenium.xml');
+            $idx->runTask('test:stop-selenium-server');
+        })->
+    add('test:start-selenium-server',
+        function () use ($idx)
+        {
+            $idx->locale("java -jar bin/selenium-server-standalone-2.25.0.jar >/dev/null 2>&1 &");
+            sleep(5);
+        })->
+    add('test:stop-selenium-server',
         function ()
         {
-            $cwd = getcwd();
-            passthru("cd /var/www/idephix && php phar_creator.php && cp idephix.phar ".$cwd."/bin/idephix.phar");
+            file_get_contents('http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer');
         })->
+    add('test:run-no-selenium',
+        function ($filter = '') use ($idx)
+        {
+            if (!empty($filter)) {
+                $filter = ' --filter '.$filter;
+            }
+            $idx->runPhpUnit('-c app/ --stderr '.$filter.' --exclude-group=selenium  --log-junit junit.xml');
+        })->
+    /** <========== LANCIAMI =========== */
     add('idephix:test-params',
-        /** @Description <========== LANCIAMI =========== */
         function ($param1, $param2, $param3 = 'default')
         {
             echo 'Param1: '.$param1."\n";
             echo 'Param2: '.$param2."\n";
             echo 'Param3: '.$param3."\n";
         });
+
+$idx->addLibrary(new Deploy($idx));
+$idx->addLibrary(new PHPUnit());
+$idx->run();

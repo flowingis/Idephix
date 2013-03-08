@@ -11,4 +11,3 @@ if (!is_file($configFile)) {
 }
 
 include $configFile;
-

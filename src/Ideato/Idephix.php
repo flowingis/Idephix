@@ -3,6 +3,7 @@
 namespace Ideato;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -11,6 +12,7 @@ use Symfony\Component\Process\Process;
 use Ideato\Application;
 use Ideato\CommandWrapper;
 use Ideato\SSH\SshClient;
+use Ideato\Util\DocBlockParser;
 
 class Idephix
 {
@@ -19,6 +21,8 @@ class Idephix
     private $output;
     private $sshClient;
     private $targets = array();
+    private $currentTarget;
+    private $currentTargetName;
 
     public function __construct(SshClient $sshClient = null, array $targets = null)
     {
@@ -30,8 +34,36 @@ class Idephix
         $this->targets = $targets;
     }
 
+    public function __call($name, $arguments = array())
+    {
+        foreach ($this->library as $library) {
+            if (is_callable(array($library, $name))) {
+                return call_user_func_array(array($library, $name), $arguments);
+                break;
+            }
+        }
+
+        throw new \BadMethodCallException('Call to undefined method: "'.$name.'"');
+    }
+
+    public function __get($name)
+    {
+        if ($name === 'output' || $name === 'sshClient') {
+            return $this->$name;
+        }
+
+        $trace = debug_backtrace();
+        trigger_error(
+            'Undefined property: '.$name.
+            ' in '.$trace[0]['file'].
+            ' on line '.$trace[0]['line'],
+            E_USER_NOTICE);
+
+        return null;
+    }
+
     /**
-     * Per i parametri tipo "--go" devono essere definiti come "bool $go=null"
+     * Per i parametri tipo "--go" devono essere definiti come "$go = false"
      *
      * @param string  $name
      * @param Closure $code
@@ -44,30 +76,33 @@ class Idephix
         $command->setCode($code);
 
         $reflector = new \ReflectionFunction($code);
+        $parser = new DocBlockParser($reflector->getDocComment());
+        $command->setDescription($parser->getDescription());
 
-        if (preg_match('/\s*\*\s*@[Dd]escription(.*)/', $reflector->getDocComment(), $matches)) {
-            $command->setDescription(trim($matches[1], '*/ '));
-        }
         foreach ($reflector->getParameters() as $parameter) {
+            $description = $parser->getParamDescription($parameter->getName());
+
             if ($parameter->isOptional()) {
-                if ($this->isParameterBoolean($parameter)) {
+                if ($this->isBooleanOption($parameter)) {
                     $command->addOption(
                         $parameter->getName(),
                         null,
-                        InputOption::VALUE_NONE
+                        InputOption::VALUE_NONE,
+                        $description
                     );
                 } else {
                     $command->addArgument(
                         $parameter->getName(),
                         InputArgument::OPTIONAL,
-                        '',
+                        $description,
                         $parameter->getDefaultValue()
                     );
                 }
             } else {
                 $command->addArgument(
                     $parameter->getName(),
-                    InputArgument::REQUIRED
+                    InputArgument::REQUIRED,
+                    $description
                 );
             }
         }
@@ -77,22 +112,76 @@ class Idephix
         return $this;
     }
 
-    public function run()
+    private function buildEnvironment(InputInterface $input)
     {
-        $input = new ArgvInput();
+        $this->currentTarget = null;
+        $this->currentTargetName = null;
         $env = $input->getParameterOption(array('--env'));
         if (false !== $env && !empty($env)) {
             if (!isset($this->targets[$env])) {
-                $this->output->writeln(
-                    '<error>Wrong environment "'.$env.'". Available ['.implode(', ', array_keys($this->targets)).']</error>');
-
-                return;
+                throw new \Exception(
+                    sprintf(
+                        'Wrong environment "%s". Available [%s]',
+                        $env,
+                        implode(', ', array_keys($this->targets))
+                    )
+                );
             }
 
             $this->currentTarget = $this->targets[$env];
+            $this->currentTargetName = $env;
+        }
+    }
+
+    private function openRemoteConnection($host)
+    {
+        if (!empty($this->currentTarget)) {
+            $this->sshClient->setParameters($this->currentTarget['ssh_params']);
+            $this->sshClient->setHost($host);
+            $this->sshClient->connect();
+        }
+    }
+
+    private function closeRemoteConnection()
+    {
+        if (!empty($this->currentTarget)) {
+            $this->sshClient->disconnect();
+        }
+    }
+
+    private function isBooleanOption(\ReflectionParameter $parameter)
+    {
+        return false === $parameter->getDefaultValue();
+    }
+
+    public function getCurrentTarget()
+    {
+        return $this->currentTarget;
+    }
+
+    public function getCurrentTargetName()
+    {
+        return $this->currentTargetName;
+    }
+
+    public function run()
+    {
+        $input = new ArgvInput();
+        try {
+            $this->buildEnvironment($input);
+        } catch (\Exception $e) {
+            $this->output->writeln('<error>'.$e->getMessage().'</error>');
+
+            return;
         }
 
+        // @todo devi ciclare per tutti gli hosts
+        $host = isset($this->currentTarget['hosts']) ?
+            current($this->currentTarget['hosts']) :
+            null;
+        $this->openRemoteConnection($host);
         $this->application->run($input, $this->output);
+        $this->closeRemoteConnection();
     }
 
     public function addLibrary($library)
@@ -116,29 +205,11 @@ class Idephix
         return $this->application->get($name)->run($arguments, $this->output);
     }
 
-    public function __call($name, $arguments = array())
+    public function remote($cmd, $dryRun = false)
     {
-        foreach ($this->library as $library) {
-            if (is_callable(array($library, $name))) {
-                return call_user_func_array(array($library, $name), $arguments);
-                break;
-            }
-        }
-
-        throw new \BadMethodCallException('Call to undefined method: "'.$name.'"');
-    }
-
-    private function isParameterBoolean(\ReflectionParameter $parameter)
-    {
-        return
-            strpos((string) $parameter, ' bool or NULL $'.$parameter->getName())|
-            strpos((string) $parameter, ' boolean or NULL $'.$parameter->getName());
-    }
-
-    public function __get($name)
-    {
-        if ($name == 'output') {
-            return $this->output;
+        $this->output->writeln('<info>Remote</info>: '.$cmd);
+        if (!$dryRun) {
+            return $this->sshClient->exec($cmd);
         }
     }
 

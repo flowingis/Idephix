@@ -2,16 +2,15 @@
 
 namespace Ideato\SSH;
 
-class PeclSsh2Proxy implements ProxyInterface
+class PeclSsh2Proxy extends BaseProxy
 {
-    protected $connection = null;
 
     public function connect($host, $port)
     {
         if (!empty($this->connection)) {
             return $this->connection;
         }
-        $this->connection = ssh2_connect($host, $port, NULL, array('disconnect', array($this, 'disconnect')));
+        $this->connection = ssh2_connect($host, $port, null, array('disconnect', array($this, 'disconnect')));
 
         return $this->connection;
     }
@@ -21,9 +20,9 @@ class PeclSsh2Proxy implements ProxyInterface
         return ssh2_auth_password($this->connection, $user, $password);
     }
 
-    public function authByPublicKey($user, $public_key_file, $private_key_file, $pwd)
+    public function authByPublicKey($user, $publicKeyFile, $privateKeyFile, $pwd)
     {
-        return ssh2_auth_pubkey_file($this->connection, $user, $public_key_file, $private_key_file, $pwd);
+        return ssh2_auth_pubkey_file($this->connection, $user, $publicKeyFile, $privateKeyFile, $pwd);
     }
 
     public function authByAgent($user)
@@ -32,29 +31,26 @@ class PeclSsh2Proxy implements ProxyInterface
             throw new \Exception("ssh2_auth_agent does not exists");
         }
 
-		return ssh2_auth_agent($this->connection, $user);
-	}
+        return ssh2_auth_agent($this->connection, $user);
+    }
 
-	public function disconnect($reason, $message, $language)
+    public function exec($cmd)
     {
-		$this->connection = NULL;
-	}
+        $stdout = ssh2_exec($this->connection, $cmd.'; echo "_RETURNS_:$?:"', 'ansi');
+        $stderr = ssh2_fetch_stream($stdout, SSH2_STREAM_STDERR);
 
-	public function exec($cmd)
-    {
-		$stdout = ssh2_exec($this->connection, $cmd." && echo 'RETOK'", 'ansi');
-		$stderr = ssh2_fetch_stream($stdout, SSH2_STREAM_STDERR);
+        stream_set_blocking($stderr, true);
+        $this->lastError = stream_get_contents($stderr);
 
-		stream_set_blocking($stderr, true);
-		$errors = stream_get_contents($stderr);
+        stream_set_blocking($stdout, true);
+        $this->lastOutput = stream_get_contents($stdout);
 
-		stream_set_blocking($stdout, true);
-		$output = stream_get_contents($stdout);
+        if (strstr($output, '__RETURNS__:')) {
+            $this->output = substr($output, 0, strpos($output, '__RETURNS__:'));
+            $returnCode = substr($output, strpos($output, '__RETURNS__:'), -1);
+        }
 
-        if (strstr($output, 'RETOK')) {
-			$output = substr($output, 0, strpos($output, 'RETOK'));
-		}
+        return $returnCode;
+    }
 
-		return $output.$errors;
-	}
 }

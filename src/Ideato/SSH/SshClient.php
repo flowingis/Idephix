@@ -26,15 +26,10 @@ class SshClient
         }
     }
 
-    public function setHost($host)
-    {
-        $this->host = $host;
-    }
-
     /**
      * @param array $options array('user', 'password', 'public_key_file', 'private_key_file', 'private_key_file_pwd', 'ssh_port')
      */
-    public function setParams($params)
+    public function setParameters($params)
     {
         $this->params = array_merge(
             array(
@@ -53,6 +48,9 @@ class SshClient
      */
     public function connect()
     {
+        if (null === $this->host) {
+            throw new \Exception("You must set the host");
+        }
         if (!$this->proxy->connect($this->host, $this->params['ssh_port'])) {
             throw new \Exception("Unable to connect");
         }
@@ -77,6 +75,16 @@ class SshClient
         return $this->proxy->exec($cmd);
     }
 
+    public function getLastOutput()
+    {
+        return $this->proxy->getLastOutput();
+    }
+
+    public function getLastError()
+    {
+        return $this->proxy->getLastError();
+    }
+
     public function getUser()
     {
         return $this->params['user'];
@@ -87,5 +95,13 @@ class SshClient
         return $this->params['ssh_port'];
     }
 
+    public function setHost($host)
+    {
+        $this->host = $host;
+    }
 
+    public function getHost()
+    {
+        return $this->host;
+    }
 }

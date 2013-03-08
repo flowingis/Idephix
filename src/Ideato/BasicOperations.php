@@ -47,22 +47,4 @@ class BasicOperations
         }
         echo("Dry run: remote sudo ".$cmd);
     }
-
-    public function get($from, $to, $dryRun = false)
-    {
-        if (!$dryRun) {
-
-            return $this->target->get($from, $to);
-        }
-        echo("Dry run: get ".$from." into ".$to);
-    }
-
-    public function put($from, $to, $dryRun = false)
-    {
-        if (!$dryRun) {
-
-            return $this->target->put($from, $to);
-        }
-        echo("Dry run: put " . $from." into ".$to);
-    }
 }

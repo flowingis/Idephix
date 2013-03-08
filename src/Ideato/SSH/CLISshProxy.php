@@ -2,20 +2,21 @@
 
 namespace Ideato\SSH;
 
-class CLISshProxy implements ProxyInterface
+use Symfony\Component\Process\Process;
+
+class CLISshProxy extends BaseProxy
 {
     protected $executable = 'ssh';
-    protected $connection = null;
     protected $host;
     protected $port = 22;
     protected $user = '';
     protected $password = '';
-    protected $private_key_file = null;
+    protected $privateKeyFile = null;
 
     private function canConnect()
     {
-        if ('connected' == trim($this->exec('echo "connected"'))) {
-
+        if (0 == $this->exec('echo "connected"') &&
+            false !== strpos($this->lastOutput, 'connected')) {
             return true;
         }
     }
@@ -45,39 +46,38 @@ class CLISshProxy implements ProxyInterface
         return $this->canConnect();
     }
 
-    public function authByPublicKey($user, $public_key_file, $private_key_file, $pwd)
+    public function authByPublicKey($user, $public_key_file, $privateKeyFile, $pwd)
     {
         $this->user = $user;
-        $this->private_key_file = $private_key_file;
-        
+        $this->privateKeyFile = $privateKeyFile;
+
         return $this->canConnect();
-	}
+    }
 
-	public function exec($cmd)
+    public function exec($cmd)
     {
-        exec($this->prepareCommand($cmd), $output);
+        $preparedCmd = $this->prepareCommand($cmd);
+        $process = new Process($preparedCmd);
+        $process->run();
+        $this->lastOutput = $process->getOutput();
+        $this->lastError = $process->getErrorOutput();
+        $process->getExitCode();
 
-        $output = implode("\n", $output);
-
-        if (strstr($output,'#RETOK#')) {
-			$output = strtr($output, array('#RETOK#' => ''));
-		}
-
-		return $output;
-	}
+        return $process->getExitCode();
+    }
 
     private function prepareCommand($cmd)
     {
         $user = $this->user ? '-l '.$this->user : '';
-        $key_file = $this->private_key_file ? '-i '.$this->private_key_file : '';
+        $keyFile = $this->privateKeyFile ? '-i '.$this->privateKeyFile : '';
 
         return sprintf(
-                "%s -p %s %s %s %s '%s && echo \"#RETOK#\"'",
-                $this->executable,
-                $this->port,
-                $key_file,
-                $user,
-                $this->host,
-                $cmd);
+            "%s -p %s %s %s %s %s",
+            $this->executable,
+            $this->port,
+            $keyFile,
+            $user,
+            $this->host,
+            escapeshellarg($cmd));
     }
 }
