@@ -1,72 +1,6 @@
 {
-    "hash": "11bbb4eb95d4ec2428af89e2d02ffe99",
+    "hash": "acf9492eb8d64472b5496b1541ade5b3",
     "packages": [
-        {
-            "name": "phpseclib/phpseclib",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "1231f58aa3ea59eb16b8d87ee0bd5c8e876d9651"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/1231f58aa3ea59eb16b8d87ee0bd5c8e876d9651",
-                "reference": "1231f58aa3ea59eb16b8d87ee0bd5c8e876d9651",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.0.0"
-            },
-            "suggest": {
-                "ext-gmp": "Install the GMP (GNU Multiple Precision) extension in order to speed up arbitrary precision integer arithmetic operations.",
-                "ext-mcrypt": "Install the Mcrypt extension in order to speed up a wide variety of cryptographic operations.",
-                "pear-pear/PHP_Compat": "Install PHP_Compat to get phpseclib working on PHP >= 4.3.3."
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Crypt": "phpseclib/",
-                    "File": "phpseclib/",
-                    "Math": "phpseclib/",
-                    "Net": "phpseclib/"
-                }
-            },
-            "notification-url": "http://packagist.org/downloads/",
-            "include-path": [
-                "phpseclib/"
-            ],
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jim Wigginton",
-                    "email": "terrafrost@php.net",
-                    "role": "Developer"
-                }
-            ],
-            "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
-            "homepage": "http://phpseclib.sourceforge.net",
-            "keywords": [
-                "BigInteger",
-                "aes",
-                "asn.1",
-                "asn1",
-                "crypto",
-                "cryptography",
-                "encryption",
-                "rsa",
-                "security",
-                "sftp",
-                "signature",
-                "signing",
-                "ssh",
-                "x.509",
-                "x509"
-            ],
-            "time": "2013-02-22 07:50:46"
-        },
         {
             "name": "symfony/console",
             "version": "2.0.x-dev",
@@ -160,7 +94,7 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "phpseclib/phpseclib": 20
-    }
+    "stability-flags": [
+
+    ]
 }

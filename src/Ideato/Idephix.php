@@ -2,17 +2,13 @@
 
 namespace Ideato;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
 use Ideato\Application;
 use Ideato\CommandWrapper;
 use Ideato\SSH\SshClient;
-use Ideato\Util\DocBlockParser;
 
 class Idephix
 {
@@ -26,9 +22,7 @@ class Idephix
 
     public function __construct(SshClient $sshClient = null, array $targets = null)
     {
-        $this->application = new Application();
-        $definition = $this->application->getDefinition();
-        $definition->addOption(new InputOption('--env', null, InputOption::VALUE_REQUIRED, 'Set remote environment.'));
+        $this->application = new Application('Idephix', '0.1');
         $this->output = new ConsoleOutput();
         $this->sshClient = $sshClient;
         $this->targets = $targets;
@@ -73,39 +67,7 @@ class Idephix
     public function add($name, \Closure $code)
     {
         $command = new CommandWrapper($name);
-        $command->setCode($code);
-
-        $reflector = new \ReflectionFunction($code);
-        $parser = new DocBlockParser($reflector->getDocComment());
-        $command->setDescription($parser->getDescription());
-
-        foreach ($reflector->getParameters() as $parameter) {
-            $description = $parser->getParamDescription($parameter->getName());
-
-            if ($parameter->isOptional()) {
-                if ($this->isBooleanOption($parameter)) {
-                    $command->addOption(
-                        $parameter->getName(),
-                        null,
-                        InputOption::VALUE_NONE,
-                        $description
-                    );
-                } else {
-                    $command->addArgument(
-                        $parameter->getName(),
-                        InputArgument::OPTIONAL,
-                        $description,
-                        $parameter->getDefaultValue()
-                    );
-                }
-            } else {
-                $command->addArgument(
-                    $parameter->getName(),
-                    InputArgument::REQUIRED,
-                    $description
-                );
-            }
-        }
+        $command->buildFromCode($code);
 
         $this->application->add($command);
 
@@ -147,11 +109,6 @@ class Idephix
         if (!empty($this->currentTarget)) {
             $this->sshClient->disconnect();
         }
-    }
-
-    private function isBooleanOption(\ReflectionParameter $parameter)
-    {
-        return false === $parameter->getDefaultValue();
     }
 
     public function getCurrentTarget()

@@ -28,6 +28,17 @@ class Deploy
         $this->idx = $idx;
     }
 
+    /**
+     * Add trailing slash to the path if it is omitted
+     * @param string $path
+     *
+     * @return string fixed path
+     */
+    private function fixPath($path)
+    {
+        return rtrim($path, '/').'/';
+    }
+
     public function setUpEnvironment()
     {
         if (null === $this->idx->getCurrentTargetName()) {
@@ -35,9 +46,9 @@ class Deploy
         }
 
         $target = $this->idx->getCurrentTarget();
-        $this->localBaseFolder = rtrim($target['local_base_folder'], '/').'/';
-        $this->remoteBaseFolder = rtrim($target['remote_base_folder'], '/').'/';
-        $this->releasesFolder = $this->remoteBaseFolder.'releases/';
+        $this->localBaseFolder  = $this->fixPath($target['local_base_folder']);
+        $this->remoteBaseFolder = $this->fixPath($target['remote_base_folder']);
+        $this->releasesFolder   = $this->fixPath($this->remoteBaseFolder.'releases');
         $this->rsyncExcludeFile = empty($target['rsync_exclude_file']) ? null : $target['rsync_exclude_file'];
         $this->rsyncIncludeFile = empty($target['rsync_include_file']) ? null : $target['rsync_include_file'];
     }
@@ -101,6 +112,13 @@ class Deploy
         $this->idx->remote("cd ".$this->remoteBaseFolder." && ln -s releases/".$this->timestamp." next && mv -fT next current", $this->dryRun);
     }
 
+    /**
+     * exec rsync from local dir to remote target dir
+     * @param string $from local source path
+     * @param string $to   remote target path
+     *
+     * @return int command return status
+     */
     public function rsync($from, $to)
     {
         $user = $this->sshClient->getUser();
@@ -119,7 +137,8 @@ class Deploy
     /**
      * @todo
      */
-    public function remoteLinkSharedFolders() {
+    public function remoteLinkSharedFolders()
+    {
       //ln -s ../shared/master/logs
       //ln -fs ../shared/web/imagine
       //ln -fs ../shared/web/uploads
@@ -152,7 +171,7 @@ class Deploy
     public function updateSchema($env = 'dev')
     {
         return $this->idx->remote(
-            "cd ".$this->getNextReleaseFolder()." && php app/console doctrine:schema:update --force",
+            "cd ".$this->getNextReleaseFolder()." && php app/console doctrine:schema:update --force --env=".$env,
             $this->dryRun
         );
     }

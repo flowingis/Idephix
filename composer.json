@@ -2,8 +2,7 @@
     "name": "ideato/idephix",
     "require": {
         "symfony/console": "2.0.*",
-        "symfony/process": "2.1.*",
-        "phpseclib/phpseclib": "dev-master"
+        "symfony/process": "2.1.*"
     },
 
     "autoload": {

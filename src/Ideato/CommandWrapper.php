@@ -6,11 +6,27 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
+use Ideato\Util\DocBlockParser;
+
 
 class CommandWrapper extends Command
 {
-    private $output;
+    public function buildFromCode(\Closure $code)
+    {
+        $this->setCode($code);
+
+        $reflector = new \ReflectionFunction($code);
+        $parser = new DocBlockParser($reflector->getDocComment());
+        $this->setDescription($parser->getDescription());
+
+        foreach ($reflector->getParameters() as $parameter) {
+            $description = $parser->getParamDescription($parameter->getName());
+            $this->addParameter($parameter, $description);
+        }
+    }
 
     public function setCode(\Closure $code)
     {
@@ -54,5 +70,30 @@ class CommandWrapper extends Command
         }
 
         return $newInput;
+    }
+
+    public function addParameter(\ReflectionParameter $parameter, $description)
+    {
+        $name = $parameter->getName();
+        $default = $parameter->getDefaultValue();
+
+        if (!$parameter->isOptional()) {
+            $this->addArgument($name, InputArgument::REQUIRED, $description);
+
+            return;
+        }
+
+        if ($this->isFlagOption($parameter)) {
+            $this->addOption($name, null, InputOption::VALUE_NONE, $description);
+
+            return;
+        }
+
+        $this->addArgument($name, InputArgument::OPTIONAL, $description, $default);
+    }
+
+    private function isFlagOption(\ReflectionParameter $parameter)
+    {
+        return false === $parameter->getDefaultValue();
     }
 }
