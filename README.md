@@ -1,40 +1,81 @@
-Idephix automator
-=================
+Idephix - Automation and Deploy tool
+====================================
 
-Appunti:
---------
+Idephix è un tool che permette di utilizzare PHP per scrivere script di automazione
 
-Mettere gli utenti sudoer sui server di destinazione senza password ma su comandi specifici (es. "php-fpm restart")
-# /etc/sudoers
-kea ALL = PASSWD:ALL, NOPASSWD: /usr/bin/php-fpm 
+Installation / Usage
+--------------------
 
-Installazione
--------------
+1. Download the [`idephix.phar`](https://github.com/ideatosrl/Idephix/blob/master/bin/idephix.phar?raw=true) executable.
 
-1. Librerie
+    ``` sh
+    $ curl https://github.com/ideatosrl/Idephix/blob/master/bin/idephix.phar?raw=true >idephix.phar
+    ```
 
-``` sh
-$ cd src && php composer.phar install
-```
 
-2. Lista comandi disponibili in idxfile.php
+2. Create a idxfile.php in the root directory of you project. Define your tasks.
 
-``` sh
-$ php src/do.php list
-```
+    ``` php
+<?php
 
-3. Lancia il comando di test
+use Idephix\Idephix;
+use Idephix\SSH\SshClient;
 
-``` sh
-$ php src/do.php idephix:test-params uno due tre
-```
+$targets = array(
+    'test' => array(
+        'hosts' => array('127.0.0.1'),
+        'local_base_folder' => __DIR__,
+        'remote_base_folder' => "/tmp/my-project.idephix/",
+        'ssh_params' => array('user' => 'kea')
+    ),
+);
 
-4. SSH Proxy
+$idx = new Idephix(new SshClient(), $targets);
 
-Puoi scegliere il tuo proxy tra CLI o SSH lib di php oppure lasciare scegliere la migliore ad Idephix
+$idx->
+    /**
+     * Esegue il touch di un file specificato in input
+     * @param string $name il nome del file
+     * @param bool   $go   se specificato esegue il comando, altrimenti dry-run
+     */
+    add('idephix:test-params',
+       function ($name, $go = false) use ($idx) {
+         $idx->local('touch /tmp/'.$name);
+         $idx->remote('touch /tmp/'.$name.'_remote');
+       });
 
-5. Nelle anonymous function puoi specificare parametri (con valore) oppure delle opzioni (tipo flag) senza valore
+$idx->run();
 
-ex. dichiarazione: add('pippo', function ($uno, $due = 'ipppo', bool $cinque = null)
-ex. invocazione: idx pippo --cinque uno due
-ex. invocazione: idx pippo uno
+    ```
+
+3. Run Idephix: `php idephix.phar --env=test idephix:test-params Nome_file`
+
+Global installation of Idephix
+----------------------------------------
+
+Puoi scegliere di installare idephix dove vuoi nel sistema poichè utizzerà la configurazione presente nella directory corrente.
+
+1. Change into a directory in your path like `cd /usr/local/bin`
+2. Get Idephix `curl https://github.com/ideatosrl/Idephix/blob/master/bin/idephix.phar?raw=true >idephix.phar`
+3. Make the phar executable `chmod a+x idephix.phar`
+4. Change into a project directory `cd /path/to/my/project`
+5. Define your tasks in idxfile.php
+5. Use idephix as you normally would `idephix.phar`
+6. Optionally you can rename the idephix.phar to idx to make it easier
+
+Requirements
+------------
+
+PHP 5.3.2 or above, at least 5.3.12 recommended
+
+Authors
+-------
+
+Manuel 'Kea' Baldssarri <mb@ideato.it>
+Michele 'Orso' Orselli <mo@ideato.it>
+Filippo De Santis <fd@ideato.it>
+
+License
+-------
+
+Idephix is licensed under the MIT License - see the LICENSE file for details

@@ -75,7 +75,6 @@ class CommandWrapper extends Command
     public function addParameter(\ReflectionParameter $parameter, $description)
     {
         $name = $parameter->getName();
-        $default = $parameter->getDefaultValue();
 
         if (!$parameter->isOptional()) {
             $this->addArgument($name, InputArgument::REQUIRED, $description);
@@ -89,6 +88,7 @@ class CommandWrapper extends Command
             return;
         }
 
+        $default = $parameter->getDefaultValue();
         $this->addArgument($name, InputArgument::OPTIONAL, $description, $default);
     }
 

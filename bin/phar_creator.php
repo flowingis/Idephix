@@ -10,6 +10,7 @@ $phar = new Phar('idephix.phar');
 $phar->buildFromDirectory('..', '/\.(php|dist)$/');
 
 $stub = <<<ENDSTUB
+#!/usr/bin/env php
 <?php
 Phar::mapPhar('idephix.phar');
 require 'phar://idephix.phar/bin/do.php';
