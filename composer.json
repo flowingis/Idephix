@@ -6,6 +6,6 @@
     },
 
     "autoload": {
-        "psr-0": {"Ideato": "src/"}
+        "psr-0": {"Idephix": "src/"}
     }
 }

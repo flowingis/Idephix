@@ -1,9 +1,9 @@
 <?php
 
-use Ideato\Idephix;
-use Ideato\Deploy\Deploy;
-use Ideato\PHPUnit\PHPUnit;
-use Ideato\SSH\SshClient;
+use Idephix\Idephix;
+use Idephix\Extension\Deploy\Deploy;
+use Idephix\Extension\PHPUnit\PHPUnit;
+use Idephix\SSH\SshClient;
 
 $localBaseDir = __DIR__;
 
@@ -80,7 +80,7 @@ $idx->
                 $filter = ' --filter '.$filter;
             }
             $idx->runTask('test:start-selenium-server');
-            $idx->runPhpUnit('-c app/ --stderr '.$filter.' src/Ideato/CasanoiBundle/Tests/Selenium/ --log-junit junit-selenium.xml');
+            $idx->runPhpUnit('-c app/ --stderr '.$filter.' src/Idephix/CasanoiBundle/Tests/Selenium/ --log-junit junit-selenium.xml');
             $idx->runTask('test:stop-selenium-server');
         })->
     add('test:start-selenium-server',
@@ -111,6 +111,6 @@ $idx->
             echo 'Param3: '.$param3."\n";
         });
 
-$idx->addLibrary(new Deploy($idx));
-$idx->addLibrary(new PHPUnit());
+$idx->addLibrary('deploy', new Deploy());
+$idx->addLibrary('phpunit', new PHPUnit());
 $idx->run();
