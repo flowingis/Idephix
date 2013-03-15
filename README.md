@@ -16,35 +16,35 @@ Installation / Usage
 2. Create a idxfile.php in the root directory of you project. Define your tasks.
 
     ``` php
-<?php
-
-use Idephix\Idephix;
-use Idephix\SSH\SshClient;
-
-$targets = array(
-    'test' => array(
-        'hosts' => array('127.0.0.1'),
-        'local_base_folder' => __DIR__,
-        'remote_base_folder' => "/tmp/my-project.idephix/",
-        'ssh_params' => array('user' => 'kea')
-    ),
-);
-
-$idx = new Idephix(new SshClient(), $targets);
-
-$idx->
-    /**
-     * Esegue il touch di un file specificato in input
-     * @param string $name il nome del file
-     * @param bool   $go   se specificato esegue il comando, altrimenti dry-run
-     */
-    add('idephix:test-params',
-       function ($name, $go = false) use ($idx) {
-         $idx->local('touch /tmp/'.$name);
-         $idx->remote('touch /tmp/'.$name.'_remote');
-       });
-
-$idx->run();
+    <?php
+    
+    use Idephix\Idephix;
+    use Idephix\SSH\SshClient;
+    
+    $targets = array(
+        'test' => array(
+            'hosts' => array('127.0.0.1'),
+            'local_base_folder' => __DIR__,
+            'remote_base_folder' => "/tmp/my-project.idephix/",
+            'ssh_params' => array('user' => 'kea')
+        ),
+    );
+    
+    $idx = new Idephix(new SshClient(), $targets);
+    
+    $idx->
+        /**
+         * Esegue il touch di un file specificato in input
+         * @param string $name il nome del file
+         * @param bool   $go   se specificato esegue il comando, altrimenti dry-run
+         */
+        add('idephix:test-params',
+           function ($name, $go = false) use ($idx) {
+             $idx->local('touch /tmp/'.$name);
+             $idx->remote('touch /tmp/'.$name.'_remote');
+           });
+    
+    $idx->run();
 
     ```
 
