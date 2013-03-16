@@ -28,7 +28,7 @@ class DocBlockParserTest extends \PHPUnit_Framework_TestCase
         $parser = new DocBlockParser($comment);
 
         $this->assertEquals(
-            'Anonym function description splitted in two lines',
+            'Anonymous function description splitted in two lines',
             $parser->getDescription());
 
         $this->assertFalse($parser->hasParam('param4'));

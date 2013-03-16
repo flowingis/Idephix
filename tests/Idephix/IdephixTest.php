@@ -32,7 +32,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function test__get()
     {
-        $this->assertInstanceOf('\Ideato\SSH\SshClient', $this->object->sshClient);
+        $this->assertInstanceOf('\Idephix\SSH\SshClient', $this->object->sshClient);
         $this->assertInstanceOf('\Symfony\Component\Console\Output\OutputInterface', $this->object->output);
 
         $this->object->application;

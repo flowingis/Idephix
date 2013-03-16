@@ -15,7 +15,7 @@
 
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>tests/Ideato</directory>
+            <directory>tests/Idephix</directory>
         </testsuite>
     </testsuites>
 </phpunit>
