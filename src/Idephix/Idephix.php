@@ -96,9 +96,14 @@ class Idephix
         }
     }
 
+    private function hasTarget()
+    {
+        return null !== $this->currentTarget;
+    }
+
     private function openRemoteConnection($host)
     {
-        if (!empty($this->currentTarget)) {
+        if ($this->hasTarget()) {
             $this->sshClient->setParameters($this->currentTarget['ssh_params']);
             $this->sshClient->setHost($host);
             $this->sshClient->connect();
@@ -107,7 +112,7 @@ class Idephix
 
     private function closeRemoteConnection()
     {
-        if (!empty($this->currentTarget)) {
+        if ($this->hasTarget()) {
             $this->sshClient->disconnect();
         }
     }
@@ -173,6 +178,9 @@ class Idephix
 
     public function remote($cmd, $dryRun = false)
     {
+        if (!$this->sshClient->isConnected()) {
+            throw new \Exception("Remote function need a valid environment. Specify --env parameter.");
+        }
         $this->output->writeln('<info>Remote</info>: '.$cmd);
         if (!$dryRun) {
             return $this->sshClient->exec($cmd);

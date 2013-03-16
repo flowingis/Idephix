@@ -7,6 +7,7 @@ class SshClient
     private $proxy;
     private $params;
     private $host;
+    private $connected = false;
 
     /**
      * Constructor
@@ -27,6 +28,7 @@ class SshClient
      */
     public function setParameters($params)
     {
+        $this->connected = false;
         $this->params = array_merge(
             array(
                 'user'                 => '',
@@ -63,7 +65,20 @@ class SshClient
             throw new \Exception("Unable to authenticate via agent");
         }
 
+        $this->connected = true;
+
         return true;
+    }
+
+    public function disconnect()
+    {
+        $this->proxy->disconnect();
+        $this->connected = false;
+    }
+
+    public function isConnected()
+    {
+        return $this->connected;
     }
 
     public function exec($cmd)

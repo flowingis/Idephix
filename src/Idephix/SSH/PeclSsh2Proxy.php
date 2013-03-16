@@ -53,4 +53,16 @@ class PeclSsh2Proxy extends BaseProxy
         return $returnCode;
     }
 
+    public function disconnect()
+    {
+        if (null !== $this->connection) {
+            $this->exec('exit');
+            $this->connection = null;
+        }
+    }
+
+    public function __destruct()
+    {
+        $this->disconnect();
+    }
 }
