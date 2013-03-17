@@ -43,29 +43,36 @@ class CommandWrapper extends Command
 
     protected function initialize(InputInterface &$input, OutputInterface $output)
     {
-        $input = $this->filterByOriginalDefinition($input);
+        $input = $this->filterByOriginalDefinition(
+            $input,
+            $this->getApplication()->getDefinition()
+        );
     }
 
-    private function filterByOriginalDefinition(InputInterface $input)
+    public function filterByOriginalDefinition(InputInterface $input, $appDefinition)
     {
         $newDefinition = new InputDefinition();
         $newInput = new ArrayInput(array(), $newDefinition);
 
         foreach ($input->getArguments() as $name => $value) {
-            if (!$this->getApplication()->getDefinition()->hasArgument($name)) {
+            if (!$appDefinition->hasArgument($name)) {
                 $newDefinition->addArgument(
                     $this->getDefinition()->getArgument($name)
                 );
-                $newInput->setArgument($name, $value);
+                if (!empty($value)) {
+                    $newInput->setArgument($name, $value);
+                }
             }
         }
 
         foreach ($input->getOptions() as $name => $value) {
-            if (!$this->getApplication()->getDefinition()->hasOption($name)) {
+            if (!$appDefinition->hasOption($name)) {
                 $newDefinition->addOption(
                     $this->getDefinition()->getOption($name)
                 );
-                $newInput->setOption($name, $value);
+                if (!empty($value)) {
+                    $newInput->setOption($name, $value);
+                }
             }
         }
 
