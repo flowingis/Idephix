@@ -4,6 +4,7 @@ namespace Idephix;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
 use Idephix\Application;
@@ -21,20 +22,27 @@ class Idephix
     private $currentTarget;
     private $currentTargetName;
 
-    public function __construct(SshClient $sshClient = null, array $targets = null)
+    public function __construct(SshClient $sshClient = null, array $targets = null, OutputInterface $output = null)
     {
         $this->application = new Application('Idephix', '0.1');
-        $this->output = new ConsoleOutput();
         $this->sshClient = $sshClient;
         $this->targets = $targets;
+
+        if (null === $output) {
+            $output = new ConsoleOutput();
+        }
+        $this->output = $output;
     }
 
     public function __call($name, $arguments = array())
     {
-        foreach ($this->library as $library) {
+        if (isset($this->library[$name])) {
+            return $this->library[$name];
+        }
+
+        foreach ($this->library as $libName => $library) {
             if (is_callable(array($library, $name))) {
                 return call_user_func_array(array($library, $name), $arguments);
-                break;
             }
         }
 
@@ -91,7 +99,10 @@ class Idephix
                 );
             }
 
-            $this->currentTarget = $this->targets[$env];
+            $this->currentTarget = array_merge(
+                array('hosts' => array()),
+                $this->targets[$env]
+            );
             $this->currentTargetName = $env;
         }
     }
@@ -138,13 +149,13 @@ class Idephix
             return;
         }
 
-        // @todo devi ciclare per tutti gli hosts
-        $host = isset($this->currentTarget['hosts']) ?
-            current($this->currentTarget['hosts']) :
-            null;
-        $this->openRemoteConnection($host);
-        $this->application->run($input, $this->output);
-        $this->closeRemoteConnection();
+        $hosts = $this->hasTarget() ? $this->currentTarget['hosts'] : array(null);
+
+        foreach ($hosts as $host) {
+            $this->openRemoteConnection($host);
+            $this->application->run($input, $this->output);
+            $this->closeRemoteConnection();
+        }
     }
 
     public function addLibrary($name, $library)
@@ -160,6 +171,11 @@ class Idephix
         $this->library[$name] = $library;
     }
 
+    public function has($name)
+    {
+        return $this->application->has($name);
+    }
+
     /**
      * runTask
      * @param string $name the name of the task you want to call
@@ -167,7 +183,7 @@ class Idephix
      */
     public function runTask($name)
     {
-        if (!$this->application->has($name)) {
+        if (!$this->has($name)) {
             throw new \InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));
         }
 
@@ -187,12 +203,19 @@ class Idephix
         }
     }
 
+    /**
+     * Execute local command
+     * @param string $cmd Command
+     *
+     * @return integer The exit status code
+     */
     public function local($cmd)
     {
-        $this->output->writeln("<info>Exec</info>: $cmd");
-        $process = new Process($cmd);
         $output = $this->output;
-        $process->run(function ($type, $buffer) use ($output) {
+        $output->writeln("<info>Exec</info>: $cmd");
+        $process = new Process($cmd);
+
+        return $process->run(function ($type, $buffer) use ($output) {
             $output->write($buffer);
         });
     }

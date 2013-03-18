@@ -49,4 +49,11 @@ class FakeSsh2Proxy extends BaseProxy
 
         return $cmd;
     }
+
+    public function isConnected()
+    {
+        $this->test->assertTrue(true, 'isConnected');
+
+        return true;
+    }
 }
