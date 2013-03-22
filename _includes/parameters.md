@@ -1,6 +1,6 @@
 <h2>Manage parameters</h2>
 
-<p>Every anonimous function passed to the <code>add</code> method will be transformed in a idephix task. Function parameters will be used as the task arguments.</p>
+<p>Every anonymous function passed to the <code>add</code> method will be transformed in a idephix task. Function parameters will be used as the task arguments.</p>
 
 <h3>Add a parameter</h3>
 
@@ -62,16 +62,17 @@
  * Delete the cache directory
  * @param bolean $go Use --go to execute the script
  */    
- add('myscript:remote-cleancache', 
+ add('myscript:remote-clearcache', 
    function ($go = false) use ($idx) {
      if ($go) {
      	$idx->remote('rm -rf ./var/www/project/cache/*');
      	return;
      }
 
-     $idx->remote('ls ./var/www/project/cache/*');   
+     $idx->output->writeln('<info>use --go to delete the following files</info>')
+     $idx->remote('ls -al ./var/www/project/cache/');   
 
  });
 </code></pre>
 
-<pre><code>$ ./idephix.phar myscript:remote-cleancache --go</code></pre>
+<pre><code>$ ./idephix.phar myscript:remote-clearcache --go</code></pre>
