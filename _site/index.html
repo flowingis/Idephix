@@ -42,7 +42,7 @@
 
 <h3>Install Idephix</h3>
 
-<p>You can chose to install idephix where you prefer. Idephix will use the configuration file in the corrent path.</p>
+<p>You can choose to install idephix where you prefer. Idephix will use the configuration file in the corrent path.</p>
 
 <ul>
 	<li>Change into a directory in your path like <code>cd /usr/local/bin</code></li>
@@ -56,6 +56,7 @@
 
 <h3>Usage example</h3>
 
+<p>create an idxfile.php</p>
 <pre><code>&lt;?php
 use Idephix\Idephix;
 use Idephix\SSH\SshClient;
@@ -69,7 +70,7 @@ $targets = array(
     ),
 );
 
-$idx = new Idephix(new SshClient(), $targets);
+$idx = new Idephix($targets);
 
 $idx->
     /**
@@ -77,7 +78,7 @@ $idx->
      * @param string $name the name of the file to be touch-ed
      * @param bool   $go   if not specified the script execute a dry-run
      */
-    add('idephix:test-params',
+    add('myscript:test-params',
        function ($name, $go = false) use ($idx) {
          $idx->local('touch /tmp/'.$name);
          $idx->remote('touch /tmp/'.$name.'_remote');
@@ -86,6 +87,43 @@ $idx->
 $idx->run();
 
 </code></pre>
+
+<p>run <code>idephix.phar</code> to execute the script and get the commands list</p>
+<pre><code>$ ./idephix.phar
+  ___    _            _     _
+ |_ _|__| | ___ _ __ | |__ (_)_  __
+  | |/ _` |/ _ \ '_ \| '_ \| \ \/ /
+  | | (_| |  __/ |_) | | | | |&gt;  &lt;
+ |___\__,_|\___| .__/|_| |_|_/_/\_\
+               |_|
+Idephix version @package_version@
+
+Usage:
+  [options] command [arguments]
+
+Options:
+  --help           -h Display this help message.
+  --quiet          -q Do not output any message.
+  --verbose        -v Increase verbosity of messages.
+  --version        -V Display this application version.
+  --ansi              Force ANSI output.
+  --no-ansi           Disable ANSI output.
+  --no-interaction -n Do not ask any interactive question.
+  --env               Set remote environment.
+
+Available commands:
+  build
+  help                   Displays help for a command
+  list                   Lists commands
+myscript
+  myscript:test-params	Execute the touch of a file specified in input
+</code></pre> 
+
+<p>then you can choose to execute a standard options or the one defined in the <code>idxfile.php</code></p>
+
+<pre><code>$ ./idephix.phar myscript:test-params myFile.txt</code></pre>
+
+<p>More examples to be published soon...</p>
 
 <h3>Requirements</h3>
 <p>PHP 5.3.2 or above, at least 5.3.12 recommended</p>
