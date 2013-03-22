@@ -23,6 +23,7 @@ class Idephix
     private $targets = array();
     private $currentTarget;
     private $currentTargetName;
+    private $currentHost;
 
     public function __construct(SshClient $sshClient = null, array $targets = null, OutputInterface $output = null)
     {
@@ -136,6 +137,11 @@ class Idephix
         return $this->currentTarget;
     }
 
+    public function getCurrentTargetHost()
+    {
+        return $this->currentHost;
+    }
+
     public function getCurrentTargetName()
     {
         return $this->currentTargetName;
@@ -155,6 +161,7 @@ class Idephix
         $hosts = $this->hasTarget() ? $this->currentTarget['hosts'] : array(null);
 
         foreach ($hosts as $host) {
+            $this->currentHost = $host;
             $this->openRemoteConnection($host);
             $this->application->run($input, $this->output);
             $this->closeRemoteConnection();
@@ -251,5 +258,7 @@ class Idephix
         if (0 != $result) {
             throw new \Exception("Local command fail: ".$process->getErrorOutput());
         }
+
+        return $process->getOutput();
     }
 }

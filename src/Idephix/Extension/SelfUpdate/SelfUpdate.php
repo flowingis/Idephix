@@ -17,18 +17,19 @@ class SelfUpdate implements IdephixAwareInterface
     /**
      * Based by composer self-update
      */
-    protected function update()
+    public function update()
     {
-        $latest = trim(file_get_contents('http://getidephix.com/version'));
+        $baseUrl = 'http://getidephix.com/';
+        $latest = trim(file_get_contents($baseUrl.'version'));
 
         if (Idephix::VERSION !== $latest) {
             $this->idx->output->writeln(sprintf("Updating to version <info>%s</info>.", $latest));
 
-            $remoteFilename = 'http://getidephix.org/idephix.phar';
+            $remoteFilename = $baseUrl.'idephix.phar';
             $localFilename = $_SERVER['argv'][0];
             $tempFilename = basename($localFilename, '.phar').'-temp.phar';
 
-            copy($remoteFilename, $tempFilename);
+            file_put_contents($tempFilename, file_get_contents($remoteFilename));
 
             try {
                 chmod($tempFilename, 0777 & ~umask());
