@@ -10,6 +10,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Application extends BaseApplication
 {
+    private $logo = '  ___    _            _     _
+ |_ _|__| | ___ _ __ | |__ (_)_  __
+  | |/ _` |/ _ \ \'_ \| \'_ \| \ \/ /
+  | | (_| |  __/ |_) | | | | |>  <
+ |___\__,_|\___| .__/|_| |_|_/_/\_\
+               |_|
+';
+
     public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
     {
         parent::__construct($name, $version);
@@ -20,5 +28,10 @@ class Application extends BaseApplication
     public function doRun(InputInterface $input, OutputInterface $output)
     {
         return parent::doRun($input, $output);
+    }
+
+    public function getHelp()
+    {
+        return $this->logo.parent::getHelp();
     }
 }

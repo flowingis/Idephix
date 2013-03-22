@@ -85,18 +85,20 @@ class Deploy implements IdephixAwareInterface
 
     public function remotePrepare($forceBootstrap = false)
     {
-        $isBootstrapDone = 0 == $this->idx->remote('ls '.$this->getCurrentReleaseFolder());
-        if (!$isBootstrapDone) {
+        try {
+            $this->idx->remote('ls '.$this->getCurrentReleaseFolder());
+        } catch (\Exception $e) {
             if (!$forceBootstrap) {
                 throw new \Exception('You have to bootstrap your server first: '.$this->sshClient->getHost());
             }
 
             $this->bootstrap();
         }
+
         $this->log("Bootstrap: OK");
         $cmd = "mkdir -p ".$this->getNextReleaseFolder();
 
-        return 0 == $this->idx->remote($cmd, $this->dryRun);
+        return $this->idx->remote($cmd, $this->dryRun);
     }
 
     public function copyCode()

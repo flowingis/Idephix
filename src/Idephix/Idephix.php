@@ -11,9 +11,11 @@ use Idephix\Application;
 use Idephix\CommandWrapper;
 use Idephix\SSH\SshClient;
 use Idephix\Extension\IdephixAwareInterface;
+use Idephix\Extension\SelfUpdate\SelfUpdate;
 
 class Idephix
 {
+    const VERSION = '@package_version@';
     private $application;
     private $library = array();
     private $output;
@@ -24,7 +26,7 @@ class Idephix
 
     public function __construct(SshClient $sshClient = null, array $targets = null, OutputInterface $output = null)
     {
-        $this->application = new Application('Idephix', '0.1');
+        $this->application = new Application('Idephix', self::VERSION);
         $this->sshClient = $sshClient;
         $this->targets = $targets;
 
@@ -32,6 +34,7 @@ class Idephix
             $output = new ConsoleOutput();
         }
         $this->output = $output;
+        $this->addSelfUpdateCommand();
     }
 
     public function __call($name, $arguments = array())
@@ -192,14 +195,40 @@ class Idephix
         return $this->application->get($name)->run($arguments, $this->output);
     }
 
+    public function addSelfUpdateCommand()
+    {
+        if ('phar:' === substr(__FILE__, 0, 5)) {
+            $this->addLibrary('selfUpdate', new SelfUpdate());
+            $idx = $this;
+            $this
+                ->add(
+                    'selfupdate',
+                    /**
+                     * Donwload and update Idephix
+                     */
+                    function () use ($idx)
+                    {
+                        $idx->selfUpdate()->update();
+                    }
+                );
+        }
+    }
+
+    /**
+     * Execute remote command
+     *
+     * @param string  $cmd command
+     * @param boolean $dryRun
+     */
     public function remote($cmd, $dryRun = false)
     {
         if (!$this->sshClient->isConnected()) {
             throw new \Exception("Remote function need a valid environment. Specify --env parameter.");
         }
         $this->output->writeln('<info>Remote</info>: '.$cmd);
-        if (!$dryRun) {
-            return $this->sshClient->exec($cmd);
+
+        if (!$dryRun && 0 != $this->sshClient->exec($cmd)) {
+            throw new \Exception("Remote command fail: ".$this->sshClient->getLastError());
         }
     }
 
@@ -215,8 +244,12 @@ class Idephix
         $output->writeln("<info>Exec</info>: $cmd");
         $process = new Process($cmd);
 
-        return $process->run(function ($type, $buffer) use ($output) {
+        $result = $process->run(function ($type, $buffer) use ($output) {
             $output->write($buffer);
         });
+
+        if (0 != $result) {
+            throw new \Exception("Local command fail: ".$process->getErrorOutput());
+        }
     }
 }
