@@ -1,7 +1,7 @@
 Idephix - Automation and Deploy tool
 ====================================
 
-Idephix è un tool che permette di utilizzare PHP per scrivere script di automazione
+Idephix is a PHP tool useful to create automation scripts
 
 Installation / Usage
 --------------------
@@ -34,9 +34,9 @@ Installation / Usage
     
     $idx->
         /**
-         * Esegue il touch di un file specificato in input
-         * @param string $name il nome del file
-         * @param bool   $go   se specificato esegue il comando, altrimenti dry-run
+         * Execute the touch of a file specified in input
+         * @param string $name the name of the file to be touch-ed
+         * @param bool   $go   if not specified the script execute a dry-run
          */
         add('idephix:test-params',
            function ($name, $go = false) use ($idx) {
@@ -53,7 +53,7 @@ Installation / Usage
 Global installation of Idephix
 ----------------------------------------
 
-Puoi scegliere di installare idephix dove vuoi nel sistema poichè utizzerà la configurazione presente nella directory corrente.
+You can chose to install idephix where you prefer. Idephix will use the configuration file in the corrent path.
 
 1. Change into a directory in your path like `cd /usr/local/bin`
 2. Get Idephix `curl https://github.com/ideatosrl/Idephix/blob/master/bin/idephix.phar?raw=true >idephix.phar`

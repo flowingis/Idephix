@@ -39,8 +39,8 @@ $idx = new Idephix(new SshClient(), $targets);
 
 $idx->
     /**
-     * Esegue il deploy specificando l'environment
-     * @param bool $go se specificato esegue il deploy, altrimenti dry-run
+     * Execute a deploy for the specified environment
+     * @param bool $go if not given it does a dry-run execution
      */
     add('project:deploy',
         function ($go = false) use ($idx)
@@ -62,8 +62,8 @@ $idx->
             $idx->deleteOldReleases(6);
         })->
     /**
-     * Esegue tutti i test compresi quelli di Selenium
-     * @param bool $log Se specificato, questo flag attiva il log su file
+     * All the test are executed, even Selenium
+     * @param bool $log If this flag is specified a log file is created (and used)
      */
     add('test:run',
         function ($log = false) use ($idx)
@@ -102,7 +102,7 @@ $idx->
             }
             $idx->runPhpUnit('-c app/ --stderr '.$filter.' --exclude-group=selenium  --log-junit junit.xml');
         })->
-    /** <========== LANCIAMI =========== */
+    /** <========== RUN ME =========== */
     add('idephix:test-params',
         function ($param1, $param2, $param3 = 'default')
         {
