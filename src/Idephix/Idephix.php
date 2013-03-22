@@ -25,11 +25,15 @@ class Idephix
     private $currentTargetName;
     private $currentHost;
 
-    public function __construct(SshClient $sshClient = null, array $targets = null, OutputInterface $output = null)
+    public function __construct(array $targets = null, SshClient $sshClient = null, OutputInterface $output = null)
     {
         $this->application = new Application('Idephix', self::VERSION);
-        $this->sshClient = $sshClient;
         $this->targets = $targets;
+
+        if (null === $sshClient) {
+            $sshClient = new SshClient();
+        }
+        $this->sshClient = $sshClient;
 
         if (null === $output) {
             $output = new ConsoleOutput();

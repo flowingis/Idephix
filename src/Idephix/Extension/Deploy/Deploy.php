@@ -51,8 +51,14 @@ class Deploy implements IdephixAwareInterface
         }
 
         $target = $this->idx->getCurrentTarget();
-        $this->localBaseFolder  = $this->fixPath($target['local_base_folder']);
-        $this->remoteBaseFolder = $this->fixPath($target['remote_base_folder']);
+
+        if (!isset($target['deploy']) || !is_array($target['deploy'])) {
+            throw new \Exception("No deploy parameters found. Check you configuration.");
+        }
+
+        $target = $target['deploy'];
+        $this->localBaseFolder  = $this->fixPath($target['local_base_dir']);
+        $this->remoteBaseFolder = $this->fixPath($target['remote_base_dir']);
         $this->releasesFolder   = $this->fixPath($this->remoteBaseFolder.'releases');
         $this->rsyncExcludeFile = empty($target['rsync_exclude_file']) ? null : $target['rsync_exclude_file'];
         $this->rsyncIncludeFile = empty($target['rsync_include_file']) ? null : $target['rsync_include_file'];
@@ -205,7 +211,15 @@ class Deploy implements IdephixAwareInterface
      */
     public function cacheClear()
     {
-        return $this->idx->remote('cd '.$this->getNextReleaseFolder().' && rm -Rf app/cache/*', $this->dryRun);
+        return $this->idx->remote('cd '.$this->getNextReleaseFolder().' && ./app/console cache:clear --env=prod --no-debug && ./app/console cache:warmup', $this->dryRun);
+    }
+
+    /**
+     * @todo sudo?
+     */
+    public function doctrineMigrate()
+    {
+        return $this->idx->remote('cd '.$this->getNextReleaseFolder().' && ./app/console doctrine:migration:migrate', $this->dryRun);
     }
 
     /**
@@ -235,5 +249,26 @@ class Deploy implements IdephixAwareInterface
     private function log($message)
     {
         $this->idx->output->writeln($message);
+    }
+
+    public function hasToMigrate()
+    {
+        return false;
+    }
+
+    public function deploySF2Copy($go, $releasesToKeep = 6, $automaticBootstrap = true)
+    {
+        $this->idx->setUpEnvironment();
+        $this->idx->setDryRun(!$go);
+        $this->idx->remotePrepare($automaticBootstrap);
+        $this->idx->copyCode();
+        $this->idx->remoteLinkSharedFolders();
+        if ($this->hasToMigrate()) {
+            $this->idx->doctrineMigrate();
+        }
+        $this->idx->cacheClear();
+        $this->idx->switchToTheNextRelease();
+        $this->idx->assetic();
+        $this->idx->deleteOldReleases($releasesToKeep);
     }
 }
