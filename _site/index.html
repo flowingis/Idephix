@@ -64,8 +64,6 @@ use Idephix\SSH\SshClient;
 $targets = array(
     'test' => array(
         'hosts' => array('127.0.0.1'),
-        'local_base_folder' => __DIR__,
-        'remote_base_folder' => "/tmp/my-project.idephix/",
         'ssh_params' => array('user' => 'kea')
     ),
 );
@@ -74,15 +72,32 @@ $idx = new Idephix($targets);
 
 $idx->
     /**
-     * Execute the touch of a file specified in input
+     * Execute the touch of a file named in input locally
      * @param string $name the name of the file to be touch-ed
-     * @param bool   $go   if not specified the script execute a dry-run
      */
-    add('myscript:test-params',
-       function ($name, $go = false) use ($idx) {
-         $idx->local('touch /tmp/'.$name);
-         $idx->remote('touch /tmp/'.$name.'_remote');
-       });
+    add('myscript:local-touch',
+      function ($name) use ($idx) {
+        $idx->local('touch /tmp/'.$name);
+    })->
+
+    /**
+     * Execute the touch of a file named in input in a remote server
+     * @param string $name the name of the file to be touch-ed
+     */    
+    add('myscript:remote-touch', 
+      function ($name) use ($idx) {
+        $idx->remote('touch /tmp/'.$name);
+    })->
+    
+    /**
+     * Execute the remote and local touch
+     * @param string $name the name of the file to be touch-ed
+     */
+    add('myscript:touch-me-everywhere',
+      function ($name) use ($idx) {
+        $idx->runTask('myscript:remote-touch', $name)
+        $idx->runTask('myscript:local-touch', $name)
+    });
 
 $idx->run();
 
@@ -116,12 +131,14 @@ Available commands:
   help                   Displays help for a command
   list                   Lists commands
 myscript
-  myscript:test-params	Execute the touch of a file specified in input
+  myscript:local-touch	Execute the touch of a file named in input locally
+  myscript:remote-touch	Execute the touch of a file named in input in a remote server
+  myscript:touch-me-everywhere	Execute the remote and local touch
 </code></pre> 
 
 <p>then you can choose to execute a standard options or the one defined in the <code>idxfile.php</code></p>
 
-<pre><code>$ ./idephix.phar myscript:test-params myFile.txt</code></pre>
+<pre><code>$ ./idephix.phar myscript:local-touch myFile.txt</code></pre>
 
 <p>More examples to be published soon...</p>
 
