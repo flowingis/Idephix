@@ -45,9 +45,10 @@ class PeclSsh2Proxy extends BaseProxy
         stream_set_blocking($stdout, true);
         $this->lastOutput = stream_get_contents($stdout);
 
-        if (strstr($output, '__RETURNS__:')) {
-            $this->output = substr($output, 0, strpos($output, '__RETURNS__:'));
-            $returnCode = substr($output, strpos($output, '__RETURNS__:'), -1);
+        $pos = strpos($this->lastOutput, '__RETURNS__:');
+        if (false !== $pos) {
+            $this->output = substr($this->lastOutput, 0, $pos);
+            $returnCode = substr($this->lastOutput, $pos, -1);
         }
 
         return $returnCode;
