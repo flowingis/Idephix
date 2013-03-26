@@ -41,7 +41,7 @@ $targets = array(
     ),
 );
 
-$idx = new Idephix($targets);
+$idx = new Idephix(new SshClient(), $targets);
 
 $idx->
     /**
@@ -68,8 +68,8 @@ $idx->
      */
     add('myscript:touch-me-everywhere',
       function ($name) use ($idx) {
-        $idx->runTask('myscript:remote-touch', $name)
-        $idx->runTask('myscript:local-touch', $name)
+        $idx->runTask('myscript:remote-touch', $name);
+        $idx->runTask('myscript:local-touch', $name);
     });
 
 $idx->run();
