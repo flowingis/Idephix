@@ -53,20 +53,20 @@ Installation / Usage
 Global installation of Idephix
 ----------------------------------------
 
-You can chose to install idephix where you prefer. Idephix will use the configuration file in the corrent path.
+You can choose to install idephix wherever you prefer. Idephix use the configuration file in the current path.
 
-1. Change into a directory in your path like `cd /usr/local/bin`
-2. Get Idephix `curl https://github.com/ideatosrl/Idephix/blob/master/bin/idephix.phar?raw=true >idephix.phar`
+1. Go to a PATH directory, e.g. `cd /usr/local/bin`
+2. Get Idephix:`curl https://github.com/ideatosrl/Idephix/blob/master/bin/idephix.phar?raw=true >idephix.phar`
 3. Make the phar executable `chmod a+x idephix.phar`
-4. Change into a project directory `cd /path/to/my/project`
-5. Define your tasks in idxfile.php
-5. Use idephix as you normally would `idephix.phar`
-6. Optionally you can rename the idephix.phar to idx to make it easier
+4. Go to a project directory, e.g. `cd /path/to/my/project`
+5. Define your tasks in the idxfile.php file
+5. Just invoke the binary `idephix.phar`
+6. You can optionally rename the idephix.phar to idx to make it easy to use
 
 Requirements
 ------------
 
-PHP 5.3.2 or above, at least 5.3.12 recommended
+PHP 5.3.2 or above, >=5.3.12 recommended
 
 Authors
 -------
