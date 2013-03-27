@@ -359,7 +359,7 @@ function out($text, $color = null, $newLine = true)
 }
 
 /**
- * function copied from Idephix\Util\StreamContextFactory::getContext
+ * function copied from Composer\Util\StreamContextFactory::getContext
  *
  * Any changes should be applied there as well, or backported here.
  */
