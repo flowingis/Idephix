@@ -9,7 +9,7 @@ Installation / Usage
 1. Download the [`idephix.phar`](https://github.com/ideatosrl/Idephix/blob/master/bin/idephix.phar?raw=true) executable.
 
     ``` sh
-    $ curl https://github.com/ideatosrl/Idephix/blob/master/bin/idephix.phar?raw=true >idephix.phar
+    $ curl https://github.com/ideatosrl/Idephix/blob/master/bin/idephix.phar?raw=true > idephix.phar
     ```
 
 
