@@ -1,7 +1,7 @@
 Idephix - Automation and Deploy tool
 ====================================
 
-Idephix is a PHP tool for building automatomated scripts
+Idephix is a PHP tool for building automated scripts
 
 Installation / Usage
 --------------------
