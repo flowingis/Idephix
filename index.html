@@ -33,7 +33,6 @@ title: home
 <p>create an <code>idxfile.php</code></p>
 <pre><code>&lt;?php
 use Idephix\Idephix;
-use Idephix\SSH\SshClient;
 
 $targets = array(
     'test' => array(
@@ -42,7 +41,7 @@ $targets = array(
     ),
 );
 
-$idx = new Idephix(new SshClient(), $targets);
+$idx = new Idephix($targets);
 
 $idx->
     /**
@@ -67,7 +66,7 @@ $idx->
      * Execute the remote and local touch
      * @param string $name the name of the file to be touch-ed
      */
-    add('myscript:touch-me-everywhere',
+    add('myscript:touch',
       function ($name) use ($idx) {
         $idx->runTask('myscript:remote-touch', $name);
         $idx->runTask('myscript:local-touch', $name);
@@ -107,7 +106,7 @@ Available commands:
 myscript
   myscript:local-touch	Execute the touch of a file named in input locally
   myscript:remote-touch	Execute the touch of a file named in input in a remote server
-  myscript:touch-me-everywhere	Execute the remote and local touch
+  myscript:touch        Execute the remote and local touch
 </code></pre> 
 
 <p>then you can choose to execute a standard options or the one defined in the <code>idxfile.php</code></p>
