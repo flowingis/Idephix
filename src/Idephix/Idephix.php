@@ -74,7 +74,8 @@ class Idephix
     }
 
     /**
-     * Per i parametri tipo "--go" devono essere definiti come "$go = false"
+     * Add a Command to the application. 
+     * The "--go" parameters should be defined as "$go = false".
      *
      * @param string  $name
      * @param Closure $code
@@ -191,7 +192,8 @@ class Idephix
     }
 
     /**
-     * runTask
+     * RunTask.
+     *
      * @param string $name the name of the task you want to call
      * @param (...)  arbitrary number of parameter maching the target task interface
      */
@@ -226,7 +228,7 @@ class Idephix
     }
 
     /**
-     * Execute remote command
+     * Execute remote command.
      *
      * @param string  $cmd command
      * @param boolean $dryRun
@@ -244,7 +246,8 @@ class Idephix
     }
 
     /**
-     * Execute local command
+     * Execute local command.
+     *
      * @param string $cmd Command
      *
      * @return integer The exit status code
