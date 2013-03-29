@@ -30,8 +30,14 @@ class CommandWrapper extends Command
 
     public function setCode(\Closure $code)
     {
-        parent::setCode(function (InputInterface $input, OutputInterface $output) use ($code)
+        $command = $this;
+        parent::setCode(function (InputInterface $input, OutputInterface $output) use ($code, $command)
         {
+            $input = $command->filterByOriginalDefinition(
+                $input,
+                $command->getApplication()->getDefinition()
+            );
+
             $args = $input->getArguments();
             $args += $input->getOptions();
 
@@ -39,14 +45,6 @@ class CommandWrapper extends Command
         });
 
         return $this;
-    }
-
-    protected function initialize(InputInterface &$input, OutputInterface $output)
-    {
-        $input = $this->filterByOriginalDefinition(
-            $input,
-            $this->getApplication()->getDefinition()
-        );
     }
 
     public function filterByOriginalDefinition(InputInterface $input, $appDefinition)
