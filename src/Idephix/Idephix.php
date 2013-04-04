@@ -7,11 +7,10 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
-use Idephix\Application;
-use Idephix\CommandWrapper;
 use Idephix\SSH\SshClient;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Extension\SelfUpdate\SelfUpdate;
+use Idephix\Config\Config;
 
 class Idephix
 {
@@ -74,7 +73,7 @@ class Idephix
     }
 
     /**
-     * Add a Command to the application. 
+     * Add a Command to the application.
      * The "--go" parameters should be defined as "$go = false".
      *
      * @param string  $name
@@ -108,10 +107,10 @@ class Idephix
                 );
             }
 
-            $this->currentTarget = array_merge(
+            $this->currentTarget = new Config(array_merge(
                 array('hosts' => array()),
                 $this->targets[$env]
-            );
+            ));
             $this->currentTargetName = $env;
         }
     }
@@ -124,7 +123,7 @@ class Idephix
     private function openRemoteConnection($host)
     {
         if ($this->hasTarget()) {
-            $this->sshClient->setParameters($this->currentTarget['ssh_params']);
+            $this->sshClient->setParameters($this->currentTarget->get('ssh_params'));
             $this->sshClient->setHost($host);
             $this->sshClient->connect();
         }
@@ -163,7 +162,7 @@ class Idephix
             return;
         }
 
-        $hosts = $this->hasTarget() ? $this->currentTarget['hosts'] : array(null);
+        $hosts = $this->hasTarget() ? $this->currentTarget->get('hosts') : array(null);
 
         foreach ($hosts as $host) {
             $this->currentHost = $host;
