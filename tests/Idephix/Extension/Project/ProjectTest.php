@@ -2,6 +2,7 @@
 namespace Idephix\Extension\Project;
 
 use Idephix\Extension\Project\Project;
+use Idephix\Config\Config;
 
 class ProjectTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +18,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 
         $this->idx->expects($this->exactly(1))
              ->method('getCurrentTarget')
-             ->will($this->returnValue(array('ssh_params' => array('user' => 'kea'))));
+             ->will($this->returnValue(new Config(array('ssh_params' => array('user' => 'kea')))));
 
         $this->idx->expects($this->exactly(1))
              ->method('getCurrentTargetHost')
