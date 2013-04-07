@@ -20,23 +20,21 @@ class Project implements IdephixAwareInterface
         $this->idx = $idx;
     }
 
-    public function rsyncProject($remote_dir, $local_dir = null, $exclude = null, $extra_opts = null, $ssh_opts = null)
+    public function rsyncProject($remoteDir, $localDir = null, $exclude = null, $extraOpts = null, $sshOpts = null)
     {
-        if (substr($remote_dir, -1) != '/')
-        {
-            $remote_dir .= '/';
+        if (substr($remoteDir, -1) != '/') {
+            $remoteDir .= '/';
         }
 
         $target = $this->idx->getCurrentTarget();
-        $user = $target['ssh_params']['user'];
+        $user = $target->get('ssh_params.user');
         $host = $this->idx->getCurrentTargetHost();
 
-        if (file_exists($exclude))
-        {
-          $extra_opts .= ' --exclude-from='.$exclude;
+        if (file_exists($exclude)) {
+          $extraOpts .= ' --exclude-from='.$exclude;
         }
 
-        $cmd = "rsync -rlDcz --force --delete --progress $extra_opts -e 'ssh' ./ $user@$host:$remote_dir";
+        $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e 'ssh' ./ $user@$host:$remoteDir";
 
         return $this->idx->local($cmd);
     }

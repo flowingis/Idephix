@@ -21,6 +21,7 @@ class Deploy implements IdephixAwareInterface
     private $rsyncExcludeFile;
     private $rsyncIncludeFile;
     private $timestamp;
+    private $hasToMigrate = false;
 
     public function __construct()
     {
@@ -52,16 +53,16 @@ class Deploy implements IdephixAwareInterface
 
         $target = $this->idx->getCurrentTarget();
 
-        if (!isset($target['deploy']) || !is_array($target['deploy'])) {
+        if (!$target->get('deploy.remote_base_dir', false)) {
             throw new \Exception("No deploy parameters found. Check you configuration.");
         }
 
-        $target = $target['deploy'];
-        $this->localBaseFolder  = $this->fixPath($target['local_base_dir']);
-        $this->remoteBaseFolder = $this->fixPath($target['remote_base_dir']);
+        $this->hasToMigrate = $target->get('deploy.migrations', false);
+        $this->localBaseFolder  = $this->fixPath($target->get('deploy.local_base_dir'));
+        $this->remoteBaseFolder = $this->fixPath($target->get('deploy.remote_base_dir'));
         $this->releasesFolder   = $this->fixPath($this->remoteBaseFolder.'releases');
-        $this->rsyncExcludeFile = empty($target['rsync_exclude_file']) ? null : $target['rsync_exclude_file'];
-        $this->rsyncIncludeFile = empty($target['rsync_include_file']) ? null : $target['rsync_include_file'];
+        $this->rsyncExcludeFile = $target->get('deploy.rsync_exclude_file', null);
+        $this->rsyncIncludeFile = $target->get('deploy.rsync_include_file', null);
     }
 
     public function setDryRun($dryRun)
@@ -177,6 +178,7 @@ class Deploy implements IdephixAwareInterface
 
     /**
      * Execute the doctrine:schema:update sf2 console command
+     * !UNSAFE FOR PRODUCTION ENVIRONMENT!
      * @param string $env the environment
      *
      * @return string output of the remote command
@@ -253,7 +255,7 @@ class Deploy implements IdephixAwareInterface
 
     public function hasToMigrate()
     {
-        return false;
+        return $this->hasToMigrate;
     }
 
     public function deploySF2Copy($go, $releasesToKeep = 6, $automaticBootstrap = true)
