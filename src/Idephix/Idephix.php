@@ -20,11 +20,11 @@ class Idephix
     private $output;
     private $sshClient;
     private $targets = array();
-    private $currentTarget;
-    private $currentTargetName;
-    private $currentHost;
+    protected $currentTarget;
+    protected $currentTargetName;
+    protected $currentHost;
 
-    public function __construct(array $targets = null, SshClient $sshClient = null, OutputInterface $output = null)
+    public function __construct(array $targets = null, SshClient $sshClient = null, OutputInterface $output = null, InputInterface $input = null)
     {
         $this->application = new Application('Idephix', self::VERSION);
         $this->targets = $targets;
@@ -38,6 +38,11 @@ class Idephix
             $output = new ConsoleOutput();
         }
         $this->output = $output;
+
+        if (null === $input) {
+            $input = new ArgvInput();
+        }
+        $this->input = $input;
         $this->addSelfUpdateCommand();
     }
 
@@ -91,7 +96,7 @@ class Idephix
         return $this;
     }
 
-    private function buildEnvironment(InputInterface $input)
+    protected function buildEnvironment(InputInterface $input)
     {
         $this->currentTarget = null;
         $this->currentTargetName = null;
@@ -115,12 +120,12 @@ class Idephix
         }
     }
 
-    private function hasTarget()
+    protected function hasTarget()
     {
         return null !== $this->currentTarget;
     }
 
-    private function openRemoteConnection($host)
+    protected function openRemoteConnection($host)
     {
         if ($this->hasTarget()) {
             $this->sshClient->setParameters($this->currentTarget->get('ssh_params'));
@@ -129,7 +134,7 @@ class Idephix
         }
     }
 
-    private function closeRemoteConnection()
+    protected function closeRemoteConnection()
     {
         if ($this->hasTarget()) {
             $this->sshClient->disconnect();
@@ -153,9 +158,8 @@ class Idephix
 
     public function run()
     {
-        $input = new ArgvInput();
         try {
-            $this->buildEnvironment($input);
+            $this->buildEnvironment($this->input);
         } catch (\Exception $e) {
             $this->output->writeln('<error>'.$e->getMessage().'</error>');
 
@@ -167,7 +171,7 @@ class Idephix
         foreach ($hosts as $host) {
             $this->currentHost = $host;
             $this->openRemoteConnection($host);
-            $this->application->run($input, $this->output);
+            $this->application->run($this->input, $this->output);
             $this->closeRemoteConnection();
         }
     }
@@ -254,7 +258,7 @@ class Idephix
     public function local($cmd)
     {
         $output = $this->output;
-        $output->writeln("<info>Exec</info>: $cmd");
+        $output->writeln("<info>Local</info>: $cmd");
         $process = new Process($cmd);
 
         $result = $process->run(function ($type, $buffer) use ($output) {
