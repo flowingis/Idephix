@@ -54,7 +54,13 @@ class Deploy implements IdephixAwareInterface
         $target->set('deploy.next_release_dir', $this->getNextReleaseFolder());
         $target->set('deploy.dry_run', $this->dryRun);
 
-        $this->strategy = new Strategy\Copy($this->idx, $target);
+        $strategyClass = 'Idephix\\Extension\\Deploy\\Strategy\\'.$target->get('deploy.strategy', 'Copy');
+
+        if (!class_exists($strategyClass)) {
+            throw new \Exception(sprintf("No deploy strategy %s found. Check you configuration.", $strategyClass));
+        }
+
+        $this->strategy = new $strategyClass($this->idx, $target);
     }
 
     public function setDryRun($dryRun)
@@ -193,9 +199,7 @@ class Deploy implements IdephixAwareInterface
         $out .= $this->sshClient->getLastOutput();
 
         // @todo: share folder
-        //ln -s ../shared/master/logs
-        //ln -fs ../shared/web/imagine
-        //ln -fs ../shared/web/uploads
+        // $this->idx->remote('mkdir -p '.$this->releaseFolder.'shared');
 
         return $out;
     }

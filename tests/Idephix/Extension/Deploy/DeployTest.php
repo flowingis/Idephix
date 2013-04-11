@@ -7,7 +7,7 @@ use Idephix\Config\Config;
 
 class DeployTest extends IdephixTestCase
 {
-    public function setUp()
+    public function initDeploy($strategy = null)
     {
         $targets = array('banana' =>
             array(
@@ -21,14 +21,30 @@ class DeployTest extends IdephixTestCase
                 )
             )
         );
+        if (!is_null($strategy)) {
+            $targets['banana']['deploy']['strategy'] = $strategy;
+        }
 
         $this->deploy = new Deploy();
         $this->idx = $this->getIdephixMock($targets, 'banana');
         $this->deploy->setIdephix($this->idx);
     }
 
+    /**
+     * Tests pass non-existent class as deploy strategy
+     *
+     * @expectedException Exception
+     * @expectedExceptionMessage No deploy strategy Idephix\Extension\Deploy\Strategy\FailStrategy found. Check you configuration.
+     */
+    public function testWrongStrategy()
+    {
+        $this->initDeploy('FailStrategy');
+        $result = $this->deploy->deploySF2Copy(true);
+    }
+
     public function testDeploySf2Copy()
     {
+        $this->initDeploy();
         $result = $this->deploy->deploySF2Copy(true);
 
         $nextReleaseDir = $this->deploy->getNextReleaseFolder();
