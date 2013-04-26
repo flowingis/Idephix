@@ -43,20 +43,24 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->idx->has('command_name'));
     }
 
+    public function getArgvAndTargets()
+    {
+        return array(
+            array(array('idx', 'foo'), array()),
+            array(array('idx', 'foo', '--env=env'), array('env' => array('hosts' => array('localhost'), 'ssh_params' => array('user' => 'test')))),
+        );
+    }
+    
     /**
      * @covers Ideato\Idephix::run
-     * @todo   Implement testRun().
+     * @dataProvider getArgvAndTargets
      */
-    public function testRun()
+    public function testRunALocalTask($argv, $target)
     {
-        $_SERVER['argv'] = array(
-            'script.php',
-            'foo',
-            '--env=env'
-        );
+        $_SERVER['argv'] = $argv;
         
         $output = fopen("php://memory", 'r+');
-        $idx = new Idephix(array('env' => array('hosts' => array('localhost'), 'ssh_params' => array('user' => 'test'))), new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
+        $idx = new Idephix($target, new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
         $idx->getApplication()->setAutoExit(false);
         
         $idx->add('foo', function() use ($idx){

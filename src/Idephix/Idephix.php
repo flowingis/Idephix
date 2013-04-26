@@ -162,7 +162,7 @@ class Idephix
             return;
         }
 
-        $hosts = $this->hasTarget() ? $this->currentTarget->get('hosts') : array();
+        $hosts = $this->hasTarget() ? $this->currentTarget->get('hosts') : array(null);
 
         foreach ($hosts as $host) {
             $this->currentHost = $host;
@@ -268,6 +268,11 @@ class Idephix
         return $process->getOutput();
     }
     
+    /**
+     * Get application
+     * 
+     * @return Idephix\Application
+     */
     public function getApplication()
     {
         return $this->application;
