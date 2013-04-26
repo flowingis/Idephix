@@ -162,7 +162,7 @@ class Idephix
             return;
         }
 
-        $hosts = $this->hasTarget() ? $this->currentTarget->get('hosts') : array(null);
+        $hosts = $this->hasTarget() ? $this->currentTarget->get('hosts') : array();
 
         foreach ($hosts as $host) {
             $this->currentHost = $host;
@@ -260,11 +260,16 @@ class Idephix
         $result = $process->run(function ($type, $buffer) use ($output) {
             $output->write($buffer);
         });
-
+        
         if (0 != $result) {
             throw new \Exception("Local command fail: ".$process->getErrorOutput());
         }
 
         return $process->getOutput();
+    }
+    
+    public function getApplication()
+    {
+        return $this->application;
     }
 }

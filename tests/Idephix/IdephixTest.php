@@ -49,10 +49,26 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function testRun()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
+        $_SERVER['argv'] = array(
+            'script.php',
+            'foo',
+            '--env=env'
         );
+        
+        $output = fopen("php://memory", 'r+');
+        $idx = new Idephix(array('env' => array('hosts' => array('localhost'), 'ssh_params' => array('user' => 'test'))), new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
+        $idx->getApplication()->setAutoExit(false);
+        
+        $idx->add('foo', function() use ($idx){
+            $idx->local('echo "Hello World"');
+        });
+        
+        $idx->run();
+        
+        rewind($output);
+        
+        $expected = "Exec: echo \"Hello World\"\nHello World\n";
+        $this->assertEquals($expected, stream_get_contents($output));
     }
 
     /**
