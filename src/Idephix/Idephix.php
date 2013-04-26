@@ -260,7 +260,6 @@ class Idephix
         $result = $process->run(function ($type, $buffer) use ($output) {
             $output->write($buffer);
         });
-        
         if (0 != $result) {
             throw new \Exception("Local command fail: ".$process->getErrorOutput());
         }
