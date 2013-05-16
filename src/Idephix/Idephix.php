@@ -6,13 +6,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Process\Process;
 use Idephix\SSH\SshClient;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Extension\SelfUpdate\SelfUpdate;
 use Idephix\Config\Config;
 
-class Idephix
+class Idephix implements IdephixInterface
 {
     const VERSION = '@package_version@';
     private $application;
@@ -20,9 +19,11 @@ class Idephix
     private $output;
     private $sshClient;
     private $targets = array();
+    private $timeout = 600;
     protected $currentTarget;
     protected $currentTargetName;
     protected $currentHost;
+    protected $invokerClassName;
 
     public function __construct(array $targets = null, SshClient $sshClient = null, OutputInterface $output = null, InputInterface $input = null)
     {
@@ -253,13 +254,18 @@ class Idephix
      *
      * @param string $cmd Command
      *
-     * @return integer The exit status code
+     * @return string the command output
      */
-    public function local($cmd)
+    public function local($cmd, $dryRun = false)
     {
         $output = $this->output;
         $output->writeln("<info>Local</info>: $cmd");
-        $process = new Process($cmd);
+
+        if ($dryRun) {
+            return $cmd;
+        }
+
+        $process = $this->buildInvoker($cmd, null, null, null, $this->timeout);
 
         $result = $process->run(function ($type, $buffer) use ($output) {
             $output->write($buffer);
@@ -270,10 +276,37 @@ class Idephix
 
         return $process->getOutput();
     }
-    
+
+    /**
+     * Set local command invoker
+     * @param string $invokerClassName class name of the local command invoker
+     */
+    public function setInvoker($invokerClassName)
+    {
+        $this->invokerClassName = $invokerClassName;
+    }
+
+    /**
+     * Build command invoker
+     * @param string  $cmd     The command line to run
+     * @param string  $cwd     The working directory
+     * @param array   $env     The environment variables or null to inherit
+     * @param string  $stdin   The STDIN content
+     * @param integer $timeout The timeout in seconds
+     * @param array   $options An array of options for proc_open
+     *
+     * @return string cmd output
+     */
+    public function buildInvoker($cmd, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
+    {
+        $invoker = $this->invokerClassName ?: '\Symfony\Component\Process\Process';
+
+        return new $invoker($cmd, $cwd, $env, $stdin, $timeout, $options);
+    }
+
     /**
      * Get application
-     * 
+     *
      * @return Idephix\Application
      */
     public function getApplication()

@@ -2,7 +2,7 @@
 
 namespace Idephix\Extension\Deploy\Strategy;
 
-use Idephix\Idephix;
+use Idephix\IdephixInterface;
 use Idephix\Config\Config;
 
 class Copy implements DeployStrategyInterface
@@ -13,7 +13,7 @@ class Copy implements DeployStrategyInterface
     protected $rsyncIncludeFile;
 
 
-    public function __construct(Idephix $idx, Config $target)
+    public function __construct(IdephixInterface $idx, Config $target)
     {
         $this->idx = $idx;
 

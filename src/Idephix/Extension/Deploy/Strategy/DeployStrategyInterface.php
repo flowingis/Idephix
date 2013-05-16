@@ -2,12 +2,12 @@
 
 namespace Idephix\Extension\Deploy\Strategy;
 
-use Idephix\Idephix;
+use Idephix\IdephixInterface;
 use Idephix\Config\Config;
 
 interface DeployStrategyInterface
 {
-    public function __construct(Idephix $idx, Config $target);
+    public function __construct(IdephixInterface $idx, Config $target);
 
     /**
      * The main deploy method
