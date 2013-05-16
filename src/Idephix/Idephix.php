@@ -6,13 +6,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Process\Process;
 use Idephix\SSH\SshClient;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Extension\SelfUpdate\SelfUpdate;
 use Idephix\Config\Config;
 
-class Idephix
+class Idephix implements IdephixInterface
 {
     const VERSION = '@package_version@';
     private $application;
@@ -20,11 +19,13 @@ class Idephix
     private $output;
     private $sshClient;
     private $targets = array();
-    private $currentTarget;
-    private $currentTargetName;
-    private $currentHost;
+    private $timeout = 600;
+    protected $currentTarget;
+    protected $currentTargetName;
+    protected $currentHost;
+    protected $invokerClassName;
 
-    public function __construct(array $targets = null, SshClient $sshClient = null, OutputInterface $output = null)
+    public function __construct(array $targets = null, SshClient $sshClient = null, OutputInterface $output = null, InputInterface $input = null)
     {
         $this->application = new Application('Idephix', self::VERSION);
         $this->targets = $targets;
@@ -38,6 +39,11 @@ class Idephix
             $output = new ConsoleOutput();
         }
         $this->output = $output;
+
+        if (null === $input) {
+            $input = new ArgvInput();
+        }
+        $this->input = $input;
         $this->addSelfUpdateCommand();
     }
 
@@ -91,7 +97,7 @@ class Idephix
         return $this;
     }
 
-    private function buildEnvironment(InputInterface $input)
+    protected function buildEnvironment(InputInterface $input)
     {
         $this->currentTarget = null;
         $this->currentTargetName = null;
@@ -115,12 +121,12 @@ class Idephix
         }
     }
 
-    private function hasTarget()
+    protected function hasTarget()
     {
         return null !== $this->currentTarget;
     }
 
-    private function openRemoteConnection($host)
+    protected function openRemoteConnection($host)
     {
         if ($this->hasTarget()) {
             $this->sshClient->setParameters($this->currentTarget->get('ssh_params'));
@@ -129,7 +135,7 @@ class Idephix
         }
     }
 
-    private function closeRemoteConnection()
+    protected function closeRemoteConnection()
     {
         if ($this->hasTarget()) {
             $this->sshClient->disconnect();
@@ -153,9 +159,8 @@ class Idephix
 
     public function run()
     {
-        $input = new ArgvInput();
         try {
-            $this->buildEnvironment($input);
+            $this->buildEnvironment($this->input);
         } catch (\Exception $e) {
             $this->output->writeln('<error>'.$e->getMessage().'</error>');
 
@@ -167,7 +172,7 @@ class Idephix
         foreach ($hosts as $host) {
             $this->currentHost = $host;
             $this->openRemoteConnection($host);
-            $this->application->run($input, $this->output);
+            $this->application->run($this->input, $this->output);
             $this->closeRemoteConnection();
         }
     }
@@ -249,13 +254,18 @@ class Idephix
      *
      * @param string $cmd Command
      *
-     * @return integer The exit status code
+     * @return string the command output
      */
-    public function local($cmd)
+    public function local($cmd, $dryRun = false)
     {
         $output = $this->output;
-        $output->writeln("<info>Exec</info>: $cmd");
-        $process = new Process($cmd);
+        $output->writeln("<info>Local</info>: $cmd");
+
+        if ($dryRun) {
+            return $cmd;
+        }
+
+        $process = $this->buildInvoker($cmd, null, null, null, $this->timeout);
 
         $result = $process->run(function ($type, $buffer) use ($output) {
             $output->write($buffer);
@@ -266,10 +276,37 @@ class Idephix
 
         return $process->getOutput();
     }
-    
+
+    /**
+     * Set local command invoker
+     * @param string $invokerClassName class name of the local command invoker
+     */
+    public function setInvoker($invokerClassName)
+    {
+        $this->invokerClassName = $invokerClassName;
+    }
+
+    /**
+     * Build command invoker
+     * @param string  $cmd     The command line to run
+     * @param string  $cwd     The working directory
+     * @param array   $env     The environment variables or null to inherit
+     * @param string  $stdin   The STDIN content
+     * @param integer $timeout The timeout in seconds
+     * @param array   $options An array of options for proc_open
+     *
+     * @return string cmd output
+     */
+    public function buildInvoker($cmd, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
+    {
+        $invoker = $this->invokerClassName ?: '\Symfony\Component\Process\Process';
+
+        return new $invoker($cmd, $cwd, $env, $stdin, $timeout, $options);
+    }
+
     /**
      * Get application
-     * 
+     *
      * @return Idephix\Application
      */
     public function getApplication()

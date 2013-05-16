@@ -2,7 +2,7 @@
 
 namespace Idephix\Extension\Project;
 
-use Idephix\Idephix;
+use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
 
 /**
@@ -15,7 +15,7 @@ class Project implements IdephixAwareInterface
 {
     private $idx;
 
-    public function setIdephix(Idephix $idx)
+    public function setIdephix(IdephixInterface $idx)
     {
         $this->idx = $idx;
     }
