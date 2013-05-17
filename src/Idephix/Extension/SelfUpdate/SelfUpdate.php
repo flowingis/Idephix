@@ -4,12 +4,13 @@ namespace Idephix\Extension\SelfUpdate;
 
 use Idephix\Idephix;
 use Idephix\Extension\IdephixAwareInterface;
+use Idephix\IdephixInterface;
 
 class SelfUpdate implements IdephixAwareInterface
 {
     private $idx;
 
-    public function setIdephix(Idephix $idx)
+    public function setIdephix(IdephixInterface $idx)
     {
         $this->idx = $idx;
     }

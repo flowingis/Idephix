@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Idephix\SSH\SshClient;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Extension\SelfUpdate\SelfUpdate;
+use Idephix\Extension\InitIdxFile\InitIdxFile;
 use Idephix\Config\Config;
 
 class Idephix implements IdephixInterface
@@ -45,6 +46,7 @@ class Idephix implements IdephixInterface
         }
         $this->input = $input;
         $this->addSelfUpdateCommand();
+        $this->addInitIdxFileCommand();
     }
 
     public function __call($name, $arguments = array())
@@ -229,6 +231,20 @@ class Idephix implements IdephixInterface
                     }
                 );
         }
+    }
+
+    public function addInitIdxFileCommand()
+    {
+        $this->addLibrary('initIdxFile', new InitIdxFile());
+        $idx = $this;
+        $this
+            ->add(
+                'init-idx-file',
+                function () use ($idx)
+                {
+                    $idx->initIdxFile()->initFile();
+                }
+            );
     }
 
     /**
