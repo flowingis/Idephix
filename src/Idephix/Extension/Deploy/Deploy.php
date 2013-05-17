@@ -2,7 +2,7 @@
 
 namespace Idephix\Extension\Deploy;
 
-use Idephix\Idephix;
+use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
 
 /**
@@ -18,31 +18,19 @@ class Deploy implements IdephixAwareInterface
     private $remoteBaseFolder;
     private $releasesFolder;
     private $dryRun = true;
-    private $rsyncExcludeFile;
-    private $rsyncIncludeFile;
     private $timestamp;
     private $hasToMigrate = false;
+    private $strategy;
 
     public function __construct()
     {
         $this->timestamp = date('YmdHis');
     }
 
-    public function setIdephix(Idephix $idx)
+    public function setIdephix(IdephixInterface $idx)
     {
         $this->sshClient = $idx->sshClient;
         $this->idx = $idx;
-    }
-
-    /**
-     * Add trailing slash to the path if it is omitted
-     * @param string $path
-     *
-     * @return string fixed path
-     */
-    private function fixPath($path)
-    {
-        return rtrim($path, '/').'/';
     }
 
     public function setUpEnvironment()
@@ -58,11 +46,21 @@ class Deploy implements IdephixAwareInterface
         }
 
         $this->hasToMigrate = $target->get('deploy.migrations', false);
-        $this->localBaseFolder  = $this->fixPath($target->get('deploy.local_base_dir'));
-        $this->remoteBaseFolder = $this->fixPath($target->get('deploy.remote_base_dir'));
-        $this->releasesFolder   = $this->fixPath($this->remoteBaseFolder.'releases');
-        $this->rsyncExcludeFile = $target->get('deploy.rsync_exclude_file', null);
-        $this->rsyncIncludeFile = $target->get('deploy.rsync_include_file', null);
+        $this->localBaseFolder  = $target->getFixedPath('deploy.local_base_dir');
+        $this->remoteBaseFolder = $target->getFixedPath('deploy.remote_base_dir');
+        $this->releasesFolder   = $this->remoteBaseFolder.'releases/';
+        $target->set('deploy.releases_dir', $this->releasesFolder);
+        $target->set('deploy.current_release_dir', $this->getCurrentReleaseFolder());
+        $target->set('deploy.next_release_dir', $this->getNextReleaseFolder());
+        $target->set('deploy.dry_run', $this->dryRun);
+
+        $strategyClass = 'Idephix\\Extension\\Deploy\\Strategy\\'.$target->get('deploy.strategy', 'Copy');
+
+        if (!class_exists($strategyClass)) {
+            throw new \Exception(sprintf("No deploy strategy %s found. Check you configuration.", $strategyClass));
+        }
+
+        $this->strategy = new $strategyClass($this->idx, $target);
     }
 
     public function setDryRun($dryRun)
@@ -70,9 +68,14 @@ class Deploy implements IdephixAwareInterface
         $this->dryRun = $dryRun;
     }
 
+    public function getNextReleaseName()
+    {
+        return $this->timestamp;
+    }
+
     public function getNextReleaseFolder()
     {
-        return $this->releasesFolder.$this->timestamp;
+        return $this->releasesFolder.$this->getNextReleaseName();
     }
 
     public function getCurrentReleaseFolder()
@@ -108,44 +111,10 @@ class Deploy implements IdephixAwareInterface
         return $this->idx->remote($cmd, $this->dryRun);
     }
 
-    public function copyCode()
-    {
-        $this->log("Remote: copy code to the next release");
-        $this->remoteCopyRecursive($this->remoteBaseFolder.'current/.', $this->getNextReleaseFolder());
-        $out = $this->sshClient->getLastOutput();
-        $this->log("Remote: sync code to the next release");
-        $this->rsync($this->localBaseFolder, ($this->dryRun) ? $this->getCurrentReleaseFolder().'/' : $this->getNextReleaseFolder());
-        $out .= $this->sshClient->getLastOutput();
-
-        return $out;
-    }
-
     public function switchToTheNextRelease()
     {
         $this->log("Switch to next release...");
-        $this->idx->remote("cd ".$this->remoteBaseFolder." && ln -s releases/".$this->timestamp." next && mv -fT next current", $this->dryRun);
-    }
-
-    /**
-     * exec rsync from local dir to remote target dir
-     * @param string $from local source path
-     * @param string $to   remote target path
-     *
-     * @return int command return status
-     */
-    public function rsync($from, $to)
-    {
-        $user = $this->sshClient->getUser();
-        $host = $this->sshClient->getHost();
-
-        $dryFlag = $this->dryRun ? '--dry-run' : '';
-        $exclude = $this->rsyncExcludeFile ? '--exclude-from='.$this->rsyncExcludeFile : '';
-        $include = $this->rsyncIncludeFile ? '--include-from='.$this->rsyncIncludeFile : '';
-        $sshCmd = "-e 'ssh";
-        $sshCmd.= $this->sshClient->getPort() ? " -p ".$this->sshClient->getPort() : "";
-        $sshCmd.= "'";
-
-        return $this->idx->local("rsync -rlpDvcz --delete $sshCmd $dryFlag $exclude $include $from $user@$host:$to");
+        $this->idx->remote("cd ".$this->remoteBaseFolder." && ln -s releases/".$this->getNextReleaseName()." next && mv -fT next current", $this->dryRun);
     }
 
     /**
@@ -167,13 +136,6 @@ class Deploy implements IdephixAwareInterface
         $this->log("Asset and assetic stuff...");
         $this->idx->remote('cd '.$folder.' && php app/console assets:install --symlink web', $this->dryRun);
         $this->idx->remote('cd '.$folder.' && php app/console assetic:dump --env=prod', $this->dryRun);
-    }
-
-    public function remoteCopyRecursive($from, $to)
-    {
-        return $this->idx->remote(
-            sprintf("cp -pR %s %s", escapeshellarg($from), escapeshellarg($to)),
-            $this->dryRun);
     }
 
     /**
@@ -237,9 +199,7 @@ class Deploy implements IdephixAwareInterface
         $out .= $this->sshClient->getLastOutput();
 
         // @todo: share folder
-        //ln -s ../shared/master/logs
-        //ln -fs ../shared/web/imagine
-        //ln -fs ../shared/web/uploads
+        // $this->idx->remote('mkdir -p '.$this->releaseFolder.'shared');
 
         return $out;
     }
@@ -260,17 +220,17 @@ class Deploy implements IdephixAwareInterface
 
     public function deploySF2Copy($go, $releasesToKeep = 6, $automaticBootstrap = true)
     {
-        $this->idx->setUpEnvironment();
-        $this->idx->setDryRun(!$go);
-        $this->idx->remotePrepare($automaticBootstrap);
-        $this->idx->copyCode();
-        $this->idx->remoteLinkSharedFolders();
+        $this->setDryRun(!$go);
+        $this->setUpEnvironment();
+        $this->remotePrepare($automaticBootstrap);
+        $this->strategy->deploy();
+        $this->remoteLinkSharedFolders();
         if ($this->hasToMigrate()) {
-            $this->idx->doctrineMigrate();
+            $this->doctrineMigrate();
         }
-        $this->idx->cacheClear();
-        $this->idx->switchToTheNextRelease();
-        $this->idx->assetic();
-        $this->idx->deleteOldReleases($releasesToKeep);
+        $this->cacheClear();
+        $this->switchToTheNextRelease();
+        $this->assetic();
+        $this->deleteOldReleases($releasesToKeep);
     }
 }

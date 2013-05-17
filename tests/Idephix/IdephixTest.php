@@ -50,7 +50,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
             array(array('idx', 'foo', '--env=env'), array('env' => array('hosts' => array('localhost'), 'ssh_params' => array('user' => 'test')))),
         );
     }
-    
+
     /**
      * @covers Ideato\Idephix::run
      * @dataProvider getArgvAndTargets
@@ -58,20 +58,20 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     public function testRunALocalTask($argv, $target)
     {
         $_SERVER['argv'] = $argv;
-        
+
         $output = fopen("php://memory", 'r+');
         $idx = new Idephix($target, new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
         $idx->getApplication()->setAutoExit(false);
-        
+
         $idx->add('foo', function() use ($idx){
             $idx->local('echo "Hello World"');
         });
-        
+
         $idx->run();
-        
+
         rewind($output);
-        
-        $expected = "Exec: echo \"Hello World\"\nHello World\n";
+
+        $expected = "Local: echo \"Hello World\"\nHello World\n";
         $this->assertEquals($expected, stream_get_contents($output));
     }
 

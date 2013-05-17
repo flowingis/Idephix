@@ -3,7 +3,7 @@
 namespace Idephix\Test;
 
 use Idephix\Extension\IdephixAwareInterface;
-use Idephix\Idephix;
+use Idephix\IdephixInterface;
 
 class LibraryMock implements IdephixAwareInterface
 {
@@ -12,7 +12,7 @@ class LibraryMock implements IdephixAwareInterface
         $this->tester = $tester;
     }
 
-    public function setIdephix(Idephix $idx)
+    public function setIdephix(IdephixInterface $idx)
     {
         $this->tester->assertTrue(true, 'Set Idephix');
 
