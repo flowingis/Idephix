@@ -67,7 +67,7 @@ Copy code to the next release dir
 Remote: cp -pPR '$currentReleaseDir/.' '$nextReleaseDir'
 Sync code to the next release
 Local: rsync -rlpDvcz --delete -e 'ssh -p $port'  --exclude-from=rsync_exclude.txt --include-from=rsync_include.txt  $user@$host:$nextReleaseDir
-Remote: cd $nextReleaseDir && ./app/console cache:clear --env=prod --no-debug && ./app/console cache:warmup
+Remote: cd $nextReleaseDir && ./app/console cache:clear --env=prod --no-debug && ./app/console cache:warmup --env=prod
 Switch to next release...
 Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 Asset and assetic stuff...
