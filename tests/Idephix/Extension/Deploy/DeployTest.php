@@ -72,7 +72,7 @@ Switch to next release...
 Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 Asset and assetic stuff...
 Remote: cd /tmp/temp_dir/current && php app/console assets:install --symlink web
-Remote: cd /tmp/temp_dir/current && php app/console assetic:dump --env=prod
+Remote: cd /tmp/temp_dir/current && php app/console assetic:dump --env=prod --no-debug
 Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
 ";
 
