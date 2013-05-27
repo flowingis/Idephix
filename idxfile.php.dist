@@ -5,33 +5,33 @@ use Idephix\Extension\Deploy\Deploy;
 use Idephix\Extension\PHPUnit\PHPUnit;
 use Idephix\SSH\SshClient;
 
-$localBaseDir = __DIR__;
-
 $sshParams = array(
     'user' => 'ideato',
 );
 
 $targets = array(
     'prod' => array(
-        'hosts' => array('12.12.12.12'),
-        'local_base_folder' => $localBaseDir,
-        'remote_base_folder' => "/var/www/my-project/",
-        'rsync_exclude_file' => 'rsync_exclude.txt',
+        'hosts' => array('127.0.0.1', '33.33.33.10'),
         'ssh_params' => $sshParams
+        'deploy' => array(
+            'local_base_dir' => __DIR__,
+            'remote_base_dir' => "/var/www/my-project/",
+            'rsync_exclude_file' => 'rsync_exclude.txt'
     ),
     'stage' => array(
         'hosts' => array('192.168.169.170'),
-        'local_base_folder' => $localBaseDir,
-        'remote_base_folder' => "/var/sites/my-project.ideato.it/",
-        'rsync_exclude_file' => 'rsync_exclude.txt',
         'ssh_params' => $sshParams
+        'deploy' => array(
+            'local_base_dir' => __DIR__,
+            'remote_base_dir' => "/var/www/my-project.ideato.it/",
+            'rsync_exclude_file' => 'rsync_exclude.txt'
     ),
     'test' => array(
         'hosts' => array('127.0.0.1'),
-        'local_base_folder' => $localBaseDir,
-        'remote_base_folder' => "/tmp/my-project.ideato.it/",
-        'rsync_exclude_file' => 'rsync_exclude.txt',
         'ssh_params' => array('user' => 'kea')
+        'deploy' => array(
+            'local_base_dir' => __DIR__,
+            'remote_base_dir' => "/tmp/my-project.test/"
     ),
 );
 
@@ -48,18 +48,35 @@ $idx->
             if (!$go) {
                 echo "\nDry Run\n";
             }
-            $idx->setUpEnvironment();
-            $idx->setDryRun(!$go);
-            $idx->remotePrepare(true);
-            $idx->copyCode();
-            $idx->remoteLinkSharedFolders();
-            $idx->cacheClear();
-            $idx->switchToTheNextRelease();
-            $idx->assetic();
+            $this->setDryRun(!$go);
+            $this->setUpEnvironment();
+            $this->remotePrepare(true);
+            $this->strategy->deploy();
+            $this->remoteLinkSharedFolders();
+/*
+            if ($this->hasToMigrate()) {
+                $this->doctrineMigrate();
+            }
             if ($idx->getCurrentTargetName() == 'stage') {
                 $idx->updateSchema();
             }
+*/
+            $this->cacheClear();
+            $this->switchToTheNextRelease();
+            $this->assetic();
+            $this->deleteOldReleases($releasesToKeep);
+
             $idx->deleteOldReleases(6);
+        })->
+    /**
+     * Execute a deploy compact method
+     * @param bool $go if not given it does a dry-run execution
+     */
+    add('project:deploy',
+        function ($go = false) use ($idx)
+        {
+            echo $go ? "\nGo!\n" : "\nDry Run\n";
+            $idx->deploySF2Copy($go);
         })->
     /**
      * All the test are executed, even Selenium
