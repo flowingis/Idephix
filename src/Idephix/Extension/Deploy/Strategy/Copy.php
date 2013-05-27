@@ -36,7 +36,7 @@ class Copy implements DeployStrategyInterface
 
         $this->idx->output->writeln("Sync code to the next release");
         $this->rsync(
-            $this->target->get('deploy.local_base_folder'),
+            $this->target->getFixedPath('deploy.local_base_dir'),
             ($this->target->get('deploy.dry_run')) ? $this->target->get('deploy.current_release_dir').'/' : $this->target->get('deploy.next_release_dir'));
         $out .= $this->idx->sshClient->getLastOutput();
 
