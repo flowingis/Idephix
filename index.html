@@ -32,12 +32,32 @@ title: home
 
 <p>create an <code>idxfile.php</code></p>
 <pre><code>&lt;?php
+
 use Idephix\Idephix;
 
+$localBaseDir = __DIR__;
+$sshParams = array(
+    'user' => 'myuser',
+);
+
 $targets = array(
-    'test' => array(
+    'prod' => array(
         'hosts' => array('127.0.0.1'),
-        'ssh_params' => array('user' => 'kea')
+        'ssh_params' => $sshParams,
+        'deploy' => array(
+            'local_base_dir' => $localBaseDir,
+            'remote_base_dir' => "/var/www/myfantasticserver/",
+            'rsync_exclude_file' => 'rsync_exclude.txt'
+        ),
+    ),
+    'stage' => array(
+        'hosts' => array('127.0.0.1'),
+        'ssh_params' => $sshParams,
+        'deploy' => array(
+            'local_base_dir' => $localBaseDir,
+            'remote_base_dir' => "/var/sites/myotherfantasticserver/",
+            'rsync_exclude_file' => 'rsync_exclude.txt'
+        ),
     ),
 );
 
