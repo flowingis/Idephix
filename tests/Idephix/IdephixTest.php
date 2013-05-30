@@ -46,8 +46,22 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     public function getArgvAndTargets()
     {
         return array(
-            array(array('idx', 'foo'), array()),
-            array(array('idx', 'foo', '--env=env'), array('env' => array('hosts' => array('localhost'), 'ssh_params' => array('user' => 'test')))),
+            array(
+                array('idx', 'foo'),
+                array(),
+                "Local: echo \"Hello World from \"\nHello World from \n"
+            ),
+            array(
+                array('idx', 'foo', '--env=env'),
+                array('env' => array('hosts' => array('localhost'), 'ssh_params' => array('user' => 'test'))),
+                "Local: echo \"Hello World from localhost\"\nHello World from localhost\n"
+            ),
+            array(
+                array('idx', 'foo', '--env=env'),
+                array('env' => array('hosts' => array('localhost', '1.2.3.4'), 'ssh_params' => array('user' => 'test'))),
+                "Local: echo \"Hello World from localhost\"\nHello World from localhost\n".
+                "Local: echo \"Hello World from 1.2.3.4\"\nHello World from 1.2.3.4\n"
+            ),
         );
     }
 
@@ -55,7 +69,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      * @covers Ideato\Idephix::run
      * @dataProvider getArgvAndTargets
      */
-    public function testRunALocalTask($argv, $target)
+    public function testRunALocalTask($argv, $target, $expected)
     {
         $_SERVER['argv'] = $argv;
 
@@ -64,14 +78,13 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $idx->getApplication()->setAutoExit(false);
 
         $idx->add('foo', function() use ($idx){
-            $idx->local('echo "Hello World"');
+            $idx->local('echo "Hello World from '.$idx->getCurrentTargetHost().'"');
         });
 
         $idx->run();
 
         rewind($output);
 
-        $expected = "Local: echo \"Hello World\"\nHello World\n";
         $this->assertEquals($expected, stream_get_contents($output));
     }
 
