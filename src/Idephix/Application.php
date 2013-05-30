@@ -21,6 +21,7 @@ class Application extends BaseApplication
     public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
     {
         parent::__construct($name, $version);
+        $this->setAutoExit(false);
         $this->getDefinition()
              ->addOption(new InputOption('--env', null, InputOption::VALUE_REQUIRED, 'Set remote environment.'));
     }
