@@ -11,7 +11,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use Idephix\Util\DocBlockParser;
 
-
 class CommandWrapper extends Command
 {
     public function buildFromCode(\Closure $code)
@@ -31,8 +30,7 @@ class CommandWrapper extends Command
     public function setCode(\Closure $code)
     {
         $command = $this;
-        parent::setCode(function (InputInterface $input, OutputInterface $output) use ($code, $command)
-        {
+        parent::setCode(function (InputInterface $input, OutputInterface $output) use ($code, $command) {
             $input = $command->filterByOriginalDefinition(
                 $input,
                 $command->getApplication()->getDefinition()

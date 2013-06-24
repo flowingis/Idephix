@@ -77,7 +77,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $idx = new Idephix($target, new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
         $idx->getApplication()->setAutoExit(false);
 
-        $idx->add('foo', function() use ($idx){
+        $idx->add('foo', function() use ($idx) {
             $idx->local('echo "Hello World from '.$idx->getCurrentTargetHost().'"');
         });
 

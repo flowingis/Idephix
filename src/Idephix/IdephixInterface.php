@@ -36,7 +36,7 @@ interface IdephixInterface
     /**
      * Execute remote command.
      *
-     * @param string  $cmd command
+     * @param string  $cmd    command
      * @param boolean $dryRun
      */
     public function remote($cmd, $dryRun = false);

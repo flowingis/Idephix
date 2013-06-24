@@ -3,7 +3,6 @@ namespace Idephix\Extension\Deploy;
 
 use Idephix\Tests\Test\IdephixTestCase;
 use Idephix\Extension\Deploy\Deploy;
-use Idephix\Config\Config;
 
 class DeployTest extends IdephixTestCase
 {
@@ -17,7 +16,11 @@ class DeployTest extends IdephixTestCase
                     'local_base_dir' => 'local_dir',
                     'remote_base_dir' => "/tmp/temp_dir",
                     'rsync_exclude_file' => 'rsync_exclude.txt',
-                    'rsync_include_file' => 'rsync_include.txt'
+                    'rsync_include_file' => 'rsync_include.txt',
+                    'shared_folders' => array (
+                        'app/logs',
+                        'web/uploads'
+                    ),
                 )
             )
         );
@@ -61,13 +64,18 @@ class DeployTest extends IdephixTestCase
         $this->assertEquals('23', $port);
 
         $expected = "Remote: ls /tmp/temp_dir/current
-Bootstrap: OK
+ Host ready banana.com
 Remote: mkdir -p $nextReleaseDir
 Copy code to the next release dir
 Remote: cp -pPR '$currentReleaseDir/.' '$nextReleaseDir'
 Sync code to the next release
 Local: rsync -rlpDvcz --delete -e 'ssh -p $port'  --exclude-from=rsync_exclude.txt --include-from=rsync_include.txt local_dir/ $user@$host:$nextReleaseDir
-Remote: cd $nextReleaseDir && ./app/console cache:clear --env=prod --no-debug
+Updating symlink for shared folder ..
+Linking shared folder $nextReleaseDir/app/logs ...
+Remote: ln -nfs /tmp/temp_dir/shared/app/logs $nextReleaseDir/app/logs
+Linking shared folder $nextReleaseDir/web/uploads ...
+Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
+Remote: cd $nextReleaseDir && ./app/console cache:clear --env=prod --no-debug && ./app/console cache:warmup --env=prod
 Switch to next release...
 Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 Asset and assetic stuff...
