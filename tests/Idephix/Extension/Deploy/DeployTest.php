@@ -64,7 +64,7 @@ class DeployTest extends IdephixTestCase
         $this->assertEquals('23', $port);
 
         $expected = "Remote: ls /tmp/temp_dir/current
- Host ready banana.com
+Host ready banana.com
 Remote: mkdir -p $nextReleaseDir
 Copy code to the next release dir
 Remote: cp -pPR '$currentReleaseDir/.' '$nextReleaseDir'
