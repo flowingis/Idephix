@@ -96,7 +96,7 @@ class Deploy implements IdephixAwareInterface
         return $this->localBaseFolder;
     }
 
-    public function isRemoteReady ($forceBootstrap = false)
+    public function isRemoteReady($forceBootstrap = false)
     {
         try {
 
@@ -203,7 +203,7 @@ class Deploy implements IdephixAwareInterface
      */
     public function cacheClear()
     {
-        return $this->idx->remote('cd '.$this->getNextReleaseFolder().' && ./app/console cache:clear --env=prod --no-debug && ./app/console cache:warmup --env=prod', $this->dryRun);
+        return $this->idx->remote('cd '.$this->getNextReleaseFolder().' && ./app/console cache:clear --env=prod --no-debug', $this->dryRun);
     }
 
     /**
