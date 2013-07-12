@@ -96,7 +96,7 @@ class Deploy implements IdephixAwareInterface
         return $this->localBaseFolder;
     }
 
-    public function isRemoteReady($forceBootstrap = false)
+    public function isRemoteReady()
     {
         try {
 
@@ -107,9 +107,8 @@ class Deploy implements IdephixAwareInterface
 
         } catch (\Exception $e) {
 
-            $this->log("Host NOT ready ".$this->sshClient->getHost());
+            $this->log(sprintf("Host %s NOT ready", $this->sshClient->getHost()));
 
-            if ($forceBootstrap) $this->bootstrap();
             return false;
 
         }
@@ -259,7 +258,13 @@ class Deploy implements IdephixAwareInterface
 
         $this->setUpEnvironment();
 
-        $this->isRemoteReady($automaticBootstrap);
+        if (!$this->isRemoteReady()) {
+            if ($automaticBootstrap)
+                $this->bootstrap();
+            else
+                throw new \Exception("Remote host not ready for deploy");
+        }
+
         $this->remotePrepare();
 
         $this->strategy->deploy();
