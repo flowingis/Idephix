@@ -31,9 +31,9 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 
     public function testRsyncProject()
     {
-        $result = $this->project->rsyncProject('/a/remote');
+        $result = $this->project->rsyncProject('/a/remote', './from');
 
-        $this->assertEquals("rsync -rlDcz --force --delete --progress  -e 'ssh' ./ kea@banana.com:/a/remote/", $result);
+        $this->assertEquals("rsync -rlDcz --force --delete --progress  -e 'ssh' ./from kea@banana.com:/a/remote/", $result);
     }
 
 }

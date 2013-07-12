@@ -34,7 +34,7 @@ class Project implements IdephixAwareInterface
           $extraOpts .= ' --exclude-from='.$exclude;
         }
 
-        $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e 'ssh' ./ $user@$host:$remoteDir";
+        $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e 'ssh' $localDir $user@$host:$remoteDir";
 
         return $this->idx->local($cmd);
     }
