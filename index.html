@@ -11,12 +11,12 @@ title: home
 <p>
 	Idephix is a PHP automation tool useful to perform <strong>remote</strong> and <strong>local</strong> tasks.
 	It can be used to deploy applications, rotate logs, synchronize data repository across server or create a build system. The choice is up to you.
-	Idephix is still in alpha, so things will change. You can report issues and submit PRs (greatly appreciated :-)) on the github repo  
+	Idephix is still in alpha, so things will change. You can report issues and submit PRs (greatly appreciated :-)) on the <a href="https://github.com/ideatosrl/Idephix" title="Idephix github repository">github repo</a>
 </p>
 
 <h3>Install Idephix</h3>
 
-<p>You can choose to install idephix where you prefer. Idephix will use the configuration file in the corrent path.</p>
+<p>You can choose to install idephix where you prefer. Idephix will use (or create for you) the configuration file in the corrent path.</p>
 
 <ul>
 	<li>Change into a directory in your path like <code>cd /usr/local/bin</code></li>
@@ -30,8 +30,21 @@ title: home
 
 <h3>Usage example</h3>
 
-<p>create an <code>idxfile.php</code></p>
+<p>
+  You can run directly the dowloaded phar and answer "yes" to let idephix create a basic idxfile.php for you.
+  <pre>
+    <code>
+$ ./idephix.phar
+$ idephix.php file does not exists!
+$ Do you want that I generate one for you? [yes|no]
+    </code>
+  </pre>
+</p>
+
+<p>or you can create it by hand</p>
 <pre><code>&lt;?php
+
+/* /your/project/path/idxfile.php */
 
 use Idephix\Idephix;
 
@@ -98,31 +111,31 @@ $idx->run();
 
 <p>run <code>idephix.phar</code> to execute the script and get the commands list</p>
 <pre><code>$ ./idephix.phar
-  ___    _            _     _
- |_ _|__| | ___ _ __ | |__ (_)_  __
-  | |/ _` |/ _ \ '_ \| '_ \| \ \/ /
-  | | (_| |  __/ |_) | | | | |&gt;  &lt;
+  ___    _            _     _
+ |_ _|__| | ___ _ __ | |__ (_)_  __
+  | |/ _` |/ _ \ '_ \| '_ \| \ \/ /
+  | | (_| |  __/ |_) | | | | |&gt;  &lt;
  |___\__,_|\___| .__/|_| |_|_/_/\_\
-               |_|
+               |_|
 Idephix version @package_version@
 
 Usage:
-  [options] command [arguments]
+  [options] command [arguments]
 
 Options:
-  --help           -h Display this help message.
-  --quiet          -q Do not output any message.
-  --verbose        -v Increase verbosity of messages.
-  --version        -V Display this application version.
-  --ansi              Force ANSI output.
-  --no-ansi           Disable ANSI output.
-  --no-interaction -n Do not ask any interactive question.
-  --env               Set remote environment.
+  --help           -h Display this help message.
+  --quiet          -q Do not output any message.
+  --verbose        -v Increase verbosity of messages.
+  --version        -V Display this application version.
+  --ansi              Force ANSI output.
+  --no-ansi           Disable ANSI output.
+  --no-interaction -n Do not ask any interactive question.
+  --env               Set remote environment.
 
 Available commands:
-  build
-  help                   Displays help for a command
-  list                   Lists commands
+  help              Displays help for a command
+  list              Lists commands
+  selfupdate        Donwload and update Idephix
 myscript
   myscript:local-touch	Execute the touch of a file named in input locally
   myscript:remote-touch	Execute the touch of a file named in input in a remote server
