@@ -3,6 +3,7 @@
 namespace Idephix\Extension\SelfUpdate;
 
 use Idephix\Idephix;
+use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\IdephixInterface;
 

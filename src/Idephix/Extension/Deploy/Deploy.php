@@ -135,7 +135,7 @@ class Deploy implements IdephixAwareInterface
         $folder = $current ? $this->getCurrentReleaseFolder() : $this->getNextReleaseFolder();
         $this->log("Asset and assetic stuff...");
         $this->idx->remote('cd '.$folder.' && php app/console assets:install --symlink web', $this->dryRun);
-        $this->idx->remote('cd '.$folder.' && php app/console assetic:dump --env=prod', $this->dryRun);
+        $this->idx->remote('cd '.$folder.' && php app/console assetic:dump --env=prod --no-debug', $this->dryRun);
     }
 
     /**
@@ -175,7 +175,7 @@ class Deploy implements IdephixAwareInterface
      */
     public function cacheClear()
     {
-        return $this->idx->remote('cd '.$this->getNextReleaseFolder().' && ./app/console cache:clear --env=prod --no-debug && ./app/console cache:warmup', $this->dryRun);
+        return $this->idx->remote('cd '.$this->getNextReleaseFolder().' && ./app/console cache:clear --env=prod --no-debug', $this->dryRun);
     }
 
     /**

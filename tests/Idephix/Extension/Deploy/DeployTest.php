@@ -66,13 +66,13 @@ Remote: mkdir -p $nextReleaseDir
 Copy code to the next release dir
 Remote: cp -pPR '$currentReleaseDir/.' '$nextReleaseDir'
 Sync code to the next release
-Local: rsync -rlpDvcz --delete -e 'ssh -p $port'  --exclude-from=rsync_exclude.txt --include-from=rsync_include.txt  $user@$host:$nextReleaseDir
-Remote: cd $nextReleaseDir && ./app/console cache:clear --env=prod --no-debug && ./app/console cache:warmup
+Local: rsync -rlpDvcz --delete -e 'ssh -p $port'  --exclude-from=rsync_exclude.txt --include-from=rsync_include.txt local_dir/ $user@$host:$nextReleaseDir
+Remote: cd $nextReleaseDir && ./app/console cache:clear --env=prod --no-debug
 Switch to next release...
 Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 Asset and assetic stuff...
 Remote: cd /tmp/temp_dir/current && php app/console assets:install --symlink web
-Remote: cd /tmp/temp_dir/current && php app/console assetic:dump --env=prod
+Remote: cd /tmp/temp_dir/current && php app/console assetic:dump --env=prod --no-debug
 Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
 ";
 

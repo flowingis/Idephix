@@ -2,9 +2,8 @@
 
 namespace Idephix\Extension\PHPUnit;
 
-use Idephix\Idephix;
-use Idephix\Extension\IdephixAwareInterface;
 use Idephix\IdephixInterface;
+use Idephix\Extension\IdephixAwareInterface;
 
 /**
  * Description of PHPUnit wrapper
@@ -20,7 +19,7 @@ class PHPUnit implements IdephixAwareInterface
         $this->idx->local('phpunit '.$params_string);
     }
 
-    public function setIdephix(IdephixAwareInterface $idx)
+    public function setIdephix(IdephixInterface $idx)
     {
         $this->idx = $idx;
     }
