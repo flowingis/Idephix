@@ -91,7 +91,7 @@ $idx->
             passthru("app/console assetic:dump");
         })->
     /**
-     * Symfony2 installing assets and running assetic command
+     * run phpunit tests
      */
     add('test:run',
         function () use ($idx)
