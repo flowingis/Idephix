@@ -12,6 +12,7 @@ class CLISshProxy extends BaseProxy
     protected $user = '';
     protected $password = '';
     protected $privateKeyFile = null;
+    protected $timeout = 600;
 
     private function canConnect()
     {
@@ -66,7 +67,7 @@ class CLISshProxy extends BaseProxy
     public function exec($cmd)
     {
         $preparedCmd = $this->prepareCommand($cmd);
-        $process = new Process($preparedCmd);
+        $process = new Process($preparedCmd, null, null, null, $this->timeout);
         $process->run();
         $this->lastOutput = $process->getOutput();
         $this->lastError = $process->getErrorOutput();
