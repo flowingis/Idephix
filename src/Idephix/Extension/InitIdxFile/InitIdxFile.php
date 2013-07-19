@@ -10,6 +10,13 @@ class InitIdxFile implements IdephixAwareInterface
 {
     private $idx;
 
+    private $baseDir;
+
+    public function __construct($baseDir = '.')
+    {
+        $this->baseDir = $baseDir;
+    }
+
     public function setIdephix(IdephixInterface $idx)
     {
         $this->idx = $idx;
@@ -105,7 +112,11 @@ $idx->addLibrary('phpunit', new PHPUnit());
 
 $idx->run();
 DEFAULT;
-        if (!is_writable('.') || false === file_put_contents('idxfile.php', $data)) {
+        if (!is_writable($this->baseDir) || false === file_put_contents(
+                $this->baseDir . DIRECTORY_SEPARATOR . 'idxfile.php',
+                $data
+            )
+        ) {
             throw new \Exception('Cannot write idxfile.php, check your permission configuration.');
         }
 

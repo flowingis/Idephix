@@ -3,10 +3,19 @@ namespace Idephix\Extension\Deploy;
 
 use Idephix\Tests\Test\IdephixTestCase;
 use Idephix\Extension\InitIdxFile\InitIdxFile;
-use Idephix\Config\Config;
+use org\bovigo\vfs\vfsStreamDirectory;
+use org\bovigo\vfs\vfsStreamWrapper;
 
 class InitIdxFileTest extends IdephixTestCase
 {
+    public function setUp()
+    {
+        @include_once 'vfsStream/vfsStream.php';
+
+        vfsStreamWrapper::register();
+        vfsStreamWrapper::setRoot(new vfsStreamDirectory('root'));
+    }
+
     public function testInitIdxFile()
     {
         $idx = $this->getMock('\Idephix\IdephixInterface');
@@ -14,12 +23,10 @@ class InitIdxFileTest extends IdephixTestCase
         $idx->output->expects($this->exactly(2))
             ->method('writeln');
 
-        $initIdxFile = new InitIdxFile();
+        $initIdxFile = new InitIdxFile('vfs://root');
         $initIdxFile->setIdephix($idx);
         $initIdxFile->initFile();
 
-        $this->assertTrue(file_exists('idxfile.php'));
-
-        unlink('idxfile.php');
+        $this->assertTrue(file_exists('vfs://root/idxfile.php'));
     }
 }
