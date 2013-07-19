@@ -27,6 +27,13 @@ class InitIdxFile implements IdephixAwareInterface
      */
     public function initFile()
     {
+        $idxFile = $this->baseDir . DIRECTORY_SEPARATOR . 'idxfile.php';
+        if (file_exists($idxFile)) {
+            $this->idx->output->writeln("<error>An idxfile.php already exists, generation skipped.</error>");
+
+            return;
+        }
+
         $this->idx->output->writeln("Creating basic idxfile.php file...");
 
         $data = <<<'DEFAULT'
@@ -112,11 +119,7 @@ $idx->addLibrary('phpunit', new PHPUnit());
 
 $idx->run();
 DEFAULT;
-        if (!is_writable($this->baseDir) || false === file_put_contents(
-                $this->baseDir . DIRECTORY_SEPARATOR . 'idxfile.php',
-                $data
-            )
-        ) {
+        if (!is_writable($this->baseDir) || false === file_put_contents($idxFile, $data)) {
             throw new \Exception('Cannot write idxfile.php, check your permission configuration.');
         }
 
