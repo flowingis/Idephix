@@ -240,6 +240,9 @@ class Idephix implements IdephixInterface
         $this
             ->add(
                 'init-idx-file',
+                /**
+                 * Create an example idxfile.php
+                 */
                 function () use ($idx)
                 {
                     $idx->initIdxFile()->initFile();
