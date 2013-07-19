@@ -14,7 +14,7 @@ use Idephix\Config\Config;
 
 class Idephix implements IdephixInterface
 {
-    const VERSION = 'fa43ca533d7a867700fe1fa59cedd65d55b613b5';
+    const VERSION = '@package_version@';
     private $application;
     private $library = array();
     private $output;
