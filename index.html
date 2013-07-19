@@ -23,25 +23,48 @@ title: home
 	<li>Get Idephix <code>curl http://getidephix.com/idephix.phar > idephix.phar</code></li>
 	<li>Make the phar executable <code>chmod a+x idephix.phar</code></li>
 	<li>Change into a project directory <code>cd /path/to/my/project</code></li>
+  <li>Create a new idxfile.php using <code>idephix.phar init-idx-file</code></li>
 	<li>Define your tasks in <code>idxfile.php</code></li>
 	<li>Use idephix as you normally would <code>idephix.phar</code></li>
 	<li>Optionally you can rename the <code>idephix.phar</code> to <code>idx</code> to make it easier</li>
 </ul>
 
-<h3>Usage example</h3>
-
 <p>
-  You can run directly the dowloaded phar and answer "yes" to let idephix create a basic idxfile.php for you.
-  <pre>
-    <code>
-$ ./idephix.phar
-$ idephix.php file does not exists!
-$ Do you want that I generate one for you? [yes|no]
-    </code>
-  </pre>
+    Idephix ships with some predefined commands:
 </p>
 
-<p>or you can create it by hand</p>
+<pre><code>$ ./idephix.phar
+  ___    _            _     _
+ |_ _|__| | ___ _ __ | |__ (_)_  __
+  | |/ _` |/ _ \ '_ \| '_ \| \ \/ /
+  | | (_| |  __/ |_) | | | | |&gt;  &lt;
+ |___\__,_|\___| .__/|_| |_|_/_/\_\
+               |_|
+Idephix version @package_version@
+
+Usage:
+  [options] command [arguments]
+
+Options:
+  --help           -h Display this help message.
+  --quiet          -q Do not output any message.
+  --verbose        -v Increase verbosity of messages.
+  --version        -V Display this application version.
+  --ansi              Force ANSI output.
+  --no-ansi           Disable ANSI output.
+  --no-interaction -n Do not ask any interactive question.
+  --env               Set remote environment.
+
+Available commands:
+  help              Displays help for a command
+  init-idx-file     Create an example idxfile.php
+  list              Lists commands
+  selfupdate        Donwload and update Idephix
+</code></pre>
+
+<h3>Usage example</h3>
+
+<p>You can create idxfile.php by hand:</p>
 <pre><code>&lt;?php
 
 /* /your/project/path/idxfile.php */
@@ -153,6 +176,7 @@ Options:
 
 Available commands:
   help              Displays help for a command
+  init-idx-file     Create an example idxfile.php
   list              Lists commands
   selfupdate        Donwload and update Idephix
 myscript
