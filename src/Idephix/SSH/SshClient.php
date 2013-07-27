@@ -61,7 +61,7 @@ class SshClient
             throw new \Exception("Unable to authenticate via public/private keys");
         }
 
-        if (!$this->proxy->authByAgent($this->params['user'])) {
+        if (empty($this->params['password']) && empty($this->params['public_key_file']) && !$this->proxy->authByAgent($this->params['user'])) {
             throw new \Exception("Unable to authenticate via agent");
         }
 
