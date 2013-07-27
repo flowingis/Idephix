@@ -36,7 +36,7 @@ class PeclSsh2Proxy extends BaseProxy
 
     public function exec($cmd)
     {
-        $stdout = ssh2_exec($this->connection, $cmd.'; echo "_RETURNS_:$?:"', 'ansi');
+        $stdout = ssh2_exec($this->connection, $cmd.'; echo "__RETURNS__:$?"', 'ansi');
         $stderr = ssh2_fetch_stream($stdout, SSH2_STREAM_STDERR);
 
         stream_set_blocking($stderr, true);
@@ -49,7 +49,7 @@ class PeclSsh2Proxy extends BaseProxy
 
         $pos = strpos($this->lastOutput, '__RETURNS__:');
         if (false !== $pos) {
-            $returnCode = substr($this->lastOutput, $pos, -1);
+            $returnCode = substr($this->lastOutput, $pos + 12);
             $this->lastOutput = substr($this->lastOutput, 0, $pos);
         }
 
