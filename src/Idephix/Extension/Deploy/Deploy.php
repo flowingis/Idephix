@@ -96,6 +96,11 @@ class Deploy implements IdephixAwareInterface
         return $this->localBaseFolder;
     }
 
+    /**
+     * Check if the current remote host is already bootstrapped
+     *
+     * @return boolean true if the host is ready, false otherwise
+     */
     public function isRemoteReady()
     {
         try {
@@ -115,6 +120,11 @@ class Deploy implements IdephixAwareInterface
 
     }
 
+    /**
+     * Create the next release folder
+     *
+     * @return string the output of the creation command
+     */
     public function remotePrepare()
     {
 
@@ -124,6 +134,9 @@ class Deploy implements IdephixAwareInterface
 
     }
 
+    /**
+     * Update the "current" symlink to the next release folder
+     */
     public function switchToTheNextRelease()
     {
         $this->log("Switch to next release...");
@@ -131,31 +144,38 @@ class Deploy implements IdephixAwareInterface
     }
 
     /**
-     * @todo
+     * Link shared folders to the next release
      */
     public function remoteLinkSharedFolders()
     {
+        $this->log("Updating symlink for shared folder ..");
 
-      $this->log("Updating symlink for shared folder ..");
+        foreach ($this->sharedFolders as $_folder) {
 
-      foreach ($this->sharedFolders as $_folder) {
+            $fullPathSharedFolder        = $this->remoteBaseFolder.'shared/'.$_folder;
+            $fullPathReleaseSharedFolder = $this->remoteBaseFolder.'releases/'.$this->getNextReleaseName()."/".$_folder;
 
-        $_full_path_shared_folder           = $this->remoteBaseFolder.'shared/'.$_folder;
-        $_full_path_release_shared_folder   = $this->remoteBaseFolder.'releases/'.$this->getNextReleaseName()."/".$_folder;
+            $this->log("Linking shared folder ".$fullPathReleaseSharedFolder." ...");
 
-        $this->log("Linking shared folder ".$_full_path_release_shared_folder." ...");
+            if (file_exists($fullPathReleaseSharedFolder)) {
+                if (is_dir($fullPathReleaseSharedFolder)) {
+                    $this->idx->remote('rmdir '.$fullPathReleaseSharedFolder);
+                } elseif (is_link($fullPathReleaseSharedFolder)) {
+                    $this->idx->remote('unlink '.$fullPathReleaseSharedFolder);
+                } elseif (is_file($fullPathReleaseSharedFolder)) {
+                    $this->idx->remote('rm '.$fullPathReleaseSharedFolder);
+                }
+            }
 
-        if (file_exists($_full_path_release_shared_folder))
-            $this->idx->remote('rmdir '.$_full_path_release_shared_folder);
+            $this->idx->remote('ln -nfs '.$fullPathSharedFolder. ' '.$fullPathReleaseSharedFolder);
 
-        $this->idx->remote('ln -nfs '.$_full_path_shared_folder. ' '.$_full_path_release_shared_folder);
-
-      }
-
+        }
     }
 
     /**
-     * @todo env?
+     * Run assets:install and assetic:dump on remote host
+     *
+     * @param boolean $current if true run commands on current release folder, on next release folder otherwise
      */
     public function assetic($current = true)
     {
@@ -259,10 +279,11 @@ class Deploy implements IdephixAwareInterface
         $this->setUpEnvironment();
 
         if (!$this->isRemoteReady()) {
-            if ($automaticBootstrap)
+            if ($automaticBootstrap) {
                 $this->bootstrap();
-            else
+            } else {
                 throw new \Exception("Remote host not ready for deploy");
+            }
         }
 
         $this->remotePrepare();
