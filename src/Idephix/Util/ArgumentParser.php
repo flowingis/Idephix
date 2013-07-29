@@ -21,7 +21,7 @@ class ArgumentParser
         }
 
         foreach (str_split($options[1]) as $option) {
-            $this->options[(string)$option] = true;
+            $this->options[(string) $option] = true;
         }
     }
 
@@ -44,7 +44,8 @@ class ArgumentParser
      *
      * @param array $noOptions List of parameters without values
      */
-    function parse($arguments, $noOptions = array()) {
+    public function parse($arguments, $noOptions = array())
+    {
         $this->options = array();
         $this->params = array();
         $onlyParams = false;

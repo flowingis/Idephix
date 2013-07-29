@@ -12,7 +12,6 @@ class Copy implements DeployStrategyInterface
     protected $rsyncExcludeFile;
     protected $rsyncIncludeFile;
 
-
     public function __construct(IdephixInterface $idx, Config $target)
     {
         $this->idx = $idx;
@@ -71,6 +70,5 @@ class Copy implements DeployStrategyInterface
             sprintf("cp -pPR %s %s", escapeshellarg($from), escapeshellarg($to)),
             $this->target->get('deploy.dry_run'));
     }
-
 
 }

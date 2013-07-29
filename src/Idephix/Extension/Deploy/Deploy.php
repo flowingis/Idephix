@@ -21,6 +21,7 @@ class Deploy implements IdephixAwareInterface
     private $timestamp;
     private $hasToMigrate = false;
     private $strategy;
+    private $sharedFolders;
 
     public function __construct()
     {
@@ -45,10 +46,12 @@ class Deploy implements IdephixAwareInterface
             throw new \Exception("No deploy parameters found. Check you configuration.");
         }
 
-        $this->hasToMigrate = $target->get('deploy.migrations', false);
+        $this->hasToMigrate     = $target->get('deploy.migrations', false);
         $this->localBaseFolder  = $target->getFixedPath('deploy.local_base_dir');
         $this->remoteBaseFolder = $target->getFixedPath('deploy.remote_base_dir');
         $this->releasesFolder   = $this->remoteBaseFolder.'releases/';
+        $this->sharedFolders    = $target->get('deploy.shared_folders');
+
         $target->set('deploy.releases_dir', $this->releasesFolder);
         $target->set('deploy.current_release_dir', $this->getCurrentReleaseFolder());
         $target->set('deploy.next_release_dir', $this->getNextReleaseFolder());
@@ -93,22 +96,32 @@ class Deploy implements IdephixAwareInterface
         return $this->localBaseFolder;
     }
 
-    public function remotePrepare($forceBootstrap = false)
+    public function isRemoteReady()
     {
         try {
-            $this->idx->remote('ls '.$this->getCurrentReleaseFolder());
-        } catch (\Exception $e) {
-            if (!$forceBootstrap) {
-                throw new \Exception('You have to bootstrap your server first: '.$this->sshClient->getHost());
-            }
 
-            $this->bootstrap();
+            $this->idx->remote('ls '.$this->getCurrentReleaseFolder());
+            $this->log("Host ready ".$this->sshClient->getHost());
+
+            return true;
+
+        } catch (\Exception $e) {
+
+            $this->log(sprintf("Host %s NOT ready", $this->sshClient->getHost()));
+
+            return false;
+
         }
 
-        $this->log("Bootstrap: OK");
+    }
+
+    public function remotePrepare()
+    {
+
         $cmd = "mkdir -p ".$this->getNextReleaseFolder();
 
         return $this->idx->remote($cmd, $this->dryRun);
+
     }
 
     public function switchToTheNextRelease()
@@ -122,9 +135,23 @@ class Deploy implements IdephixAwareInterface
      */
     public function remoteLinkSharedFolders()
     {
-      //ln -s ../shared/master/logs
-      //ln -fs ../shared/web/imagine
-      //ln -fs ../shared/web/uploads
+
+      $this->log("Updating symlink for shared folder ..");
+
+      foreach ($this->sharedFolders as $_folder) {
+
+        $_full_path_shared_folder           = $this->remoteBaseFolder.'shared/'.$_folder;
+        $_full_path_release_shared_folder   = $this->remoteBaseFolder.'releases/'.$this->getNextReleaseName()."/".$_folder;
+
+        $this->log("Linking shared folder ".$_full_path_release_shared_folder." ...");
+
+        if (file_exists($_full_path_release_shared_folder))
+            $this->idx->remote('rmdir '.$_full_path_release_shared_folder);
+
+        $this->idx->remote('ln -nfs '.$_full_path_shared_folder. ' '.$_full_path_release_shared_folder);
+
+      }
+
     }
 
     /**
@@ -192,14 +219,20 @@ class Deploy implements IdephixAwareInterface
      */
     public function bootstrap()
     {
+        $this->log("Boostrapping environment ...");
+
         $bootstrapFolder = $this->releasesFolder.'bootstrap';
         $this->idx->remote("mkdir -p ".$bootstrapFolder);
         $out = $this->sshClient->getLastOutput();
         $this->idx->remote("cd ".$this->remoteBaseFolder." && ln -s releases/bootstrap current");
         $out .= $this->sshClient->getLastOutput();
 
-        // @todo: share folder
-        // $this->idx->remote('mkdir -p '.$this->releaseFolder.'shared');
+        $this->log("Creating shared folders...");
+
+        foreach ($this->sharedFolders as $_folder) {
+          $this->log("Creating shared folder ".$_folder." ...");
+          $this->idx->remote('mkdir -p '.$this->remoteBaseFolder.'shared/'.$_folder);
+        }
 
         return $out;
     }
@@ -220,17 +253,32 @@ class Deploy implements IdephixAwareInterface
 
     public function deploySF2Copy($go, $releasesToKeep = 6, $automaticBootstrap = true)
     {
+
         $this->setDryRun(!$go);
+
         $this->setUpEnvironment();
-        $this->remotePrepare($automaticBootstrap);
+
+        if (!$this->isRemoteReady()) {
+            if ($automaticBootstrap)
+                $this->bootstrap();
+            else
+                throw new \Exception("Remote host not ready for deploy");
+        }
+
+        $this->remotePrepare();
+
         $this->strategy->deploy();
+
         $this->remoteLinkSharedFolders();
+
         if ($this->hasToMigrate()) {
             $this->doctrineMigrate();
         }
+
         $this->cacheClear();
         $this->switchToTheNextRelease();
         $this->assetic();
         $this->deleteOldReleases($releasesToKeep);
+
     }
 }

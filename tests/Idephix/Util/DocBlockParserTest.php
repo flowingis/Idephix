@@ -18,8 +18,7 @@ class DocBlockParserTest extends \PHPUnit_Framework_TestCase
          * @param string $param3
          * @return string nothing interesting
          */
-        function ($param1 = true, $param2 = 'bho')
-        {
+        function ($param1 = true, $param2 = 'bho') {
             // function body
         };
 

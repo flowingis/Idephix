@@ -225,8 +225,7 @@ class Idephix implements IdephixInterface
                     /**
                      * Donwload and update Idephix
                      */
-                    function () use ($idx)
-                    {
+                    function () use ($idx) {
                         $idx->selfUpdate()->update();
                     }
                 );
@@ -253,7 +252,7 @@ class Idephix implements IdephixInterface
     /**
      * Execute remote command.
      *
-     * @param string  $cmd command
+     * @param string  $cmd    command
      * @param boolean $dryRun
      */
     public function remote($cmd, $dryRun = false)

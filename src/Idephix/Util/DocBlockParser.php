@@ -93,12 +93,10 @@ class DocBlockParser
         return $this->hasParam($name) ? $this->params[$name] : null;
     }
 
-
     public function hasParam($name)
     {
         return isset($this->params[$name]);
     }
-
 
     public function getParams()
     {
