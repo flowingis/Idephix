@@ -2,11 +2,9 @@
 namespace Idephix;
 
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Idephix\Util\DocBlockParser;
 
 use Idephix\CommandWrapper;
 

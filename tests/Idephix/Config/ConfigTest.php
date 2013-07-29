@@ -1,8 +1,6 @@
 <?php
 namespace Idephix\Config;
 
-use Idephix\CommandWrapper;
-
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetter()
