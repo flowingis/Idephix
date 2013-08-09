@@ -21,7 +21,7 @@ class Deploy implements IdephixAwareInterface
     private $timestamp;
     private $hasToMigrate = false;
     private $strategy;
-    private $sharedFolders;
+    private $sharedFolders = array();
 
     public function __construct()
     {
@@ -50,7 +50,7 @@ class Deploy implements IdephixAwareInterface
         $this->localBaseFolder  = $target->getFixedPath('deploy.local_base_dir');
         $this->remoteBaseFolder = $target->getFixedPath('deploy.remote_base_dir');
         $this->releasesFolder   = $this->remoteBaseFolder.'releases/';
-        $this->sharedFolders    = $target->get('deploy.shared_folders');
+        $this->sharedFolders    = $target->get('deploy.shared_folders', array());
 
         $target->set('deploy.releases_dir', $this->releasesFolder);
         $target->set('deploy.current_release_dir', $this->getCurrentReleaseFolder());
@@ -250,8 +250,8 @@ class Deploy implements IdephixAwareInterface
         $this->log("Creating shared folders...");
 
         foreach ($this->sharedFolders as $_folder) {
-          $this->log("Creating shared folder ".$_folder." ...");
-          $this->idx->remote('mkdir -p '.$this->remoteBaseFolder.'shared/'.$_folder);
+            $this->log("Creating shared folder ".$_folder." ...");
+            $this->idx->remote('mkdir -p '.$this->remoteBaseFolder.'shared/'.$_folder);
         }
 
         return $out;
