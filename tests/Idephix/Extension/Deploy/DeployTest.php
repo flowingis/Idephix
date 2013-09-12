@@ -72,8 +72,12 @@ Sync code to the next release
 Local: rsync -rlpDvcz --delete -e 'ssh -p $port'  --exclude-from=rsync_exclude.txt --include-from=rsync_include.txt local_dir/ $user@$host:$nextReleaseDir
 Updating symlink for shared folder ..
 Linking shared folder $nextReleaseDir/app/logs ...
+Remote: [ -e '$nextReleaseDir/app/logs' ]
+Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm $nextReleaseDir/app/logs
 Remote: ln -nfs /tmp/temp_dir/shared/app/logs $nextReleaseDir/app/logs
 Linking shared folder $nextReleaseDir/web/uploads ...
+Remote: [ -e '$nextReleaseDir/web/uploads' ]
+Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
 Remote: cd $nextReleaseDir && ./app/console cache:clear --env=prod --no-debug
 Switch to next release...

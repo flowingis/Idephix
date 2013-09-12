@@ -143,6 +143,17 @@ class Deploy implements IdephixAwareInterface
         $this->idx->remote("cd ".$this->remoteBaseFolder." && ln -s releases/".$this->getNextReleaseName()." next && mv -fT next current", $this->dryRun);
     }
 
+    public function remoteFileExits($path)
+    {
+        try {
+            $this->idx->remote("[ -e '$path' ]", $this->dryRun);
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     /**
      * Link shared folders to the next release
      */
@@ -150,25 +161,33 @@ class Deploy implements IdephixAwareInterface
     {
         $this->log("Updating symlink for shared folder ..");
 
-        foreach ($this->sharedFolders as $_folder) {
+        foreach ($this->sharedFolders as $folder) {
 
-            $fullPathSharedFolder        = $this->remoteBaseFolder.'shared/'.$_folder;
-            $fullPathReleaseSharedFolder = $this->remoteBaseFolder.'releases/'.$this->getNextReleaseName()."/".$_folder;
+            $fullPathSharedFolder        = $this->remoteBaseFolder.'shared/'.$folder;
+            $fullPathReleaseSharedFolder = $this->remoteBaseFolder.'releases/'.$this->getNextReleaseName()."/".$folder;
 
             $this->log("Linking shared folder ".$fullPathReleaseSharedFolder." ...");
 
-            if (file_exists($fullPathReleaseSharedFolder)) {
-                if (is_dir($fullPathReleaseSharedFolder)) {
-                    $this->idx->remote('rmdir '.$fullPathReleaseSharedFolder);
-                } elseif (is_link($fullPathReleaseSharedFolder)) {
-                    $this->idx->remote('unlink '.$fullPathReleaseSharedFolder);
-                } elseif (is_file($fullPathReleaseSharedFolder)) {
-                    $this->idx->remote('rm '.$fullPathReleaseSharedFolder);
+            if ($this->remoteFileExits($fullPathReleaseSharedFolder)) {
+                try {
+                    $this->idx->remote(
+                        sprintf(
+                            "unlink %s || rmdir %s || rm %s",
+                            $fullPathReleaseSharedFolder,
+                            $fullPathReleaseSharedFolder,
+                            $fullPathReleaseSharedFolder
+                        ),
+                        $this->dryRun);
+                } catch (\Exception $e) {
+                    throw new \Exception(
+                        sprintf(
+                            'Unable to link shared directory "%s". Destination file or directory exists.',
+                            $fullPathReleaseSharedFolder
+                        ));
                 }
             }
 
             $this->idx->remote('ln -nfs '.$fullPathSharedFolder. ' '.$fullPathReleaseSharedFolder);
-
         }
     }
 
@@ -249,9 +268,9 @@ class Deploy implements IdephixAwareInterface
 
         $this->log("Creating shared folders...");
 
-        foreach ($this->sharedFolders as $_folder) {
-            $this->log("Creating shared folder ".$_folder." ...");
-            $this->idx->remote('mkdir -p '.$this->remoteBaseFolder.'shared/'.$_folder);
+        foreach ($this->sharedFolders as $folder) {
+            $this->log("Creating shared folder ".$folder." ...");
+            $this->idx->remote('mkdir -p '.$this->remoteBaseFolder.'shared/'.$folder);
         }
 
         return $out;
