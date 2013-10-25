@@ -232,7 +232,7 @@ class Deploy implements IdephixAwareInterface
      */
     public function doctrineMigrate()
     {
-        return $this->idx->remote('cd '.$this->getNextReleaseFolder().' && ./app/console doctrine:migration:migrate', $this->dryRun);
+        return $this->idx->remote('cd '.$this->getNextReleaseFolder()." && ./app/console doctrine:migration:migrate --env=$this->symfonyEnv", $this->dryRun);
     }
 
     /**
