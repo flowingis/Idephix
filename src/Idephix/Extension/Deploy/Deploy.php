@@ -22,6 +22,7 @@ class Deploy implements IdephixAwareInterface
     private $hasToMigrate = false;
     private $strategy;
     private $sharedFolders;
+    private $symfonyEnv;
 
     public function __construct()
     {
@@ -46,7 +47,8 @@ class Deploy implements IdephixAwareInterface
             throw new \Exception("No deploy parameters found. Check you configuration.");
         }
 
-        $this->hasToMigrate     = $target->get('deploy.migrations', false);
+        $this->symfonyEnv = $target->get('symfony_env', 'dev');
+        $this->hasToMigrate = $target->get('deploy.migrations', false);
         $this->localBaseFolder  = $target->getFixedPath('deploy.local_base_dir');
         $this->remoteBaseFolder = $target->getFixedPath('deploy.remote_base_dir');
         $this->releasesFolder   = $this->remoteBaseFolder.'releases/';
@@ -181,8 +183,8 @@ class Deploy implements IdephixAwareInterface
     {
         $folder = $current ? $this->getCurrentReleaseFolder() : $this->getNextReleaseFolder();
         $this->log("Asset and assetic stuff...");
-        $this->idx->remote('cd '.$folder.' && php app/console assets:install --symlink web', $this->dryRun);
-        $this->idx->remote('cd '.$folder.' && php app/console assetic:dump --env=prod --no-debug', $this->dryRun);
+        $this->idx->remote('cd '.$folder." && php app/console assets:install --symlink web --env=$this->symfonyEnv", $this->dryRun);
+        $this->idx->remote('cd '.$folder." && php app/console assetic:dump --env=$this->symfonyEnv --no-debug", $this->dryRun);
     }
 
     /**
@@ -222,7 +224,7 @@ class Deploy implements IdephixAwareInterface
      */
     public function cacheClear()
     {
-        return $this->idx->remote('cd '.$this->getNextReleaseFolder().' && ./app/console cache:clear --env=prod --no-debug', $this->dryRun);
+        return $this->idx->remote('cd '.$this->getNextReleaseFolder()." && ./app/console cache:clear --env=$this->symfonyEnv --no-debug", $this->dryRun);
     }
 
     /**
@@ -230,7 +232,7 @@ class Deploy implements IdephixAwareInterface
      */
     public function doctrineMigrate()
     {
-        return $this->idx->remote('cd '.$this->getNextReleaseFolder().' && ./app/console doctrine:migration:migrate', $this->dryRun);
+        return $this->idx->remote('cd '.$this->getNextReleaseFolder()." && ./app/console doctrine:migration:migrate --env=$this->symfonyEnv", $this->dryRun);
     }
 
     /**
