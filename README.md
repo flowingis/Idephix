@@ -80,3 +80,7 @@ License
 -------
 
 Idephix is licensed under the MIT License - see the LICENSE file for details
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ideatosrl/idephix/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
