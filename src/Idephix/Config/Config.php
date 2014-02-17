@@ -4,6 +4,8 @@ namespace Idephix\Config;
 
 class Config
 {
+    private $config = array();
+
     public function __construct(array $config)
     {
         $this->config = $config;
