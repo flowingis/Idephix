@@ -323,4 +323,9 @@ class Deploy implements IdephixAwareInterface
         $this->deleteOldReleases($releasesToKeep);
 
     }
+   
+    public function getStrategy()
+    {
+      return $this->strategy;
+    }
 }
