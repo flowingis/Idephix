@@ -31,19 +31,19 @@ class Project implements IdephixAwareInterface
 
         $target = $this->idx->getCurrentTarget();
 
-        if( $target !== null ) {
-            $user = $target->get('ssh_params.user');
-            $host = $this->idx->getCurrentTargetHost();
-
-            if (file_exists($exclude)) {
-                $extraOpts .= ' --exclude-from='.$exclude;
-            }
-
-            $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e 'ssh' $localDir $user@$host:$remoteDir";
-
-            return $this->idx->local($cmd);
-        } else {
-            $this->idx->output->writeln("<error>Target not provided. Please provide a valid target.</error>");
+        if( $target === null ) {
+            throw new \InvalidArgumentException("Target not provided. Please provide a valid target.");
         }
+
+        $user = $target->get('ssh_params.user');
+        $host = $this->idx->getCurrentTargetHost();
+
+        if (file_exists($exclude)) {
+            $extraOpts .= ' --exclude-from='.$exclude;
+        }
+
+        $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e 'ssh' $localDir $user@$host:$remoteDir";
+
+        return $this->idx->local($cmd);
     }
 }
