@@ -13,6 +13,9 @@ use Idephix\Extension\IdephixAwareInterface;
  */
 class Project implements IdephixAwareInterface
 {
+    /**
+     * @var \Idephix\IdephixInterface
+     */
     private $idx;
 
     public function setIdephix(IdephixInterface $idx)
@@ -27,11 +30,16 @@ class Project implements IdephixAwareInterface
         }
 
         $target = $this->idx->getCurrentTarget();
+
+        if( $target === null ) {
+            throw new \InvalidArgumentException("Target not provided. Please provide a valid target.");
+        }
+
         $user = $target->get('ssh_params.user');
         $host = $this->idx->getCurrentTargetHost();
 
         if (file_exists($exclude)) {
-          $extraOpts .= ' --exclude-from='.$exclude;
+            $extraOpts .= ' --exclude-from='.$exclude;
         }
 
         $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e 'ssh' $localDir $user@$host:$remoteDir";
