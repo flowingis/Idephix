@@ -171,12 +171,16 @@ class Idephix implements IdephixInterface
 
         $hosts = $this->hasTarget() ? $this->currentTarget->get('hosts') : array(null);
 
+        $hasErrors = false;
         foreach ($hosts as $host) {
             $this->currentHost = $host;
             $this->openRemoteConnection($host);
-            $this->application->run($this->input, $this->output);
+            $returnValue = $this->application->run($this->input, $this->output);
+            $hasErrors = $hasErrors || !(is_null($returnValue) || ($returnValue == 0));
             $this->closeRemoteConnection();
         }
+
+        return $hasErrors ? 1 : 0;
     }
 
     public function addLibrary($name, $library)
