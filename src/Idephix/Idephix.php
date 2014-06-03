@@ -26,7 +26,7 @@ class Idephix implements IdephixInterface
     protected $currentHost;
     protected $invokerClassName;
 
-    public function __construct(array $targets = null, SshClient $sshClient = null, OutputInterface $output = null, InputInterface $input = null)
+    public function __construct(array $targets = array(), SshClient $sshClient = null, OutputInterface $output = null, InputInterface $input = null)
     {
         $this->application = new Application('Idephix', self::VERSION);
         $this->targets = $targets;
