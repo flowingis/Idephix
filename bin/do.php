@@ -8,5 +8,11 @@ if (is_file($configFile)){
     return;
 }
 
+$configFile = getcwd().'/idxfile.php.dist';
+if (is_file($configFile)){
+    include $configFile;
+    return;
+}
+
 $idx = new Idephix\Idephix();
 $idx->run();
