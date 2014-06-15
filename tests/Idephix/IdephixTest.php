@@ -159,4 +159,35 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         rewind($this->output);
         $this->assertRegExp('/echo foo/m', stream_get_contents($this->output));
     }
+
+    public function getTaskAndReturnCode()
+    {
+        return array(
+            array('fooOk', 0),
+            array('fooKo', 1)
+        );
+    }
+
+    /**
+     * @covers Ideato\Idephix::run
+     * @dataProvider getTaskAndReturnCode
+     */
+    public function testReturnCode($task, $expected)
+    {
+        $_SERVER['argv'] = array('idx', $task);
+
+        $output = fopen("php://memory", 'r+');
+        $idx = new Idephix(array(), new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
+        $idx->getApplication()->setAutoExit(false);
+
+        $idx->add('fooOk', function() use ($idx) {
+            $idx->local("echo 'God save the Queen'");
+        });
+
+        $idx->add('fooKo', function() use ($idx) {
+            $idx->local("God save the Queen but this command will fail!");
+        });
+
+        $this->assertEquals($expected, $idx->run());
+    }
 }

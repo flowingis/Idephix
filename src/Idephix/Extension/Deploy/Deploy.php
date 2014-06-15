@@ -189,7 +189,7 @@ class Deploy implements IdephixAwareInterface
                 }
             }
 
-            $this->idx->remote('ln -nfs '.$fullPathSharedFolder. ' '.$fullPathReleaseSharedFolder);
+            $this->idx->remote('ln -nfs '.$fullPathSharedFolder. ' '.$fullPathReleaseSharedFolder, $this->dryRun);
         }
     }
 
@@ -322,5 +322,10 @@ class Deploy implements IdephixAwareInterface
         $this->assetic();
         $this->deleteOldReleases($releasesToKeep);
 
+    }
+   
+    public function getStrategy()
+    {
+      return $this->strategy;
     }
 }
