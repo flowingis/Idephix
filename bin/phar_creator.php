@@ -26,3 +26,4 @@ ENDSTUB;
 
 $phar->setStub($stub);
 file_put_contents($file, $content);
+chmod(__DIR__.'/idephix.phar',0775);
