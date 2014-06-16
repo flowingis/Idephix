@@ -84,11 +84,11 @@ Remote: mkdir -p /tmp/temp_dir/shared/web/uploads
 Updating symlink for shared folder ..
 Creating shared symlink for $nextReleaseDir/app/logs ...
 Remote: [ -e '$nextReleaseDir/app/logs' ]
-Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm $nextReleaseDir/app/logs
+Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm -R $nextReleaseDir/app/logs
 Remote: ln -nfs /tmp/temp_dir/shared/app/logs $nextReleaseDir/app/logs
 Creating shared symlink for $nextReleaseDir/web/uploads ...
 Remote: [ -e '$nextReleaseDir/web/uploads' ]
-Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
+Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm -R $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
 Remote: cd $nextReleaseDir && ./app/console cache:clear --env=dev --no-debug
 Switch to next release...
@@ -138,11 +138,11 @@ Remote: mkdir -p /tmp/temp_dir/shared/web/uploads
 Updating symlink for shared folder ..
 Creating shared symlink for $nextReleaseDir/app/logs ...
 Remote: [ -e '$nextReleaseDir/app/logs' ]
-Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm $nextReleaseDir/app/logs
+Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm -R $nextReleaseDir/app/logs
 Remote: ln -nfs /tmp/temp_dir/shared/app/logs $nextReleaseDir/app/logs
 Creating shared symlink for $nextReleaseDir/web/uploads ...
 Remote: [ -e '$nextReleaseDir/web/uploads' ]
-Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
+Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm -R $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
 Remote: cd $nextReleaseDir && ./app/console cache:clear --env=prod --no-debug
 Switch to next release...
@@ -211,11 +211,11 @@ Remote: mkdir -p /tmp/temp_dir/shared/web/uploads
 Updating symlink for shared folder ..
 Creating shared symlink for $nextReleaseDir/app/logs ...
 Remote: [ -e '$nextReleaseDir/app/logs' ]
-Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm $nextReleaseDir/app/logs
+Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm -R $nextReleaseDir/app/logs
 Remote: ln -nfs /tmp/temp_dir/shared/app/logs $nextReleaseDir/app/logs
 Creating shared symlink for $nextReleaseDir/web/uploads ...
 Remote: [ -e '$nextReleaseDir/web/uploads' ]
-Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
+Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm -R $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
 Remote: cd $nextReleaseDir && ./app/console doctrine:migration:migrate --env=dev
 Remote: cd $nextReleaseDir && ./app/console cache:clear --env=dev --no-debug
