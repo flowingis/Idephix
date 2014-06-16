@@ -270,15 +270,21 @@ class Deploy implements IdephixAwareInterface
         $this->idx->remote("cd ".$this->remoteBaseFolder." && ln -s releases/bootstrap current");
         $out .= $this->sshClient->getLastOutput();
 
+        $this->updateSharedFolders();
+
+        return $out;
+    }
+    
+    private function updateSharedFolders()
+    {
         $this->log("Creating shared folders...");
 
         foreach ($this->sharedFolders as $folder) {
             $this->log("Creating shared folder ".$folder." ...");
             $this->idx->remote('mkdir -p '.$this->remoteBaseFolder.'shared/'.$folder);
         }
-
-        return $out;
     }
+    
 
     /**
      * Proxy to idephix output->writeln method
@@ -313,6 +319,7 @@ class Deploy implements IdephixAwareInterface
 
         $this->strategy->deploy();
 
+        $this->updateSharedFolders();
         $this->remoteCreateSymlinks();
 
         if ($this->hasToMigrate()) {
