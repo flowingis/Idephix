@@ -16,12 +16,16 @@ class DeployTest extends IdephixTestCase
                 'remote_base_dir' => "/tmp/temp_dir",
                 'rsync_exclude_file' => 'rsync_exclude.txt',
                 'rsync_include_file' => 'rsync_include.txt',
-				'shared_folders' => array (
-					'app/logs',
-					'web/uploads'
-				),
-			)
-		);
+                'shared_folders' => array (
+                    'app/logs',
+                    'web/uploads'
+                ),
+                'shared_symlinks' => array (
+                    'app/logs',
+                    'web/uploads'
+                ),
+            )
+        );
 
         $targets = array('banana' =>
             array_merge($defaultConfig, $config),
@@ -73,11 +77,11 @@ Remote: cp -pPR '$currentReleaseDir/.' '$nextReleaseDir'
 Sync code to the next release
 Local: rsync -rlpDvcz --delete -e 'ssh -p $port'  --exclude-from=rsync_exclude.txt --include-from=rsync_include.txt local_dir/ $user@$host:$nextReleaseDir
 Updating symlink for shared folder ..
-Linking shared folder $nextReleaseDir/app/logs ...
+Creating shared symlink for $nextReleaseDir/app/logs ...
 Remote: [ -e '$nextReleaseDir/app/logs' ]
 Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm $nextReleaseDir/app/logs
 Remote: ln -nfs /tmp/temp_dir/shared/app/logs $nextReleaseDir/app/logs
-Linking shared folder $nextReleaseDir/web/uploads ...
+Creating shared symlink for $nextReleaseDir/web/uploads ...
 Remote: [ -e '$nextReleaseDir/web/uploads' ]
 Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
@@ -122,11 +126,11 @@ Remote: cp -pPR '$currentReleaseDir/.' '$nextReleaseDir'
 Sync code to the next release
 Local: rsync -rlpDvcz --delete -e 'ssh -p $port'  --exclude-from=rsync_exclude.txt --include-from=rsync_include.txt local_dir/ $user@$host:$nextReleaseDir
 Updating symlink for shared folder ..
-Linking shared folder $nextReleaseDir/app/logs ...
+Creating shared symlink for $nextReleaseDir/app/logs ...
 Remote: [ -e '$nextReleaseDir/app/logs' ]
 Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm $nextReleaseDir/app/logs
 Remote: ln -nfs /tmp/temp_dir/shared/app/logs $nextReleaseDir/app/logs
-Linking shared folder $nextReleaseDir/web/uploads ...
+Creating shared symlink for $nextReleaseDir/web/uploads ...
 Remote: [ -e '$nextReleaseDir/web/uploads' ]
 Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
@@ -160,6 +164,10 @@ Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
                         'app/logs',
                         'web/uploads'
                     ),
+                    'shared_symlinks' => array (
+                        'app/logs',
+                        'web/uploads'
+                    ),
                 )
             )
         );
@@ -186,11 +194,11 @@ Remote: cp -pPR '$currentReleaseDir/.' '$nextReleaseDir'
 Sync code to the next release
 Local: rsync -rlpDvcz --delete -e 'ssh -p $port'  --exclude-from=rsync_exclude.txt --include-from=rsync_include.txt local_dir/ $user@$host:$nextReleaseDir
 Updating symlink for shared folder ..
-Linking shared folder $nextReleaseDir/app/logs ...
+Creating shared symlink for $nextReleaseDir/app/logs ...
 Remote: [ -e '$nextReleaseDir/app/logs' ]
 Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm $nextReleaseDir/app/logs
 Remote: ln -nfs /tmp/temp_dir/shared/app/logs $nextReleaseDir/app/logs
-Linking shared folder $nextReleaseDir/web/uploads ...
+Creating shared symlink for $nextReleaseDir/web/uploads ...
 Remote: [ -e '$nextReleaseDir/web/uploads' ]
 Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
