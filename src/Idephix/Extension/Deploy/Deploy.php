@@ -176,7 +176,7 @@ class Deploy implements IdephixAwareInterface
                 try {
                     $this->idx->remote(
                         sprintf(
-                            "unlink %s || rmdir %s || rm %s",
+                            "unlink %s || rmdir -R %s || rm -R %s",
                             $fullPathReleaseSharedFile,
                             $fullPathReleaseSharedFile,
                             $fullPathReleaseSharedFile
