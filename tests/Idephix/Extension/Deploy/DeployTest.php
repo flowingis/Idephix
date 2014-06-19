@@ -232,5 +232,48 @@ Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
 
         $this->assertEquals($expected, $actualOutput);
     }
-
+    
+    /**
+     * Tests pass non-existent class as deploy strategy
+     *
+     * @expectedException Exception
+     * @expectedExceptionMessage In "banana" target, deploy.shared_folders parameter was set but deploy.shared_symlinks was not. You must define deploy.shared_symlinks too.
+     */
+    public function testDeploySf2CopyWithoutSpecificSharedSymlinksToo()
+    {
+        $this->initDeploy(
+            null,
+            array(
+                'deploy' => array(
+                    'local_base_dir' => 'local_dir',
+                    'remote_base_dir' => "/tmp/temp_dir",
+                    'shared_folders' => array (
+                        'app/logs',
+                        'web/uploads'
+                    )
+                )
+            )
+        );
+        $result = $this->deploy->deploySF2Copy(true);
+    }
+    
+    public function testDeploySf2CopySpecifyingEmptySharedSymlinks()
+    {
+        $this->initDeploy(
+            null,
+            array(
+                'deploy' => array(
+                    'local_base_dir' => 'local_dir',
+                    'remote_base_dir' => "/tmp/temp_dir",
+                    'shared_folders' => array (
+                        'app/logs',
+                        'web/uploads'
+                    ),
+                    'shared_symlinks' => array()
+                )
+            )
+        );
+        $result = $this->deploy->deploySF2Copy(true);
+        //No Exceptions
+    }
 }

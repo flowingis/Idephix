@@ -54,7 +54,11 @@ class Deploy implements IdephixAwareInterface
         $this->remoteBaseFolder = $target->getFixedPath('deploy.remote_base_dir');
         $this->releasesFolder   = $this->remoteBaseFolder.'releases/';
         $this->sharedFolders    = $target->get('deploy.shared_folders', array());
-        $this->sharedSymlinks   = $target->get('deploy.shared_symlinks', array());
+        $this->sharedSymlinks   = $target->get('deploy.shared_symlinks', null);
+        
+        if ($this->sharedFolders && is_null($this->sharedSymlinks)) {
+            throw new \Exception(sprintf('In "%s" target, deploy.shared_folders parameter was set but deploy.shared_symlinks was not. You must define deploy.shared_symlinks too.', $this->idx->getCurrentTargetName()));
+        }
 
         $target->set('deploy.releases_dir', $this->releasesFolder);
         $target->set('deploy.current_release_dir', $this->getCurrentReleaseFolder());
