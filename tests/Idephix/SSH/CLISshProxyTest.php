@@ -14,13 +14,15 @@ class CLISshProxyTest extends \PHPUnit_Framework_TestCase
 
     public function testFakeCliPermission()
     {
-        $this->assertNotEquals(126, $this->proxy->exec('text'), "You have to set the execution permission to ".$this->exec);
+        $result = $this->proxy->exec('text');
+        $this->assertNotEquals(126, $this->proxy->getLastExitCode(), "You have to set the execution permission to ".$this->exec);
+        $this->assertTrue($result, "Run command");
     }
 
     public function testConnect()
     {
         $this->assertTrue($this->proxy->connect('myhost', '23'));
-        $this->assertEquals(0, $this->proxy->exec('text'));
+        $this->assertTrue($this->proxy->exec('text'));
 
         $expectedCli = "Array
 (
@@ -37,7 +39,7 @@ class CLISshProxyTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->proxy->connect('myhost', '23'));
         $this->proxy->authByAgent('username');
-        $this->assertEquals(0, $this->proxy->exec('text'));
+        $this->assertTrue($this->proxy->exec('text'));
 
         $expectedCli = "Array
 (
@@ -57,7 +59,7 @@ class CLISshProxyTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->proxy->connect('myhost', '23'));
         $this->proxy->authByPublicKey('user', 'public_key_file', 'privateKeyFile', 'pwd');
-        $this->assertEquals(0, $this->proxy->exec('text'));
+        $this->assertTrue($this->proxy->exec('text'));
 
         $expectedCli = "Array
 (

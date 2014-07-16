@@ -68,4 +68,20 @@ class PeclSsh2Proxy extends BaseProxy
     {
         $this->disconnect();
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function scpToRemote($localPath, $remotePath)
+    {
+        return ssh2_scp_send($this->connection, $localPath, $remotePath);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function scpToLocal($remotePath, $localPath)
+    {
+        return ssh2_scp_recv($this->connection, $remotePath, $localPath);
+    }
 }

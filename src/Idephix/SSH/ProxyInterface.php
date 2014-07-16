@@ -17,6 +17,24 @@ interface ProxyInterface
      */
     public function exec($cmd);
 
+    /**
+     * Copy a file via scp from $localPath to $remotePath
+     *
+     * @param $localPath source local path
+     * @param $remotePath destination remote path
+     * @return bool
+     */
+    public function scpToRemote($localPath, $remotePath);
+
+    /**
+     * Copy a file via scp from $remotePath to $localPath
+     *
+     * @param $remotePath source remote path
+     * @param $localPath destination local path
+     * @return bool
+     */
+    public function scpToLocal($remotePath, $localPath);
+
     public function getLastError();
     public function getLastOutput();
 }
