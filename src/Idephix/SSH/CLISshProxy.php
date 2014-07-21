@@ -88,7 +88,7 @@ class CLISshProxy extends BaseProxy
     /**
      * @inheritdoc
      */
-    public function scpToRemote($localPath, $remotePath)
+    public function put($localPath, $remotePath)
     {
         $user = $this->user ? $this->user.'@' : '';
         $keyFile = $this->privateKeyFile ? '-i '.$this->privateKeyFile : '';
@@ -109,7 +109,7 @@ class CLISshProxy extends BaseProxy
     /**
      * @inheritdoc
      */
-    public function scpToLocal($remotePath, $localPath)
+    public function get($remotePath, $localPath)
     {
         $user = $this->user ? $this->user.'@' : '';
         $keyFile = $this->privateKeyFile ? '-i '.$this->privateKeyFile : '';

@@ -72,7 +72,7 @@ class PeclSsh2Proxy extends BaseProxy
     /**
      * @inheritdoc
      */
-    public function scpToRemote($localPath, $remotePath)
+    public function put($localPath, $remotePath)
     {
         return ssh2_scp_send($this->connection, $localPath, $remotePath);
     }
@@ -80,7 +80,7 @@ class PeclSsh2Proxy extends BaseProxy
     /**
      * @inheritdoc
      */
-    public function scpToLocal($remotePath, $localPath)
+    public function get($remotePath, $localPath)
     {
         return ssh2_scp_recv($this->connection, $remotePath, $localPath);
     }

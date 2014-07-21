@@ -24,7 +24,7 @@ interface ProxyInterface
      * @param $remotePath destination remote path
      * @return bool
      */
-    public function scpToRemote($localPath, $remotePath);
+    public function put($localPath, $remotePath);
 
     /**
      * Copy a file via scp from $remotePath to $localPath
@@ -33,7 +33,7 @@ interface ProxyInterface
      * @param $localPath destination local path
      * @return bool
      */
-    public function scpToLocal($remotePath, $localPath);
+    public function get($remotePath, $localPath);
 
     public function getLastError();
     public function getLastOutput();

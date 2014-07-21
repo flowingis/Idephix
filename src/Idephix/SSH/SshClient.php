@@ -124,7 +124,7 @@ class SshClient
      * @throws \Exception
      * @return bool
      */
-    public function scpToRemote($localPath, $remotePath)
+    public function put($localPath, $remotePath)
     {
         if (!$this->isConnected()) {
             throw new \Exception("SSH Client is not connected");
@@ -141,7 +141,7 @@ class SshClient
      * @throws \Exception
      * @return bool
      */
-    public function scpToLocal($remotePath, $localPath)
+    public function get($remotePath, $localPath)
     {
         if (!$this->isConnected()) {
             throw new \Exception("SSH Client is not connected");
