@@ -1,0 +1,16 @@
+# Project files
+/app/cache
+/app/logs
+/web/*_dev.php
+/web/uploads
+
+/build
+build.xml
+selenium
+
+# SCM files
+.git
+.gitignore
+.svn
+
+.DS_Store

@@ -1,0 +1,148 @@
+<?php
+
+use Idephix\Idephix;
+use Idephix\Extension\Deploy\Deploy;
+use Idephix\Extension\PHPUnit\PHPUnit;
+use Idephix\SSH\SshClient;
+
+$sshParams = array(
+    'user' => 'ideato',
+);
+
+$targets = array(
+    'prod' => array(
+        'hosts' => array('127.0.0.1', '33.33.33.10'),
+        'ssh_params' => $sshParams,
+        'deploy' => array(
+            'local_base_dir' => __DIR__,
+            'remote_base_dir' => "/var/www/my-project/",
+            'rsync_exclude_file' => 'rsync_exclude.txt',
+            'shared_folders' => array (
+                'app/logs',
+                'web/uploads'
+            ),
+         )
+    ),
+    'stage' => array(
+        'hosts' => array('192.168.169.170'),
+        'ssh_params' => $sshParams,
+        'deploy' => array(
+            'local_base_dir' => __DIR__,
+            'remote_base_dir' => "/var/www/my-project.ideato.it/",
+            'rsync_exclude_file' => 'rsync_exclude.txt',
+            'shared_folders' => array (
+                'app/logs',
+                'web/uploads'
+            ),
+         )
+    ),
+    'test' => array(
+        'hosts' => array('127.0.0.1'),
+        'ssh_params' => array('user' => 'kea'),
+        'deploy' => array(
+            'local_base_dir' => __DIR__,
+            'remote_base_dir' => "/tmp/my-project.test/",
+            'shared_folders' => array (
+                'app/logs',
+                'web/uploads'
+            ),
+         )
+    ),
+);
+
+$idx = new Idephix($targets, new SshClient());
+
+$idx->
+    /**
+     * Execute a deploy for the specified environment
+     * @param bool $go if not given it does a dry-run execution
+     */
+    add('project:deploy',
+        function ($go = false) use ($idx)
+        {
+            if (!$go) {
+                echo "\nDry Run\n";
+            }
+            $this->setDryRun(!$go);
+            $this->setUpEnvironment();
+            $this->remotePrepare(true);
+            $this->strategy->deploy();
+            $this->remoteLinkSharedFolders();
+/*
+            if ($this->hasToMigrate()) {
+                $this->doctrineMigrate();
+            }
+            if ($idx->getCurrentTargetName() == 'stage') {
+                $idx->updateSchema();
+            }
+*/
+            $this->cacheClear();
+            $this->switchToTheNextRelease();
+            $this->assetic();
+            $this->deleteOldReleases($releasesToKeep);
+
+            $idx->deleteOldReleases(6);
+        })->
+    /**
+     * Execute a deploy compact method
+     * @param bool $go if not given it does a dry-run execution
+     */
+    add('project:deploy',
+        function ($go = false) use ($idx)
+        {
+            echo $go ? "\nGo!\n" : "\nDry Run\n";
+            $idx->deploySF2Copy($go);
+        })->
+    /**
+     * All the test are executed, even Selenium
+     * @param bool $log If this flag is specified a log file is created (and used)
+     */
+    add('test:run',
+        function ($log = false) use ($idx)
+        {
+            $log = $log ? ' --log-junit junit.xml' : '';
+            $idx->runTask('test:start-selenium-server');
+            $idx->runPhpUnit('-c app/ --stderr'.$log);
+            $idx->runTask('test:stop-selenium-server');
+        })->
+    add('test:run-selenium',
+        function ($filter = '') use ($idx)
+        {
+            if (!empty($filter)) {
+                $filter = ' --filter '.$filter;
+            }
+            $idx->runTask('test:start-selenium-server');
+            $idx->runPhpUnit('-c app/ --stderr '.$filter.' src/Idephix/CasanoiBundle/Tests/Selenium/ --log-junit junit-selenium.xml');
+            $idx->runTask('test:stop-selenium-server');
+        })->
+    add('test:start-selenium-server',
+        function () use ($idx)
+        {
+            $idx->locale("java -jar bin/selenium-server-standalone-2.25.0.jar >/dev/null 2>&1 &");
+            sleep(5);
+        })->
+    add('test:stop-selenium-server',
+        function ()
+        {
+            file_get_contents('http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer');
+        })->
+    add('test:run-no-selenium',
+        function ($filter = '') use ($idx)
+        {
+            if (!empty($filter)) {
+                $filter = ' --filter '.$filter;
+            }
+            $idx->runPhpUnit('-c app/ --stderr '.$filter.' --exclude-group=selenium  --log-junit junit.xml');
+        })->
+    /** <========== RUN ME =========== */
+    add('idephix:test-params',
+        function ($param1, $param2, $param3 = 'default')
+        {
+            echo 'Param1: '.$param1."\n";
+            echo 'Param2: '.$param2."\n";
+            echo 'Param3: '.$param3."\n";
+        });
+
+$idx->addLibrary('deploy', new Deploy());
+$idx->addLibrary('phpunit', new PHPUnit());
+$idx->run();
