@@ -115,4 +115,38 @@ class SshClient
     {
         return $this->host;
     }
+
+    /**
+     * Copy a file via scp from $localPath to $remotePath
+     *
+     * @param $localPath source local path
+     * @param $remotePath destination remote path
+     * @throws \Exception
+     * @return bool
+     */
+    public function put($localPath, $remotePath)
+    {
+        if (!$this->isConnected()) {
+            throw new \Exception("SSH Client is not connected");
+        }
+
+        return $this->proxy->scpToRemote($localPath, $remotePath);
+    }
+
+    /**
+     * Copy a file via scp from $remotePath to $localPath
+     *
+     * @param $remotePath source remote path
+     * @param $localPath destination local path
+     * @throws \Exception
+     * @return bool
+     */
+    public function get($remotePath, $localPath)
+    {
+        if (!$this->isConnected()) {
+            throw new \Exception("SSH Client is not connected");
+        }
+
+        return $this->proxy->scpToLocal($remotePath, $localPath);
+    }
 }

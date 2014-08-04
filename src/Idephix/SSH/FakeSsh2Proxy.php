@@ -56,4 +56,14 @@ class FakeSsh2Proxy extends BaseProxy
 
         return true;
     }
+
+    public function put($localPath, $remotePath)
+    {
+        $this->test->assertTrue(true, 'scp '.$localPath.' '.$remotePath);
+    }
+
+    public function get($remotePath, $localPath)
+    {
+        $this->test->assertTrue(true, 'scp '.$remotePath.' '.$localPath);
+    }
 }
