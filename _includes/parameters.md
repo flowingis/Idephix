@@ -10,8 +10,8 @@
  * @param string $name the name of the file to be touch-ed
  */    
  add('myscript:remote-touch', 
-   function ($name) use ($idx) {
-     $idx->remote('touch /tmp/'.$name);
+     function ($name) use ($idx) {
+         $idx->remote('touch /tmp/'.$name);
  });
 </code></pre>
 
@@ -21,7 +21,7 @@
 
 <h3>Add two or more parameters</h3>
 
-<p>You can add two or more arguments as parameters of the anonimous function</p>
+<p>You can add two or more arguments as parameters of the anonymous function</p>
 
 <pre><code>
 /**
@@ -60,13 +60,13 @@
 <pre><code>
 /**
  * Delete the cache directory
- * @param bolean $go Use --go to execute the script
+ * @param boolean $go Use --go to execute the script
  */    
  add('myscript:remote-clearcache', 
-   function ($go = false) use ($idx) {
-     if ($go) {
-     	$idx->remote('rm -rf ./var/www/project/cache/*');
-     	return;
+     function ($go = false) use ($idx) {
+         if ($go) {
+             $idx->remote('rm -rf ./var/www/project/cache/*');
+         return;
      }
 
      $idx->output->writeln('<info>use --go to delete the following files</info>')

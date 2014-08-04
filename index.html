@@ -9,9 +9,9 @@ title: home
 </code></pre>
 
 <p>
-	Idephix is a PHP automation tool useful to perform <strong>remote</strong> and <strong>local</strong> tasks.
-	It can be used to deploy applications, rotate logs, synchronize data repository across server or create a build system. The choice is up to you.
-	Idephix is still in alpha, so things will change. You can report issues and submit PRs (greatly appreciated :-)) on the <a href="https://github.com/ideatosrl/Idephix" title="Idephix github repository">github repo</a>
+    Idephix is a PHP automation tool useful to perform <strong>remote</strong> and <strong>local</strong> tasks.
+    It can be used to deploy applications, rotate logs, synchronize data repository across server or create a build system. The choice is up to you.
+    Idephix is still in alpha, so things will change. You can report issues and submit PRs (greatly appreciated :-)) on the <a href="https://github.com/ideatosrl/Idephix" title="Idephix github repository">github repo</a>
 </p>
 
 <h3>Install Idephix</h3>
@@ -19,14 +19,14 @@ title: home
 <p>You can choose to install idephix where you prefer. Idephix will use (or create for you) the configuration file in the corrent path.</p>
 
 <ul>
-	<li>Change into a directory in your path like <code>cd /usr/local/bin</code></li>
-	<li>Get Idephix <code>curl http://getidephix.com/idephix.phar > idephix.phar</code></li>
-	<li>Make the phar executable <code>chmod a+x idephix.phar</code></li>
-	<li>Change into a project directory <code>cd /path/to/my/project</code></li>
-  <li>Create a new idxfile.php using <code>idephix.phar init-idx-file</code></li>
-	<li>Define your tasks in <code>idxfile.php</code></li>
-	<li>Use idephix as you normally would <code>idephix.phar</code></li>
-	<li>Optionally you can rename the <code>idephix.phar</code> to <code>idx</code> to make it easier</li>
+    <li>Change into a directory in your path like <code>cd /usr/local/bin</code></li>
+    <li>Get Idephix <code>curl http://getidephix.com/idephix.phar > idephix.phar</code></li>
+    <li>Make the phar executable <code>chmod a+x idephix.phar</code></li>
+    <li>Change into a project directory <code>cd /path/to/my/project</code></li>
+    <li>Create a new idxfile.php using <code>idephix.phar init-idx-file</code></li>
+    <li>Define your tasks in <code>idxfile.php</code></li>
+    <li>Use idephix as you normally would <code>idephix.phar</code></li>
+    <li>Optionally you can rename the <code>idephix.phar</code> to <code>idx</code> to make it easier</li>
 </ul>
 
 <p>
@@ -64,7 +64,52 @@ Available commands:
 
 <h3>Usage example</h3>
 
-<p>You can create idxfile.php by hand:</p>
+<p>You can create simple idxfile.php by hand:</p>
+<pre><code>&lt;?php
+
+    /* /your/project/path/idxfile.php */
+
+    use Idephix\Idephix;
+
+    $targets = array(
+        'prod' => array(
+            'hosts' => array('yoursite.com'),
+            'ssh_params' => array('user' => 'myuser'),
+        )
+    );
+
+    $idx = new Idephix($targets);
+
+    $idx->
+        /**
+         * Run clear cache command on remote server
+         */
+        add('remote:clear:cache',
+            function () use ($idx) {
+                $idx->remote("cd /my/project && rm -Rf cache/*");
+            }
+        )->
+        /**
+         * Put and get files
+         */
+        add('manage:files',
+            function () use ($idx) {
+                $idx->output->writeln("Download file.log");
+                $idx->sshClient->get("/remote/dir/file.log", "/tmp/local.log");
+                $idx->local("echo 'add some text' >> /tmp/local.log");
+                $idx->sshClient->put("/tmp/local.log", "/remote/dir/file2.log");
+            }
+        );
+
+</code></pre>
+
+<p>
+    Idephix use ssh-agent to authenticate to remote computers without password. Otherwise you can
+    specify the password in your script or use CLISshProxy (instead of the default PeclSsh2Proxy)
+    that ask you the password.
+</p>
+
+<p>You can create even more complex idxfile.php using external libraries:</p>
 <pre><code>&lt;?php
 
 /* /your/project/path/idxfile.php */
@@ -115,15 +160,14 @@ $idx->
     {
       if (!file_exists(__DIR__.'/composer.phar')) {
         $idx->output->writeln("Downloading composer.phar ...");
-        shell_exec('curl -sS https://getcomposer.org/installer | php');
+        $idx->local("curl -sS https://getcomposer.org/installer | php");
       }
 
-      passthru("php composer.phar update");
-      passthru("./app/console doctrine:schema:update --force");
+      $idx->local("php composer.phar update");
+      $idx->local("./app/console doctrine:schema:update --force");
       $idx->runTask('asset:install');
-      passthru("./app/console cache:clear --env=dev");
-      passthru("./app/console cache:clear --env=test");
-      //$idx->runTask('test:run');
+      $idx->local("./app/console cache:clear");
+      $idx->runTask('test:run');
     })->
   /**
    * Symfony2 installing assets and running assetic command
@@ -131,8 +175,8 @@ $idx->
   add('asset:install',
     function () use ($idx)
     {
-      passthru("app/console assets:install web");
-      passthru("app/console assetic:dump");
+      $idx->local("app/console assets:install web");
+      $idx->local("app/console assetic:dump");
     })->
   /**
    * run phpunit tests
