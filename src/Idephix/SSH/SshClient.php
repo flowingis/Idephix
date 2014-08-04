@@ -96,6 +96,11 @@ class SshClient
         return $this->proxy->getLastError();
     }
 
+    public function isSuccessful()
+    {
+        return $this->proxy->isSuccessful();
+    }
+
     public function getUser()
     {
         return $this->params['user'];
@@ -130,7 +135,7 @@ class SshClient
             throw new \Exception("SSH Client is not connected");
         }
 
-        return $this->proxy->scpToRemote($localPath, $remotePath);
+        return $this->proxy->put($localPath, $remotePath);
     }
 
     /**
@@ -147,6 +152,6 @@ class SshClient
             throw new \Exception("SSH Client is not connected");
         }
 
-        return $this->proxy->scpToLocal($remotePath, $localPath);
+        return $this->proxy->get($remotePath, $localPath);
     }
 }

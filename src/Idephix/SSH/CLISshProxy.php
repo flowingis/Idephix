@@ -13,7 +13,6 @@ class CLISshProxy extends BaseProxy
     protected $password = '';
     protected $privateKeyFile = null;
     protected $timeout = 600;
-    protected $lastExitCode;
 
     private function canConnect()
     {
@@ -80,7 +79,7 @@ class CLISshProxy extends BaseProxy
         $process->run();
         $this->lastOutput = $process->getOutput();
         $this->lastError = $process->getErrorOutput();
-        $this->lastExitCode = $process->getExitCode();
+        $this->exitCode = $process->getExitCode();
 
         return $process->isSuccessful();
     }
@@ -139,11 +138,7 @@ class CLISshProxy extends BaseProxy
             $keyFile,
             $user,
             $this->host,
-            escapeshellarg($cmd));
-    }
-
-    public function getLastExitCode()
-    {
-        return $this->lastExitCode;
+            escapeshellarg($cmd)
+        );
     }
 }

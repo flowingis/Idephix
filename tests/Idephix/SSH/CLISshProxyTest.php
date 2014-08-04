@@ -15,7 +15,7 @@ class CLISshProxyTest extends \PHPUnit_Framework_TestCase
     public function testFakeCliPermission()
     {
         $result = $this->proxy->exec('text');
-        $this->assertNotEquals(126, $this->proxy->getLastExitCode(), "You have to set the execution permission to ".$this->exec);
+        $this->assertNotEquals(126, $this->proxy->getExitCode(), "You have to set the execution permission to ".$this->exec);
         $this->assertTrue($result, "Run command");
     }
 
