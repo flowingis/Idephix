@@ -20,6 +20,7 @@ class Deploy implements IdephixAwareInterface
     private $dryRun = true;
     private $timestamp;
     private $hasToMigrate = false;
+    private $useAssetic = true;
     private $strategy;
     private $sharedFolders = array();
     private $sharedSymlinks = array();
@@ -50,6 +51,7 @@ class Deploy implements IdephixAwareInterface
 
         $this->symfonyEnv = $target->get('symfony_env', 'dev');
         $this->hasToMigrate = $target->get('deploy.migrations', false);
+        $this->useAssetic = $target->get('deploy.assetic', true);
         $this->localBaseFolder  = $target->getFixedPath('deploy.local_base_dir');
         $this->remoteBaseFolder = $target->getFixedPath('deploy.remote_base_dir');
         $this->releasesFolder   = $this->remoteBaseFolder.'releases/';
@@ -151,7 +153,7 @@ class Deploy implements IdephixAwareInterface
         $this->idx->remote("cd ".$this->remoteBaseFolder." && ln -s releases/".$this->getNextReleaseName()." next && mv -fT next current", $this->dryRun);
     }
 
-    public function remoteFileExits($path)
+    public function remoteFileExists($path)
     {
         try {
             $this->idx->remote("[ -e '$path' ]", $this->dryRun);
@@ -176,7 +178,21 @@ class Deploy implements IdephixAwareInterface
 
             $this->log("Creating shared symlink for ".$fullPathReleaseSharedFile." ...");
 
-            if ($this->remoteFileExits($fullPathReleaseSharedFile)) {
+            if (
+                    !$this->remoteFileExists($fullPathSharedFile)
+                    && $this->remoteFileExists($fullPathReleaseSharedFile)
+                ) {
+                
+                $this->idx->remote(
+                        sprintf(
+                            "cp %s %s",
+                            $fullPathReleaseSharedFile,
+                            $fullPathSharedFile
+                        ),
+                        $this->dryRun);
+            }
+
+            if ($this->remoteFileExists($fullPathReleaseSharedFile)) {
                 try {
                     $this->idx->remote(
                         sprintf(
@@ -249,6 +265,7 @@ class Deploy implements IdephixAwareInterface
      */
     public function cacheClear()
     {
+        return $this->idx->remote('cd '.$this->getNextReleaseFolder()." && rm -Rf app/cache/*", $this->dryRun);
         return $this->idx->remote('cd '.$this->getNextReleaseFolder()." && ./app/console cache:clear --env=$this->symfonyEnv --no-debug", $this->dryRun);
     }
 
@@ -304,6 +321,11 @@ class Deploy implements IdephixAwareInterface
         return $this->hasToMigrate;
     }
 
+    public function useAssetic()
+    {
+        return $this->useAssetic;
+    }
+    
     public function deploySF2Copy($go, $releasesToKeep = 6, $automaticBootstrap = true)
     {
 
@@ -332,7 +354,9 @@ class Deploy implements IdephixAwareInterface
 
         $this->cacheClear();
         $this->switchToTheNextRelease();
-        $this->assetic();
+        if ($this->useAssetic()) {
+            $this->assetic();
+        }
         $this->deleteOldReleases($releasesToKeep);
 
     }
