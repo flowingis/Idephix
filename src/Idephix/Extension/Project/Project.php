@@ -8,7 +8,6 @@ use Idephix\Extension\IdephixAwareInterface;
 /**
  * @todo:
  * - allow for $exclude to be an array
- * - manage ports different from the default one
  * - check to undefined params in currentTarget
  */
 class Project implements IdephixAwareInterface
@@ -37,12 +36,18 @@ class Project implements IdephixAwareInterface
 
         $user = $target->get('ssh_params.user');
         $host = $this->idx->getCurrentTargetHost();
+        $port = $target->get('ssh_params.port');
 
         if (file_exists($exclude)) {
             $extraOpts .= ' --exclude-from='.$exclude;
         }
 
-        $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e 'ssh' $localDir $user@$host:$remoteDir";
+        $sshCmd = 'ssh';
+        if ($port) {
+            $sshCmd .= ' -p ' . $port;
+        }
+
+        $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e '$sshCmd' $localDir $user@$host:$remoteDir";
 
         return $this->idx->local($cmd);
     }
