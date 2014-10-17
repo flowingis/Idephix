@@ -69,50 +69,57 @@ $idx->
     /**
      * Symfony2 basic deploy
      */
-    add('sf2:deploy',
+    add(
+        'sf2:deploy',
         function($go = false) use ($idx)
         {
             if (!$go) {
                 echo "\nDry Run...\n";
             }
             $idx->deploySF2Copy($go);
-        })->
+        }
+    )->
     /**
      * Build your Symfony project after you have downloaded it for the first time
      */
-    add('build:fromscratch',
+    add(
+        'build:fromscratch',
         function () use ($idx)
         {
-            if (!file_exists(__DIR__.'/composer.phar')) {
+            if (!file_exists(__DIR__."/composer.phar")) {
                 $idx->output->writeln("Downloading composer.phar ...");
-                shell_exec('curl -sS https://getcomposer.org/installer | php');
+                $idx->local("curl -sS https://getcomposer.org/installer | php");
             }
 
-            passthru("php composer.phar update");
-            passthru("./app/console doctrine:schema:update --force");
+            $idx->local("php composer.phar install");
+            $idx->local("./app/console doctrine:schema:update --force");
             $idx->runTask('asset:install');
-            passthru("./app/console cache:clear --env=dev");
-            passthru("./app/console cache:clear --env=test");
-            //$idx->runTask('test:run');
-        })->
+            $idx->local("./app/console cache:clear --env=dev");
+            $idx->local("./app/console cache:clear --env=test");
+            $idx->runTask('test:run');
+        }
+    )->
     /**
      * Symfony2 installing assets and running assetic command
      */
-    add('asset:install',
+    add(
+        'asset:install',
         function () use ($idx)
         {
-            passthru("app/console assets:install web");
-            passthru("app/console assetic:dump");
-        })->
+            $idx->local("app/console assets:install web");
+            $idx->local("app/console assetic:dump");
+        }
+    )->
     /**
      * run phpunit tests
      */
-    add('test:run',
+    add(
+        'test:run',
         function () use ($idx)
         {
-            $idx->runPhpUnit('-c app/');
-        })
-    ;
+            $idx->phpunit()->runPhpUnit('-c app/');
+        }
+    );
 
 $idx->addLibrary('deploy', new Deploy());
 $idx->addLibrary('phpunit', new PHPUnit());
