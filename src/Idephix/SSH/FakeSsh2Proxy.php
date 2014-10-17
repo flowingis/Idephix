@@ -4,6 +4,8 @@ namespace Idephix\SSH;
 
 class FakeSsh2Proxy extends BaseProxy
 {
+    protected $test;
+
     public function __construct($test)
     {
         $this->test = $test;

@@ -44,7 +44,7 @@ class DeployTest extends IdephixTestCase
     public function testWrongStrategy()
     {
         $this->initDeploy('FailStrategy');
-        $result = $this->deploy->deploySF2Copy(true);
+        $this->deploy->deploySF2Copy(true);
     }
 
     public function testDeploySf2CopyWithoutSpecificEnvConfiguration()

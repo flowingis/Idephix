@@ -11,6 +11,11 @@ class Config
         $this->config = $config;
     }
 
+    /**
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
+     */
     public function get($name, $default = null)
     {
         if (isset($this->config[$name])) {
@@ -18,8 +23,7 @@ class Config
         }
 
         if (preg_match('/^(?<first_level>[^.]*)\.(?<second_level>.*)$/', $name, $matches)) {
-            if (isset($this->config[$matches['first_level']]) &&
-                isset($this->config[$matches['first_level']][$matches['second_level']])) {
+            if ($this->isSetFirstAndSecondLevel($matches)) {
                 return $this->config[$matches['first_level']][$matches['second_level']];
             }
         }
@@ -27,6 +31,10 @@ class Config
         return $default;
     }
 
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
     public function set($name, $value)
     {
         if (isset($this->config[$name])) {
@@ -36,9 +44,7 @@ class Config
         }
 
         if (preg_match('/^(?<first_level>[^.]*)\.(?<second_level>.*)$/', $name, $matches)) {
-            if (isset($this->config[$matches['first_level']]) &&
-                isset($this->config[$matches['first_level']][$matches['second_level']])) {
-
+            if ($this->isSetFirstAndSecondLevel($matches)) {
                 $this->config[$matches['first_level']][$matches['second_level']] = $value;
 
                 return;
@@ -50,12 +56,23 @@ class Config
 
     /**
      * Add trailing slash to the path if it is omitted
-     * @param string $path
      *
+     * @param string $name
+     * @param string $default
      * @return string fixed path
      */
     public function getFixedPath($name, $default = '')
     {
         return rtrim($this->get($name, $default), '/').'/';
+    }
+
+    /**
+     * @param string[] $matches
+     * @return bool
+     */
+    protected function isSetFirstAndSecondLevel($matches)
+    {
+        return isset($this->config[$matches['first_level']]) &&
+        isset($this->config[$matches['first_level']][$matches['second_level']]);
     }
 }

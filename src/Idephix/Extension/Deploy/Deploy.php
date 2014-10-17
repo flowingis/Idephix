@@ -68,6 +68,9 @@ class Deploy implements IdephixAwareInterface
         $this->strategy = new $strategyClass($this->idx, $target);
     }
 
+    /**
+     * @param boolean $dryRun
+     */
     public function setDryRun($dryRun)
     {
         $this->dryRun = $dryRun;
@@ -145,6 +148,10 @@ class Deploy implements IdephixAwareInterface
         $this->idx->remote("cd ".$this->remoteBaseFolder." && ln -s releases/".$this->getNextReleaseName()." next && mv -fT next current", $this->dryRun);
     }
 
+    /**
+     * @param string $path
+     * @return boolean
+     */
     public function remoteFileExits($path)
     {
         try {
@@ -179,13 +186,15 @@ class Deploy implements IdephixAwareInterface
                             $fullPathReleaseSharedFolder,
                             $fullPathReleaseSharedFolder
                         ),
-                        $this->dryRun);
+                        $this->dryRun
+                    );
                 } catch (\Exception $e) {
                     throw new \Exception(
                         sprintf(
                             'Unable to link shared directory "%s". Destination file or directory exists.',
                             $fullPathReleaseSharedFolder
-                        ));
+                        )
+                    );
                 }
             }
 

@@ -12,11 +12,17 @@ use Idephix\Extension\SelfUpdate\SelfUpdate;
 use Idephix\Extension\InitIdxFile\InitIdxFile;
 use Idephix\Config\Config;
 
+/**
+ * Class Idephix
+ * @method InitIdxFile initIdxFile()
+ * @method SelfUpdate selfUpdate()
+ */
 class Idephix implements IdephixInterface
 {
     const VERSION = '@package_version@';
     private $application;
     private $library = array();
+    private $input;
     private $output;
     private $sshClient;
     private $targets = array();
@@ -81,15 +87,9 @@ class Idephix implements IdephixInterface
     }
 
     /**
-     * Add a Command to the application.
-     * The "--go" parameters should be defined as "$go = false".
-     *
-     * @param string  $name
-     * @param Closure $code
-     *
-     * @return Idephix
+     * @inheritdoc
      */
-    public function add($name, \Closure $code)
+    public function add($name, $code)
     {
         $command = new CommandWrapper($name);
         $command->buildFromCode($code);
@@ -99,6 +99,10 @@ class Idephix implements IdephixInterface
         return $this;
     }
 
+    /**
+     * @param InputInterface $input
+     * @throws \Exception
+     */
     protected function buildEnvironment(InputInterface $input)
     {
         $this->currentTarget = null;
@@ -183,6 +187,9 @@ class Idephix implements IdephixInterface
         return $hasErrors ? 1 : 0;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function addLibrary($name, $library)
     {
         if (!is_object($library)) {
@@ -196,6 +203,10 @@ class Idephix implements IdephixInterface
         $this->library[$name] = $library;
     }
 
+    /**
+     * @param string $name
+     * @return bool
+     */
     public function has($name)
     {
         return $this->application->has($name);
@@ -205,7 +216,8 @@ class Idephix implements IdephixInterface
      * RunTask.
      *
      * @param string $name the name of the task you want to call
-     * @param (...)  arbitrary number of parameter maching the target task interface
+     * @param (...)  arbitrary number of parameter matching the target task interface
+     * @return integer
      */
     public function runTask($name)
     {
@@ -246,8 +258,7 @@ class Idephix implements IdephixInterface
                 /**
                  * Create an example idxfile.php
                  */
-                function () use ($idx)
-                {
+                function () use ($idx) {
                     $idx->initIdxFile()->initFile();
                 }
             );
@@ -329,7 +340,7 @@ class Idephix implements IdephixInterface
     /**
      * Get application
      *
-     * @return Idephix\Application
+     * @return Application
      */
     public function getApplication()
     {

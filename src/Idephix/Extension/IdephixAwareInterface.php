@@ -7,7 +7,8 @@ use Idephix\IdephixInterface;
 interface IdephixAwareInterface
 {
     /**
-     * @param Idephix $idx
+     * @param IdephixInterface $idx
+     * @return void
      */
     public function setIdephix(IdephixInterface $idx);
 }

@@ -31,11 +31,23 @@ class CLISshProxy extends BaseProxy
         }
     }
 
+    /**
+     * Set executable full path
+     *
+     * @param $executable
+     */
     public function setExecutable($executable)
     {
         $this->executable = $executable;
     }
 
+    /**
+     * Connect
+     *
+     * @param $host
+     * @param int $port
+     * @return bool
+     */
     public function connect($host, $port = 22)
     {
         $this->host = $host;
@@ -44,11 +56,21 @@ class CLISshProxy extends BaseProxy
         return true;
     }
 
+    /**
+     * @param $user
+     * @param $pwd
+     * @throws \Exception
+     */
     public function authByPassword($user, $pwd)
     {
         throw new \Exception("Not implemented");
     }
 
+    /**
+     * @param $user
+     * @return bool
+     * @throws \Exception
+     */
     public function authByAgent($user)
     {
         $this->assertConnected();
@@ -57,6 +79,14 @@ class CLISshProxy extends BaseProxy
         return $this->canConnect();
     }
 
+    /**
+     * @param $user
+     * @param $public_key_file
+     * @param $privateKeyFile
+     * @param $pwd
+     * @return bool
+     * @throws \Exception
+     */
     public function authByPublicKey($user, $public_key_file, $privateKeyFile, $pwd)
     {
         $this->assertConnected();
@@ -66,6 +96,9 @@ class CLISshProxy extends BaseProxy
         return $this->canConnect();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function exec($cmd)
     {
         $preparedCmd = $this->prepareCommand($cmd);
@@ -73,6 +106,10 @@ class CLISshProxy extends BaseProxy
         return $this->doExec($preparedCmd);
     }
 
+    /**
+     * @param string $preparedCmd
+     * @return bool
+     */
     private function doExec($preparedCmd)
     {
         $process = new Process($preparedCmd, null, null, null, $this->timeout);
@@ -126,6 +163,10 @@ class CLISshProxy extends BaseProxy
         return $this->doExec($preparedCmd);
     }
 
+    /**
+     * @param string $cmd
+     * @return string
+     */
     private function prepareCommand($cmd)
     {
         $user = $this->user ? '-l '.$this->user : '';

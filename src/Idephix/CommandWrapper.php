@@ -8,13 +8,17 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Output\OutputInterface;
 use Idephix\Util\DocBlockParser;
 
 class CommandWrapper extends Command
 {
-    public function buildFromCode(\Closure $code)
+    /**
+     * @param callable $code
+     */
+    public function buildFromCode($code)
     {
+        $this->assertCallable($code);
+
         $this->setCode($code);
 
         $reflector = new \ReflectionFunction($code);
@@ -27,10 +31,16 @@ class CommandWrapper extends Command
         }
     }
 
+    /**
+     * @param callable $code
+     * @return $this|Command
+     */
     public function setCode($code)
     {
+        $this->assertCallable($code);
+
         $command = $this;
-        parent::setCode(function (InputInterface $input, OutputInterface $output) use ($code, $command) {
+        parent::setCode(function (InputInterface $input) use ($code, $command) {
             $input = $command->filterByOriginalDefinition(
                 $input,
                 $command->getApplication()->getDefinition()
@@ -45,6 +55,11 @@ class CommandWrapper extends Command
         return $this;
     }
 
+    /**
+     * @param InputInterface $input
+     * @param $appDefinition
+     * @return ArrayInput
+     */
     public function filterByOriginalDefinition(InputInterface $input, $appDefinition)
     {
         $newDefinition = new InputDefinition();
@@ -75,6 +90,10 @@ class CommandWrapper extends Command
         return $newInput;
     }
 
+    /**
+     * @param \ReflectionParameter $parameter
+     * @param string $description
+     */
     public function addParameter(\ReflectionParameter $parameter, $description)
     {
         $name = $parameter->getName();
@@ -95,8 +114,22 @@ class CommandWrapper extends Command
         $this->addArgument($name, InputArgument::OPTIONAL, $description, $default);
     }
 
+    /**
+     * @param \ReflectionParameter $parameter
+     * @return bool
+     */
     private function isFlagOption(\ReflectionParameter $parameter)
     {
         return false === $parameter->getDefaultValue();
+    }
+
+    /**
+     * @param callable $code
+     */
+    protected function assertCallable($code)
+    {
+        if (!is_callable($code)) {
+            throw new \InvalidArgumentException("Code must be a callable");
+        }
     }
 }

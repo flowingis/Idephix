@@ -24,7 +24,7 @@ class SshClient
     }
 
     /**
-     * @param array $options array('user', 'password', 'public_key_file', 'private_key_file', 'private_key_file_pwd', 'ssh_port')
+     * @param array $params array('user', 'password', 'public_key_file', 'private_key_file', 'private_key_file_pwd', 'ssh_port')
      */
     public function setParameters($params)
     {
@@ -81,6 +81,10 @@ class SshClient
         return $this->connected;
     }
 
+    /**
+     * @param string $cmd
+     * @return bool
+     */
     public function exec($cmd)
     {
         return $this->proxy->exec($cmd);

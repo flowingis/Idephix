@@ -4,6 +4,9 @@ namespace Idephix\Util;
 
 class ArgumentParser
 {
+    protected $params;
+    protected $options;
+
     private function addLongOption($param)
     {
         if (!preg_match('/^--([^=]*)=?(.*)$/', $param, $matches)) {
@@ -42,6 +45,7 @@ class ArgumentParser
      * --long-param=<value>
      * <value>
      *
+     * @param string[] $arguments
      * @param array $noOptions List of parameters without values
      */
     public function parse($arguments, $noOptions = array())

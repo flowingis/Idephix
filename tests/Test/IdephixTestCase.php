@@ -33,14 +33,14 @@ class IdephixTestCase extends \PHPUnit_Framework_TestCase
         $idx->expects($this->any())
             ->method('local')
             ->will($this->returnCallback(
-                function($cmd) use ($output) {
+                function ($cmd) use ($output) {
                     $output->writeln('Local: '.$cmd);
                 }
             ));
         $idx->expects($this->any())
             ->method('remote')
             ->will($this->returnCallback(
-                function($cmd) use ($output) {
+                function ($cmd) use ($output) {
                     $output->writeln('Remote: '.$cmd);
                 }
             ));
