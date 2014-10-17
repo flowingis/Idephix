@@ -14,13 +14,13 @@ file_put_contents($file, $contentVersion);
 
 $phar = new Phar('idephix.phar');
 $phar->setSignatureAlgorithm(Phar::SHA1);
-$phar->buildFromDirectory('..', '/\.(php|dist)$/');
+$phar->buildFromDirectory('..', '/(\.(php|dist)|idx)$/');
 
 $stub = <<<ENDSTUB
 #!/usr/bin/env php
 <?php
 Phar::mapPhar('idephix.phar');
-require 'phar://idephix.phar/bin/do.php';
+require 'phar://idephix.phar/bin/idx';
 __HALT_COMPILER();
 ENDSTUB;
 
