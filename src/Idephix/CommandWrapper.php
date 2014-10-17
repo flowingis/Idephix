@@ -27,7 +27,7 @@ class CommandWrapper extends Command
         }
     }
 
-    public function setCode(\Closure $code)
+    public function setCode($code)
     {
         $command = $this;
         parent::setCode(function (InputInterface $input, OutputInterface $output) use ($code, $command) {
