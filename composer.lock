@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f0d623c3a53d874e68ec600642ecdbee",
+    "hash": "e989cf90226059cff3f42af063608167",
     "packages": [
         {
             "name": "symfony/console",
@@ -157,9 +157,9 @@
         "mikey179/vfsstream": 20
     },
     "prefer-stable": false,
-    "platform": [
-
-    ],
+    "platform": {
+        "php": ">=5.3.3"
+    },
     "platform-dev": [
 
     ]

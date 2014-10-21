@@ -23,7 +23,7 @@ interface IdephixInterface
      *
      * @param string $name
      * @param callable $code
-     * @return Idephix
+     * @return \Idephix\IdephixInterface
      */
     public function add($name, $code);
 
@@ -67,6 +67,7 @@ interface IdephixInterface
      * Execute local command.
      *
      * @param string $cmd Command
+     * @param boolean $dryRun
      *
      * @return string the command output
      */
