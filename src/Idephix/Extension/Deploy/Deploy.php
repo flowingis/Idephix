@@ -232,8 +232,6 @@ class Deploy implements IdephixAwareInterface
 
     /**
      * @param int $releasesToKeep how many releases you want to keep
-     *
-     * @todo sudo?
      */
     public function deleteOldReleases($releasesToKeep)
     {
@@ -248,7 +246,7 @@ class Deploy implements IdephixAwareInterface
     }
 
     /**
-     * @todo sudo?
+     * Symfony app/console cache:clear
      */
     public function cacheClear()
     {
@@ -256,7 +254,7 @@ class Deploy implements IdephixAwareInterface
     }
 
     /**
-     * @todo sudo?
+     * Symfony app/console doctrine:migration:migrate
      */
     public function doctrineMigrate()
     {
