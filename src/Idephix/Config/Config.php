@@ -22,13 +22,18 @@ class Config
             return $this->config[$name];
         }
 
-        if (preg_match('/^(?<first_level>[^.]*)\.(?<second_level>.*)$/', $name, $matches)) {
-            if ($this->isSetFirstAndSecondLevel($matches)) {
-                return $this->config[$matches['first_level']][$matches['second_level']];
+        $name = explode('.', $name);
+        
+        $result = $this->config;
+        
+        foreach ($name as $i => $part) {
+            if (!isset($result[$part])) {
+                return $default;
             }
+            $result = $result[$part];
         }
-
-        return $default;
+        
+        return $result;
     }
 
     /**
@@ -42,16 +47,15 @@ class Config
 
             return;
         }
+        
+        $name = array_reverse(explode('.', $name));
 
-        if (preg_match('/^(?<first_level>[^.]*)\.(?<second_level>.*)$/', $name, $matches)) {
-            if ($this->isSetFirstAndSecondLevel($matches)) {
-                $this->config[$matches['first_level']][$matches['second_level']] = $value;
-
-                return;
-            }
+        $result = $value;
+        foreach ($name as $i => $part) {
+            $result = array($part => $result);
         }
-
-        $this->config[$name] = $value;
+        
+        $this->config = array_merge_recursive($this->config, $result);
     }
 
     /**
