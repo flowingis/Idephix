@@ -324,6 +324,7 @@ class Idephix implements IdephixInterface
         if (!$dryRun && !$this->sshClient->exec($cmd)) {
             throw new \Exception('Remote command fail: '.$this->sshClient->getLastError());
         }
+        $this->output->writeln($this->sshClient->getLastOutput());        
     }
 
     /**
