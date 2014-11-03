@@ -20,8 +20,10 @@ class Deploy implements IdephixAwareInterface
     private $dryRun = true;
     private $timestamp;
     private $hasToMigrate = false;
+    private $useAssetic = true;
     private $strategy;
     private $sharedFolders = array();
+    private $sharedSymlinks = array();
     private $symfonyEnv;
 
     public function __construct()
@@ -49,10 +51,16 @@ class Deploy implements IdephixAwareInterface
 
         $this->symfonyEnv = $target->get('symfony_env', 'dev');
         $this->hasToMigrate = $target->get('deploy.migrations', false);
+        $this->useAssetic = $target->get('deploy.assetic', true);
         $this->localBaseFolder  = $target->getFixedPath('deploy.local_base_dir');
         $this->remoteBaseFolder = $target->getFixedPath('deploy.remote_base_dir');
         $this->releasesFolder   = $this->remoteBaseFolder.'releases/';
         $this->sharedFolders    = $target->get('deploy.shared_folders', array());
+        $this->sharedSymlinks   = $target->get('deploy.shared_symlinks', null);
+        
+        if ($this->sharedFolders && is_null($this->sharedSymlinks)) {
+            throw new \Exception(sprintf('In "%s" target, deploy.shared_folders parameter was set but deploy.shared_symlinks was not. You must define deploy.shared_symlinks too.', $this->idx->getCurrentTargetName()));
+        }
 
         $target->set('deploy.releases_dir', $this->releasesFolder);
         $target->set('deploy.current_release_dir', $this->getCurrentReleaseFolder());
@@ -152,7 +160,7 @@ class Deploy implements IdephixAwareInterface
      * @param string $path
      * @return boolean
      */
-    public function remoteFileExits($path)
+    public function remoteFileExists($path)
     {
         try {
             $this->idx->remote("[ -e '$path' ]", $this->dryRun);
@@ -164,41 +172,55 @@ class Deploy implements IdephixAwareInterface
     }
 
     /**
-     * Link shared folders to the next release
+     * Link shared files and folder to the next release
      */
-    public function remoteLinkSharedFolders()
+    public function remoteCreateSymlinks()
     {
         $this->log("Updating symlink for shared folder ..");
 
-        foreach ($this->sharedFolders as $folder) {
+        foreach ($this->sharedSymlinks as $file) {
 
-            $fullPathSharedFolder        = $this->remoteBaseFolder.'shared/'.$folder;
-            $fullPathReleaseSharedFolder = $this->remoteBaseFolder.'releases/'.$this->getNextReleaseName()."/".$folder;
+            $fullPathSharedFile        = $this->remoteBaseFolder.'shared/'.$file;
+            $fullPathReleaseSharedFile = $this->remoteBaseFolder.'releases/'.$this->getNextReleaseName()."/".$file;
 
-            $this->log("Linking shared folder ".$fullPathReleaseSharedFolder." ...");
+            $this->log("Creating shared symlink for ".$fullPathReleaseSharedFile." ...");
 
-            if ($this->remoteFileExits($fullPathReleaseSharedFolder)) {
+            if (
+                    !$this->remoteFileExists($fullPathSharedFile)
+                    && $this->remoteFileExists($fullPathReleaseSharedFile)
+                ) {
+                
+                $this->idx->remote(
+                        sprintf(
+                            "cp %s %s",
+                            $fullPathReleaseSharedFile,
+                            $fullPathSharedFile
+                        ),
+                        $this->dryRun);
+            }
+
+            if ($this->remoteFileExists($fullPathReleaseSharedFile)) {
                 try {
                     $this->idx->remote(
                         sprintf(
-                            "unlink %s || rmdir %s || rm %s",
-                            $fullPathReleaseSharedFolder,
-                            $fullPathReleaseSharedFolder,
-                            $fullPathReleaseSharedFolder
+                            "unlink %s || rmdir %s || rm -R %s",
+                            $fullPathReleaseSharedFile,
+                            $fullPathReleaseSharedFile,
+                            $fullPathReleaseSharedFile
                         ),
                         $this->dryRun
                     );
                 } catch (\Exception $e) {
                     throw new \Exception(
                         sprintf(
-                            'Unable to link shared directory "%s". Destination file or directory exists.',
-                            $fullPathReleaseSharedFolder
+                            'Unable to link shared file "%s". Destination file or directory exists.',
+                            $fullPathReleaseSharedFile
                         )
                     );
                 }
             }
 
-            $this->idx->remote('ln -nfs '.$fullPathSharedFolder. ' '.$fullPathReleaseSharedFolder, $this->dryRun);
+            $this->idx->remote('ln -nfs '.$fullPathSharedFile. ' '.$fullPathReleaseSharedFile, $this->dryRun);
         }
     }
 
@@ -250,6 +272,7 @@ class Deploy implements IdephixAwareInterface
      */
     public function cacheClear()
     {
+        return $this->idx->remote('cd '.$this->getNextReleaseFolder()." && rm -Rf app/cache/*", $this->dryRun);
         return $this->idx->remote('cd '.$this->getNextReleaseFolder()." && ./app/console cache:clear --env=$this->symfonyEnv --no-debug", $this->dryRun);
     }
 
@@ -275,15 +298,21 @@ class Deploy implements IdephixAwareInterface
         $this->idx->remote("cd ".$this->remoteBaseFolder." && ln -s releases/bootstrap current");
         $out .= $this->sshClient->getLastOutput();
 
+        $this->updateSharedFolders();
+
+        return $out;
+    }
+    
+    private function updateSharedFolders()
+    {
         $this->log("Creating shared folders...");
 
         foreach ($this->sharedFolders as $folder) {
             $this->log("Creating shared folder ".$folder." ...");
             $this->idx->remote('mkdir -p '.$this->remoteBaseFolder.'shared/'.$folder);
         }
-
-        return $out;
     }
+    
 
     /**
      * Proxy to idephix output->writeln method
@@ -299,6 +328,11 @@ class Deploy implements IdephixAwareInterface
         return $this->hasToMigrate;
     }
 
+    public function useAssetic()
+    {
+        return $this->useAssetic;
+    }
+    
     public function deploySF2Copy($go, $releasesToKeep = 6, $automaticBootstrap = true)
     {
 
@@ -318,7 +352,8 @@ class Deploy implements IdephixAwareInterface
 
         $this->strategy->deploy();
 
-        $this->remoteLinkSharedFolders();
+        $this->updateSharedFolders();
+        $this->remoteCreateSymlinks();
 
         if ($this->hasToMigrate()) {
             $this->doctrineMigrate();
@@ -326,7 +361,9 @@ class Deploy implements IdephixAwareInterface
 
         $this->cacheClear();
         $this->switchToTheNextRelease();
-        $this->assetic();
+        if ($this->useAssetic()) {
+            $this->assetic();
+        }
         $this->deleteOldReleases($releasesToKeep);
 
     }

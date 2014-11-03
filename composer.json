@@ -18,7 +18,8 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/console": "~2.5",
-        "symfony/process": "~2.5"
+        "symfony/process": "~2.5",
+        "symfony/yaml": "2.5.*"
     },
     "require-dev": {
         "mikey179/vfsStream": "1.3.*@dev"

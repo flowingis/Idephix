@@ -1,5 +1,6 @@
 /pecl
 /vendor
+/nbproject
 idxfile.php
 junit.xml
 bin/idephix.phar

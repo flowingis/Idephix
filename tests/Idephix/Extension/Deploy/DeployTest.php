@@ -16,7 +16,11 @@ class DeployTest extends IdephixTestCase
                 'remote_base_dir' => "/tmp/temp_dir",
                 'rsync_exclude_file' => 'rsync_exclude.txt',
                 'rsync_include_file' => 'rsync_include.txt',
-                'shared_folders' => array(
+                'shared_folders' => array (
+                    'app/logs',
+                    'web/uploads'
+                ),
+                'shared_symlinks' => array (
                     'app/logs',
                     'web/uploads'
                 ),
@@ -72,16 +76,23 @@ Copy code to the next release dir
 Remote: cp -pPR '$currentReleaseDir/.' '$nextReleaseDir'
 Sync code to the next release
 Local: rsync -rlpDvcz --delete -e 'ssh -p $port'  --exclude-from=rsync_exclude.txt --include-from=rsync_include.txt local_dir/ $user@$host:$nextReleaseDir
+Creating shared folders...
+Creating shared folder app/logs ...
+Remote: mkdir -p /tmp/temp_dir/shared/app/logs
+Creating shared folder web/uploads ...
+Remote: mkdir -p /tmp/temp_dir/shared/web/uploads
 Updating symlink for shared folder ..
-Linking shared folder $nextReleaseDir/app/logs ...
+Creating shared symlink for $nextReleaseDir/app/logs ...
+Remote: [ -e '/tmp/temp_dir/shared/app/logs' ]
 Remote: [ -e '$nextReleaseDir/app/logs' ]
-Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm $nextReleaseDir/app/logs
+Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm -R $nextReleaseDir/app/logs
 Remote: ln -nfs /tmp/temp_dir/shared/app/logs $nextReleaseDir/app/logs
-Linking shared folder $nextReleaseDir/web/uploads ...
+Creating shared symlink for $nextReleaseDir/web/uploads ...
+Remote: [ -e '/tmp/temp_dir/shared/web/uploads' ]
 Remote: [ -e '$nextReleaseDir/web/uploads' ]
-Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
+Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm -R $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
-Remote: cd $nextReleaseDir && ./app/console cache:clear --env=dev --no-debug
+Remote: cd $nextReleaseDir && rm -Rf app/cache/*
 Switch to next release...
 Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 Asset and assetic stuff...
@@ -121,16 +132,23 @@ Copy code to the next release dir
 Remote: cp -pPR '$currentReleaseDir/.' '$nextReleaseDir'
 Sync code to the next release
 Local: rsync -rlpDvcz --delete -e 'ssh -p $port'  --exclude-from=rsync_exclude.txt --include-from=rsync_include.txt local_dir/ $user@$host:$nextReleaseDir
+Creating shared folders...
+Creating shared folder app/logs ...
+Remote: mkdir -p /tmp/temp_dir/shared/app/logs
+Creating shared folder web/uploads ...
+Remote: mkdir -p /tmp/temp_dir/shared/web/uploads
 Updating symlink for shared folder ..
-Linking shared folder $nextReleaseDir/app/logs ...
+Creating shared symlink for $nextReleaseDir/app/logs ...
+Remote: [ -e '/tmp/temp_dir/shared/app/logs' ]
 Remote: [ -e '$nextReleaseDir/app/logs' ]
-Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm $nextReleaseDir/app/logs
+Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm -R $nextReleaseDir/app/logs
 Remote: ln -nfs /tmp/temp_dir/shared/app/logs $nextReleaseDir/app/logs
-Linking shared folder $nextReleaseDir/web/uploads ...
+Creating shared symlink for $nextReleaseDir/web/uploads ...
+Remote: [ -e '/tmp/temp_dir/shared/web/uploads' ]
 Remote: [ -e '$nextReleaseDir/web/uploads' ]
-Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
+Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm -R $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
-Remote: cd $nextReleaseDir && ./app/console cache:clear --env=prod --no-debug
+Remote: cd $nextReleaseDir && rm -Rf app/cache/*
 Switch to next release...
 Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 Asset and assetic stuff...
@@ -160,6 +178,10 @@ Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
                         'app/logs',
                         'web/uploads'
                     ),
+                    'shared_symlinks' => array (
+                        'app/logs',
+                        'web/uploads'
+                    ),
                 )
             )
         );
@@ -185,17 +207,24 @@ Copy code to the next release dir
 Remote: cp -pPR '$currentReleaseDir/.' '$nextReleaseDir'
 Sync code to the next release
 Local: rsync -rlpDvcz --delete -e 'ssh -p $port'  --exclude-from=rsync_exclude.txt --include-from=rsync_include.txt local_dir/ $user@$host:$nextReleaseDir
+Creating shared folders...
+Creating shared folder app/logs ...
+Remote: mkdir -p /tmp/temp_dir/shared/app/logs
+Creating shared folder web/uploads ...
+Remote: mkdir -p /tmp/temp_dir/shared/web/uploads
 Updating symlink for shared folder ..
-Linking shared folder $nextReleaseDir/app/logs ...
+Creating shared symlink for $nextReleaseDir/app/logs ...
+Remote: [ -e '/tmp/temp_dir/shared/app/logs' ]
 Remote: [ -e '$nextReleaseDir/app/logs' ]
-Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm $nextReleaseDir/app/logs
+Remote: unlink $nextReleaseDir/app/logs || rmdir $nextReleaseDir/app/logs || rm -R $nextReleaseDir/app/logs
 Remote: ln -nfs /tmp/temp_dir/shared/app/logs $nextReleaseDir/app/logs
-Linking shared folder $nextReleaseDir/web/uploads ...
+Creating shared symlink for $nextReleaseDir/web/uploads ...
+Remote: [ -e '/tmp/temp_dir/shared/web/uploads' ]
 Remote: [ -e '$nextReleaseDir/web/uploads' ]
-Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
+Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm -R $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
 Remote: cd $nextReleaseDir && ./app/console doctrine:migration:migrate --env=dev
-Remote: cd $nextReleaseDir && ./app/console cache:clear --env=dev --no-debug
+Remote: cd $nextReleaseDir && rm -Rf app/cache/*
 Switch to next release...
 Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 Asset and assetic stuff...
@@ -209,5 +238,48 @@ Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
 
         $this->assertEquals($expected, $actualOutput);
     }
-
+    
+    /**
+     * Tests pass non-existent class as deploy strategy
+     *
+     * @expectedException Exception
+     * @expectedExceptionMessage In "banana" target, deploy.shared_folders parameter was set but deploy.shared_symlinks was not. You must define deploy.shared_symlinks too.
+     */
+    public function testDeploySf2CopyWithoutSpecificSharedSymlinksToo()
+    {
+        $this->initDeploy(
+            null,
+            array(
+                'deploy' => array(
+                    'local_base_dir' => 'local_dir',
+                    'remote_base_dir' => "/tmp/temp_dir",
+                    'shared_folders' => array (
+                        'app/logs',
+                        'web/uploads'
+                    )
+                )
+            )
+        );
+        $result = $this->deploy->deploySF2Copy(true);
+    }
+    
+    public function testDeploySf2CopySpecifyingEmptySharedSymlinks()
+    {
+        $this->initDeploy(
+            null,
+            array(
+                'deploy' => array(
+                    'local_base_dir' => 'local_dir',
+                    'remote_base_dir' => "/tmp/temp_dir",
+                    'shared_folders' => array (
+                        'app/logs',
+                        'web/uploads'
+                    ),
+                    'shared_symlinks' => array()
+                )
+            )
+        );
+        $result = $this->deploy->deploySF2Copy(true);
+        //No Exceptions
+    }
 }
