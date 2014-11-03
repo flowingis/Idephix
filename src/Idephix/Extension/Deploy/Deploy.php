@@ -160,7 +160,7 @@ class Deploy implements IdephixAwareInterface
      * @param string $path
      * @return boolean
      */
-    public function remoteFileExits($path)
+    public function remoteFileExists($path)
     {
         try {
             $this->idx->remote("[ -e '$path' ]", $this->dryRun);
