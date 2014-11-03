@@ -16,15 +16,11 @@ class DeployTest extends IdephixTestCase
                 'remote_base_dir' => "/tmp/temp_dir",
                 'rsync_exclude_file' => 'rsync_exclude.txt',
                 'rsync_include_file' => 'rsync_include.txt',
-<<<<<<< HEAD
                 'shared_folders' => array (
                     'app/logs',
                     'web/uploads'
                 ),
                 'shared_symlinks' => array (
-=======
-                'shared_folders' => array(
->>>>>>> output
                     'app/logs',
                     'web/uploads'
                 ),
