@@ -4,6 +4,8 @@ namespace Idephix;
 use Symfony\Component\Console\Output\StreamOutput;
 use Idephix\Test\LibraryMock;
 
+include_once(__DIR__."/PassTester.php");
+
 class IdephixTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -77,7 +79,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $idx = new Idephix($target, new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
         $idx->getApplication()->setAutoExit(false);
 
-        $idx->add('foo', function() use ($idx) {
+        $idx->add('foo', function () use ($idx) {
             $idx->local('echo "Hello World from '.$idx->getCurrentTargetHost().'"');
         });
 
@@ -115,11 +117,18 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function testRunTask()
     {
-        $this->idx->add('command_name', function ($param) {
-            return $param;
+        $mock = $this->getMock("\\Idephix\\PassTester");
+        $mock->expects($this->exactly(1))
+            ->method('pass')
+            ->with('foo');
+
+        $this->idx->add('command_name', function ($param) use ($mock) {
+            $mock->pass($param);
+
+            return 0;
         });
 
-        $this->assertEquals('foo', $this->idx->runTask('command_name', 'foo'));
+        $this->assertEquals(0, $this->idx->runTask('command_name', 'foo'));
     }
 
     /**
@@ -180,11 +189,11 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $idx = new Idephix(array(), new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
         $idx->getApplication()->setAutoExit(false);
 
-        $idx->add('fooOk', function() use ($idx) {
+        $idx->add('fooOk', function () use ($idx) {
             $idx->local("echo 'God save the Queen'");
         });
 
-        $idx->add('fooKo', function() use ($idx) {
+        $idx->add('fooKo', function () use ($idx) {
             $idx->local("God save the Queen but this command will fail!");
         });
 

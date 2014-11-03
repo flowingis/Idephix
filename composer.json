@@ -1,14 +1,35 @@
 {
     "name": "ideato/idephix",
+    "description": "PHP automation and deploy tool.",
+    "type": "library",
+    "keywords": ["idephix", "idx", "automation", "deploy"],
+    "homepage": "http://getidephix.com/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Manuel Baldassarri",
+            "email": "mb@ideato.it",
+            "role": "lead"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/ideato/idephix/issues"
+    },
     "require": {
-        "symfony/console": "2.0.*",
-        "symfony/process": "2.1.*",
+        "php": ">=5.3.3",
+        "symfony/console": "~2.5",
+        "symfony/process": "~2.5",
         "symfony/yaml": "2.5.*"
     },
     "require-dev": {
         "mikey179/vfsStream": "1.3.*@dev"
     },
-
+    "bin": [
+        "bin/idx"
+    ],
+    "config": {
+        "bin-dir": "bin"
+    },
     "autoload": {
         "psr-0": {"Idephix": "src/"}
     }

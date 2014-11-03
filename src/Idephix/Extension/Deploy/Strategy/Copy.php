@@ -4,6 +4,8 @@ namespace Idephix\Extension\Deploy\Strategy;
 
 use Idephix\IdephixInterface;
 use Idephix\Config\Config;
+use Idephix\SSH\SshClient;
+use Symfony\Component\Console\Output\Output;
 
 class Copy implements DeployStrategyInterface
 {
@@ -11,10 +13,28 @@ class Copy implements DeployStrategyInterface
     protected $conf;
     protected $rsyncExcludeFile;
     protected $rsyncIncludeFile;
+    protected $target;
+    /**
+     * @var Output
+     */
+    protected $output;
+    /**
+     * @var SshClient
+     */
+    protected $sshClient;
 
     public function __construct(IdephixInterface $idx, Config $target)
     {
         $this->idx = $idx;
+        if (!$idx->output instanceof Output) {
+            throw new \InvalidArgumentException("Idx output should be a writable console");
+        }
+        $this->output = $idx->output;
+
+        if (!$idx->sshClient instanceof SshClient) {
+            throw new \InvalidArgumentException("Idx should have an SSH client connected");
+        }
+        $this->sshClient = $idx->sshClient;
 
         $this->target = $target;
         $this->rsyncExcludeFile = $target->get('deploy.rsync_exclude_file');
@@ -27,17 +47,19 @@ class Copy implements DeployStrategyInterface
      */
     public function deploy()
     {
-        $this->idx->output->writeln("Copy code to the next release dir");
+        $this->output->writeln("Copy code to the next release dir");
         $this->remoteCopyRecursive(
             $this->target->get('deploy.current_release_dir').'/.',
-            $this->target->get('deploy.next_release_dir'));
-        $out = $this->idx->sshClient->getLastOutput();
+            $this->target->get('deploy.next_release_dir')
+        );
+        $out = $this->sshClient->getLastOutput();
 
-        $this->idx->output->writeln("Sync code to the next release");
+        $this->output->writeln("Sync code to the next release");
         $this->rsync(
             $this->target->getFixedPath('deploy.local_base_dir'),
-            ($this->target->get('deploy.dry_run')) ? $this->target->get('deploy.current_release_dir').'/' : $this->target->get('deploy.next_release_dir'));
-        $out .= $this->idx->sshClient->getLastOutput();
+            ($this->target->get('deploy.dry_run')) ? $this->target->get('deploy.current_release_dir').'/' : $this->target->get('deploy.next_release_dir')
+        );
+        $out .= $this->sshClient->getLastOutput();
 
         return $out;
     }
@@ -47,28 +69,33 @@ class Copy implements DeployStrategyInterface
      * @param string $from local source path
      * @param string $to   remote target path
      *
-     * @return int command return status
+     * @return string command return status
      */
     public function rsync($from, $to)
     {
-        $user = $this->idx->sshClient->getUser();
-        $host = $this->idx->sshClient->getHost();
+        $user = $this->sshClient->getUser();
+        $host = $this->sshClient->getHost();
 
         $dryFlag = $this->target->get('deploy.dry_run') ? '--dry-run' : '';
         $exclude = $this->rsyncExcludeFile ? '--exclude-from='.$this->rsyncExcludeFile : '';
         $include = $this->rsyncIncludeFile ? '--include-from='.$this->rsyncIncludeFile : '';
         $sshCmd = "-e 'ssh";
-        $sshCmd.= $this->idx->sshClient->getPort() ? " -p ".$this->idx->sshClient->getPort() : "";
+        $sshCmd.= $this->sshClient->getPort() ? " -p ".$this->sshClient->getPort() : "";
         $sshCmd.= "'";
 
         return $this->idx->local("rsync -rlpDvcz --delete $sshCmd $dryFlag $exclude $include $from $user@$host:$to");
     }
 
+    /**
+     * @param string $from
+     * @param string $to
+     */
     public function remoteCopyRecursive($from, $to)
     {
         return $this->idx->remote(
             sprintf("cp -pPR %s %s", escapeshellarg($from), escapeshellarg($to)),
-            $this->target->get('deploy.dry_run'));
+            $this->target->get('deploy.dry_run')
+        );
     }
 
 }

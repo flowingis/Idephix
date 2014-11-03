@@ -4,6 +4,8 @@ namespace Idephix\SSH;
 
 class FakeSsh2Proxy extends BaseProxy
 {
+    protected $test;
+
     public function __construct($test)
     {
         $this->test = $test;
@@ -55,5 +57,15 @@ class FakeSsh2Proxy extends BaseProxy
         $this->test->assertTrue(true, 'isConnected');
 
         return true;
+    }
+
+    public function put($localPath, $remotePath)
+    {
+        $this->test->assertTrue(true, 'scp '.$localPath.' '.$remotePath);
+    }
+
+    public function get($remotePath, $localPath)
+    {
+        $this->test->assertTrue(true, 'scp '.$remotePath.' '.$localPath);
     }
 }

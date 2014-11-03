@@ -93,6 +93,9 @@ class DocBlockParser
         return $this->hasParam($name) ? $this->params[$name] : null;
     }
 
+    /**
+     * @param string $name
+     */
     public function hasParam($name)
     {
         return isset($this->params[$name]);
@@ -108,6 +111,10 @@ class DocBlockParser
         return $this->description;
     }
 
+    /**
+     * @param string $name
+     * @return string
+     */
     public function getParamDescription($name)
     {
         return $this->hasParam($name) ? $this->params[$name]['description'] : '';

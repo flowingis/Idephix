@@ -7,6 +7,8 @@ use Idephix\IdephixInterface;
 
 class LibraryMock implements IdephixAwareInterface
 {
+    protected $tester;
+
     public function __construct($tester)
     {
         $this->tester = $tester;
@@ -15,8 +17,6 @@ class LibraryMock implements IdephixAwareInterface
     public function setIdephix(IdephixInterface $idx)
     {
         $this->tester->assertTrue(true, 'Set Idephix');
-
-        return true;
     }
 
     public function test($return)

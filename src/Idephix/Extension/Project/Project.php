@@ -6,10 +6,7 @@ use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
 
 /**
- * @todo:
- * - allow for $exclude to be an array
- * - manage ports different from the default one
- * - check to undefined params in currentTarget
+ * Provide a basic rsync interface based on current idx target parameters
  */
 class Project implements IdephixAwareInterface
 {
@@ -23,7 +20,7 @@ class Project implements IdephixAwareInterface
         $this->idx = $idx;
     }
 
-    public function rsyncProject($remoteDir, $localDir = null, $exclude = null, $extraOpts = null, $sshOpts = null)
+    public function rsyncProject($remoteDir, $localDir = null, $exclude = null, $extraOpts = null)
     {
         if (substr($remoteDir, -1) != '/') {
             $remoteDir .= '/';
@@ -31,18 +28,29 @@ class Project implements IdephixAwareInterface
 
         $target = $this->idx->getCurrentTarget();
 
-        if( $target === null ) {
+        if ($target === null) {
             throw new \InvalidArgumentException("Target not provided. Please provide a valid target.");
         }
 
         $user = $target->get('ssh_params.user');
         $host = $this->idx->getCurrentTargetHost();
+        $port = $target->get('ssh_params.port');
 
         if (file_exists($exclude)) {
-            $extraOpts .= ' --exclude-from='.$exclude;
+            $extraOpts .= ' --exclude-from='.escapeshellarg($exclude);
+        } elseif (!empty($exclude)) {
+            $exclude = is_array($exclude) ? $exclude : array($exclude);
+            $extraOpts .= array_reduce($exclude, function ($carry, $item) {
+                return $carry.' --exclude='.escapeshellarg($item);
+            });
         }
 
-        $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e 'ssh' $localDir $user@$host:$remoteDir";
+        $sshCmd = 'ssh';
+        if ($port) {
+            $sshCmd .= ' -p ' . $port;
+        }
+
+        $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e '$sshCmd' $localDir $user@$host:$remoteDir";
 
         return $this->idx->local($cmd);
     }

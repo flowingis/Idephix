@@ -24,7 +24,7 @@ class SshClient
     }
 
     /**
-     * @param array $options array('user', 'password', 'public_key_file', 'private_key_file', 'private_key_file_pwd', 'ssh_port')
+     * @param array $params array('user', 'password', 'public_key_file', 'private_key_file', 'private_key_file_pwd', 'ssh_port')
      */
     public function setParameters($params)
     {
@@ -81,6 +81,10 @@ class SshClient
         return $this->connected;
     }
 
+    /**
+     * @param string $cmd
+     * @return bool
+     */
     public function exec($cmd)
     {
         return $this->proxy->exec($cmd);
@@ -94,6 +98,11 @@ class SshClient
     public function getLastError()
     {
         return $this->proxy->getLastError();
+    }
+
+    public function isSuccessful()
+    {
+        return $this->proxy->isSuccessful();
     }
 
     public function getUser()
@@ -114,5 +123,39 @@ class SshClient
     public function getHost()
     {
         return $this->host;
+    }
+
+    /**
+     * Copy a file via scp from $localPath to $remotePath
+     *
+     * @param $localPath source local path
+     * @param $remotePath destination remote path
+     * @throws \Exception
+     * @return bool
+     */
+    public function put($localPath, $remotePath)
+    {
+        if (!$this->isConnected()) {
+            throw new \Exception("SSH Client is not connected");
+        }
+
+        return $this->proxy->put($localPath, $remotePath);
+    }
+
+    /**
+     * Copy a file via scp from $remotePath to $localPath
+     *
+     * @param $remotePath source remote path
+     * @param $localPath destination local path
+     * @throws \Exception
+     * @return bool
+     */
+    public function get($remotePath, $localPath)
+    {
+        if (!$this->isConnected()) {
+            throw new \Exception("SSH Client is not connected");
+        }
+
+        return $this->proxy->get($remotePath, $localPath);
     }
 }
