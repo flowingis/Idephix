@@ -3,3 +3,5 @@
 idxfile.php
 junit.xml
 bin/idephix.phar
+.idea
+bin/phpunit
