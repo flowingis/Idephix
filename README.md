@@ -4,7 +4,7 @@ Idephix - Automation and Deploy tool
 Idephix is a PHP tool for building automated scripts
 
 [![Build Status](https://travis-ci.org/ideatosrl/Idephix.png)](https://travis-ci.org/ideatosrl/Idephix)
-
+[![Code Climate](https://codeclimate.com/github/ideatosrl/Idephix/badges/gpa.svg)](https://codeclimate.com/github/ideatosrl/Idephix)
 
 Installation / Usage
 --------------------
