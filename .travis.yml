@@ -8,9 +8,15 @@ php:
 
 before_script: composer install --prefer-source
 
-script: phpunit
+script: phpunit --coverage-clover clover.xml
+
+after_script:
+  - vendor/bin/test-reporter
 
 branches:
   only:
     - master
-    
+
+addons:
+  code_climate:
+    repo_token: d78a2bee0da040438a789f86c200b705caaa43eea2358a2610cef18e3960f145
