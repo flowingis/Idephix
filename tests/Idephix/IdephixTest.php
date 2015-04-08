@@ -22,7 +22,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::__get
      * @expectedException PHPUnit_Framework_Error
      * @expectedExceptionMessage Undefined property: application in
      */
@@ -35,7 +34,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::add
      */
     public function testAdd()
     {
@@ -68,7 +66,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::run
      * @dataProvider getArgvAndTargets
      */
     public function testRunALocalTask($argv, $target, $expected)
@@ -91,8 +88,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::addLibrary
-     * @covers Ideato\Idephix::__call
      */
     public function testAddLibrary()
     {
@@ -103,7 +98,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::addLibrary
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The library must be an object
      */
@@ -113,7 +107,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::runTask
      */
     public function testRunTask()
     {
@@ -132,7 +125,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::remote
      * Exception: Remote function need a valid environment. Specify --env parameter.
      */
     public function testRemote()
@@ -148,7 +140,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::remote
      * @expectedException \Exception
      * @expectedExceptionMessage Remote function need a valid environment. Specify --env parameter.
      */
@@ -160,7 +151,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::local
      */
     public function testLocal()
     {
@@ -178,7 +168,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::run
      * @dataProvider getTaskAndReturnCode
      */
     public function testReturnCode($task, $expected)
