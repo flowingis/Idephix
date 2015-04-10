@@ -16,12 +16,12 @@ class DeployTest extends IdephixTestCase
                 'remote_base_dir' => "/tmp/temp_dir",
                 'rsync_exclude_file' => 'rsync_exclude.txt',
                 'rsync_include_file' => 'rsync_include.txt',
-				'shared_folders' => array (
-					'app/logs',
-					'web/uploads'
-				),
-			)
-		);
+                'shared_folders' => array(
+                    'app/logs',
+                    'web/uploads'
+                ),
+            )
+        );
 
         $targets = array('banana' =>
             array_merge($defaultConfig, $config),
@@ -44,7 +44,7 @@ class DeployTest extends IdephixTestCase
     public function testWrongStrategy()
     {
         $this->initDeploy('FailStrategy');
-        $result = $this->deploy->deploySF2Copy(true);
+        $this->deploy->deploySF2Copy(true);
     }
 
     public function testDeploySf2CopyWithoutSpecificEnvConfiguration()
@@ -156,7 +156,7 @@ Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
                     'rsync_exclude_file' => 'rsync_exclude.txt',
                     'rsync_include_file' => 'rsync_include.txt',
                     'migrations' => true,
-                    'shared_folders' => array (
+                    'shared_folders' => array(
                         'app/logs',
                         'web/uploads'
                     ),

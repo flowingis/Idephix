@@ -4,8 +4,9 @@ namespace Idephix\SSH;
 
 class PeclSsh2Proxy extends BaseProxy
 {
+    const RETURN_TOKEN = '__RETURNS__:';
 
-    public function connect($host, $port)
+    public function connect($host, $port = 22)
     {
         if (!empty($this->connection)) {
             return $this->connection;
@@ -34,9 +35,14 @@ class PeclSsh2Proxy extends BaseProxy
         return ssh2_auth_agent($this->connection, $user);
     }
 
+    public function isSuccessful()
+    {
+        return 0 == $this->getExitCode();
+    }
+
     public function exec($cmd)
     {
-        $stdout = ssh2_exec($this->connection, $cmd.'; echo "__RETURNS__:$?"', 'ansi');
+        $stdout = ssh2_exec($this->connection, $cmd.'; echo "'.self::RETURN_TOKEN.'$?"', 'ansi');
         $stderr = ssh2_fetch_stream($stdout, SSH2_STREAM_STDERR);
 
         stream_set_blocking($stderr, true);
@@ -45,15 +51,18 @@ class PeclSsh2Proxy extends BaseProxy
         stream_set_blocking($stdout, true);
         $this->lastOutput = stream_get_contents($stdout);
 
-        $returnCode = null;
+        $this->exitCode = -1;
 
-        $pos = strpos($this->lastOutput, '__RETURNS__:');
-        if (false !== $pos) {
-            $returnCode = substr($this->lastOutput, $pos + 12);
-            $this->lastOutput = substr($this->lastOutput, 0, $pos);
+        $pos = strpos($this->lastOutput, self::RETURN_TOKEN);
+
+        if (false === $pos) {
+            return false;
         }
 
-        return $returnCode;
+        $this->exitCode = substr($this->lastOutput, $pos + strlen(self::RETURN_TOKEN));
+        $this->lastOutput = substr($this->lastOutput, 0, $pos);
+
+        return $this->isSuccessful();
     }
 
     public function disconnect()
@@ -67,5 +76,21 @@ class PeclSsh2Proxy extends BaseProxy
     public function __destruct()
     {
         $this->disconnect();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function put($localPath, $remotePath)
+    {
+        return ssh2_scp_send($this->connection, $localPath, $remotePath);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function get($remotePath, $localPath)
+    {
+        return ssh2_scp_recv($this->connection, $remotePath, $localPath);
     }
 }

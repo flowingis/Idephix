@@ -7,3 +7,4 @@ bin/idephix.phar
 nbproject/
 .idea
 phpunit.xml
+bin/phpunit

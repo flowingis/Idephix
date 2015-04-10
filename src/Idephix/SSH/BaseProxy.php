@@ -7,6 +7,7 @@ abstract class BaseProxy implements ProxyInterface
     protected $connection = null;
     protected $lastError;
     protected $lastOutput;
+    protected $exitCode;
 
     public function disconnect()
     {
@@ -21,5 +22,10 @@ abstract class BaseProxy implements ProxyInterface
     public function getLastOutput()
     {
         return $this->lastOutput;
+    }
+
+    public function getExitCode()
+    {
+        return $this->exitCode;
     }
 }

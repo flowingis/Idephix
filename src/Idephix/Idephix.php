@@ -12,11 +12,17 @@ use Idephix\Extension\SelfUpdate\SelfUpdate;
 use Idephix\Extension\InitIdxFile\InitIdxFile;
 use Idephix\Config\Config;
 
+/**
+ * Class Idephix
+ * @method InitIdxFile initIdxFile()
+ * @method SelfUpdate selfUpdate()
+ */
 class Idephix implements IdephixInterface
 {
     const VERSION = '@package_version@';
     private $application;
     private $library = array();
+    private $input;
     private $output;
     private $sshClient;
     private $targets = array();
@@ -26,7 +32,7 @@ class Idephix implements IdephixInterface
     protected $currentHost;
     protected $invokerClassName;
 
-    public function __construct(array $targets = null, SshClient $sshClient = null, OutputInterface $output = null, InputInterface $input = null)
+    public function __construct(array $targets = array(), SshClient $sshClient = null, OutputInterface $output = null, InputInterface $input = null)
     {
         $this->application = new Application('Idephix', self::VERSION);
         $this->targets = $targets;
@@ -64,7 +70,7 @@ class Idephix implements IdephixInterface
             }
         }
 
-        throw new \BadMethodCallException('Call to undefined method: "' . $name . '"');
+        throw new \BadMethodCallException('Call to undefined method: "'.$name.'"');
     }
 
     public function __get($name)
@@ -75,24 +81,19 @@ class Idephix implements IdephixInterface
 
         $trace = debug_backtrace();
         trigger_error(
-            'Undefined property: ' . $name .
-            ' in ' . $trace[0]['file'] .
-            ' on line ' . $trace[0]['line'],
-            E_USER_NOTICE);
+            'Undefined property: '.$name.
+            ' in '.$trace[0]['file'].
+            ' on line '.$trace[0]['line'],
+            E_USER_NOTICE
+        );
 
         return null;
     }
 
     /**
-     * Add a Command to the application.
-     * The "--go" parameters should be defined as "$go = false".
-     *
-     * @param string  $name
-     * @param Closure $code
-     *
-     * @return Idephix
+     * @inheritdoc
      */
-    public function add($name, \Closure $code)
+    public function add($name, $code)
     {
         $command = new CommandWrapper($name);
         $command->buildFromCode($code);
@@ -102,6 +103,10 @@ class Idephix implements IdephixInterface
         return $this;
     }
 
+    /**
+     * @param InputInterface $input
+     * @throws \Exception
+     */
     protected function buildEnvironment(InputInterface $input)
     {
         $this->currentTarget = null;
@@ -167,21 +172,28 @@ class Idephix implements IdephixInterface
         try {
             $this->buildEnvironment($this->input);
         } catch (\Exception $e) {
-            $this->output->writeln('<error>' . $e->getMessage() . '</error>');
+            $this->output->writeln('<error>'.$e->getMessage().'</error>');
 
             return;
         }
 
         $hosts = $this->hasTarget() ? $this->currentTarget->get('hosts') : array(null);
 
+        $hasErrors = false;
         foreach ($hosts as $host) {
             $this->currentHost = $host;
             $this->openRemoteConnection($host);
-            $this->application->run($this->input, $this->output);
+            $returnValue = $this->application->run($this->input, $this->output);
+            $hasErrors = $hasErrors || !(is_null($returnValue) || ($returnValue == 0));
             $this->closeRemoteConnection();
         }
+
+        return $hasErrors ? 1 : 0;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function addLibrary($name, $library)
     {
         if (!is_object($library)) {
@@ -195,6 +207,10 @@ class Idephix implements IdephixInterface
         $this->library[$name] = $library;
     }
 
+    /**
+     * @param string $name
+     * @return bool
+     */
     public function has($name)
     {
         return $this->application->has($name);
@@ -204,7 +220,8 @@ class Idephix implements IdephixInterface
      * RunTask.
      *
      * @param string $name the name of the task you want to call
-     * @param (...)  arbitrary number of parameter maching the target task interface
+     * @param (...)  arbitrary number of parameter matching the target task interface
+     * @return integer
      */
     public function runTask($name)
     {
@@ -254,7 +271,7 @@ class Idephix implements IdephixInterface
     /**
      * Execute remote command.
      *
-     * @param string  $cmd command
+     * @param string  $cmd    command
      * @param boolean $dryRun
      */
     public function remote($cmd, $dryRun = false)
@@ -262,10 +279,10 @@ class Idephix implements IdephixInterface
         if (!$this->sshClient->isConnected()) {
             throw new \Exception("Remote function need a valid environment. Specify --env parameter.");
         }
-        $this->output->writeln('<info>Remote</info>: ' . $cmd);
+        $this->output->writeln('<info>Remote</info>: '.$cmd);
 
-        if (!$dryRun && 0 != $this->sshClient->exec($cmd)) {
-            throw new \Exception("Remote command fail: " . $this->sshClient->getLastError());
+        if (!$dryRun && !$this->sshClient->exec($cmd)) {
+            throw new \Exception("Remote command fail: ".$this->sshClient->getLastError());
         }
     }
 
@@ -291,7 +308,7 @@ class Idephix implements IdephixInterface
             $output->write($buffer);
         });
         if (0 != $result) {
-            throw new \Exception("Local command fail: " . $process->getErrorOutput());
+            throw new \Exception("Local command fail: ".$process->getErrorOutput());
         }
 
         return $process->getOutput();
@@ -299,7 +316,6 @@ class Idephix implements IdephixInterface
 
     /**
      * Set local command invoker
-     *
      * @param string $invokerClassName class name of the local command invoker
      */
     public function setInvoker($invokerClassName)
@@ -309,11 +325,10 @@ class Idephix implements IdephixInterface
 
     /**
      * Build command invoker
-     *
-     * @param string  $cmd The command line to run
-     * @param string  $cwd The working directory
-     * @param array   $env The environment variables or null to inherit
-     * @param string  $stdin The STDIN content
+     * @param string  $cmd     The command line to run
+     * @param string  $cwd     The working directory
+     * @param array   $env     The environment variables or null to inherit
+     * @param string  $stdin   The STDIN content
      * @param integer $timeout The timeout in seconds
      * @param array   $options An array of options for proc_open
      *
@@ -329,7 +344,7 @@ class Idephix implements IdephixInterface
     /**
      * Get application
      *
-     * @return Idephix\Application
+     * @return Application
      */
     public function getApplication()
     {

@@ -68,6 +68,9 @@ class Deploy implements IdephixAwareInterface
         $this->strategy = new $strategyClass($this->idx, $target);
     }
 
+    /**
+     * @param boolean $dryRun
+     */
     public function setDryRun($dryRun)
     {
         $this->dryRun = $dryRun;
@@ -145,6 +148,10 @@ class Deploy implements IdephixAwareInterface
         $this->idx->remote("cd ".$this->remoteBaseFolder." && ln -s releases/".$this->getNextReleaseName()." next && mv -fT next current", $this->dryRun);
     }
 
+    /**
+     * @param string $path
+     * @return boolean
+     */
     public function remoteFileExits($path)
     {
         try {
@@ -179,17 +186,19 @@ class Deploy implements IdephixAwareInterface
                             $fullPathReleaseSharedFolder,
                             $fullPathReleaseSharedFolder
                         ),
-                        $this->dryRun);
+                        $this->dryRun
+                    );
                 } catch (\Exception $e) {
                     throw new \Exception(
                         sprintf(
                             'Unable to link shared directory "%s". Destination file or directory exists.',
                             $fullPathReleaseSharedFolder
-                        ));
+                        )
+                    );
                 }
             }
 
-            $this->idx->remote('ln -nfs '.$fullPathSharedFolder. ' '.$fullPathReleaseSharedFolder);
+            $this->idx->remote('ln -nfs '.$fullPathSharedFolder. ' '.$fullPathReleaseSharedFolder, $this->dryRun);
         }
     }
 
@@ -223,8 +232,6 @@ class Deploy implements IdephixAwareInterface
 
     /**
      * @param int $releasesToKeep how many releases you want to keep
-     *
-     * @todo sudo?
      */
     public function deleteOldReleases($releasesToKeep)
     {
@@ -239,7 +246,7 @@ class Deploy implements IdephixAwareInterface
     }
 
     /**
-     * @todo sudo?
+     * Symfony app/console cache:clear
      */
     public function cacheClear()
     {
@@ -247,7 +254,7 @@ class Deploy implements IdephixAwareInterface
     }
 
     /**
-     * @todo sudo?
+     * Symfony app/console doctrine:migration:migrate
      */
     public function doctrineMigrate()
     {
@@ -322,5 +329,10 @@ class Deploy implements IdephixAwareInterface
         $this->assetic();
         $this->deleteOldReleases($releasesToKeep);
 
+    }
+   
+    public function getStrategy()
+    {
+      return $this->strategy;
     }
 }

@@ -16,10 +16,12 @@ class CLISshProxy extends BaseProxy
 
     private function canConnect()
     {
-        if (0 == $this->exec('echo "connected"') &&
+        if ($this->exec('echo "connected"') &&
             false !== strpos($this->lastOutput, 'connected')) {
             return true;
         }
+
+        return false;
     }
 
     private function assertConnected()
@@ -29,11 +31,23 @@ class CLISshProxy extends BaseProxy
         }
     }
 
+    /**
+     * Set executable full path
+     *
+     * @param $executable
+     */
     public function setExecutable($executable)
     {
         $this->executable = $executable;
     }
 
+    /**
+     * Connect
+     *
+     * @param $host
+     * @param int $port
+     * @return bool
+     */
     public function connect($host, $port = 22)
     {
         $this->host = $host;
@@ -42,11 +56,21 @@ class CLISshProxy extends BaseProxy
         return true;
     }
 
+    /**
+     * @param $user
+     * @param $pwd
+     * @throws \Exception
+     */
     public function authByPassword($user, $pwd)
     {
         throw new \Exception("Not implemented");
     }
 
+    /**
+     * @param $user
+     * @return bool
+     * @throws \Exception
+     */
     public function authByAgent($user)
     {
         $this->assertConnected();
@@ -55,6 +79,14 @@ class CLISshProxy extends BaseProxy
         return $this->canConnect();
     }
 
+    /**
+     * @param $user
+     * @param $public_key_file
+     * @param $privateKeyFile
+     * @param $pwd
+     * @return bool
+     * @throws \Exception
+     */
     public function authByPublicKey($user, $public_key_file, $privateKeyFile, $pwd)
     {
         $this->assertConnected();
@@ -64,18 +96,77 @@ class CLISshProxy extends BaseProxy
         return $this->canConnect();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function exec($cmd)
     {
         $preparedCmd = $this->prepareCommand($cmd);
+
+        return $this->doExec($preparedCmd);
+    }
+
+    /**
+     * @param string $preparedCmd
+     * @return bool
+     */
+    private function doExec($preparedCmd)
+    {
         $process = new Process($preparedCmd, null, null, null, $this->timeout);
         $process->run();
         $this->lastOutput = $process->getOutput();
         $this->lastError = $process->getErrorOutput();
-        $process->getExitCode();
+        $this->exitCode = $process->getExitCode();
 
-        return $process->getExitCode();
+        return $process->isSuccessful();
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function put($localPath, $remotePath)
+    {
+        $user = $this->user ? $this->user.'@' : '';
+        $keyFile = $this->privateKeyFile ? '-i '.$this->privateKeyFile : '';
+
+        $preparedCmd = sprintf(
+            "scp -pP %s %s %s %s%s:%s",
+            $this->port,
+            $keyFile,
+            escapeshellarg($localPath),
+            $user,
+            $this->host,
+            strtr(escapeshellarg($remotePath), array(' ' => '\\ '))
+        );
+
+        return $this->doExec($preparedCmd);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function get($remotePath, $localPath)
+    {
+        $user = $this->user ? $this->user.'@' : '';
+        $keyFile = $this->privateKeyFile ? '-i '.$this->privateKeyFile : '';
+
+        $preparedCmd = sprintf(
+            "scp -pP %s %s %s%s:%s %s",
+            $this->port,
+            $keyFile,
+            $user,
+            $this->host,
+            strtr(escapeshellarg($remotePath), array(' ' => '\\ ')),
+            escapeshellarg($localPath)
+        );
+
+        return $this->doExec($preparedCmd);
+    }
+
+    /**
+     * @param string $cmd
+     * @return string
+     */
     private function prepareCommand($cmd)
     {
         $user = $this->user ? '-l '.$this->user : '';
@@ -88,6 +179,7 @@ class CLISshProxy extends BaseProxy
             $keyFile,
             $user,
             $this->host,
-            escapeshellarg($cmd));
+            escapeshellarg($cmd)
+        );
     }
 }

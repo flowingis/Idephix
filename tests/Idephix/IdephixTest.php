@@ -4,6 +4,8 @@ namespace Idephix;
 use Symfony\Component\Console\Output\StreamOutput;
 use Idephix\Test\LibraryMock;
 
+include_once(__DIR__."/PassTester.php");
+
 class IdephixTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -20,7 +22,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::__get
      * @expectedException PHPUnit_Framework_Error
      * @expectedExceptionMessage Undefined property: application in
      */
@@ -33,7 +34,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::add
      */
     public function testAdd()
     {
@@ -66,7 +66,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::run
      * @dataProvider getArgvAndTargets
      */
     public function testRunALocalTask($argv, $target, $expected)
@@ -77,7 +76,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $idx = new Idephix($target, new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
         $idx->getApplication()->setAutoExit(false);
 
-        $idx->add('foo', function() use ($idx) {
+        $idx->add('foo', function () use ($idx) {
             $idx->local('echo "Hello World from '.$idx->getCurrentTargetHost().'"');
         });
 
@@ -89,8 +88,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::addLibrary
-     * @covers Ideato\Idephix::__call
      */
     public function testAddLibrary()
     {
@@ -101,7 +98,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::addLibrary
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The library must be an object
      */
@@ -111,19 +107,24 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::runTask
      */
     public function testRunTask()
     {
-        $this->idx->add('command_name', function ($param) {
-            return $param;
+        $mock = $this->getMock("\\Idephix\\PassTester");
+        $mock->expects($this->exactly(1))
+            ->method('pass')
+            ->with('foo');
+
+        $this->idx->add('command_name', function ($param) use ($mock) {
+            $mock->pass($param);
+
+            return 0;
         });
 
-        $this->assertEquals('foo', $this->idx->runTask('command_name', 'foo'));
+        $this->assertEquals(0, $this->idx->runTask('command_name', 'foo'));
     }
 
     /**
-     * @covers Ideato\Idephix::remote
      * Exception: Remote function need a valid environment. Specify --env parameter.
      */
     public function testRemote()
@@ -139,7 +140,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::remote
      * @expectedException \Exception
      * @expectedExceptionMessage Remote function need a valid environment. Specify --env parameter.
      */
@@ -151,12 +151,41 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Ideato\Idephix::local
      */
     public function testLocal()
     {
         $this->idx->local('echo foo');
         rewind($this->output);
         $this->assertRegExp('/echo foo/m', stream_get_contents($this->output));
+    }
+
+    public function getTaskAndReturnCode()
+    {
+        return array(
+            array('fooOk', 0),
+            array('fooKo', 1)
+        );
+    }
+
+    /**
+     * @dataProvider getTaskAndReturnCode
+     */
+    public function testReturnCode($task, $expected)
+    {
+        $_SERVER['argv'] = array('idx', $task);
+
+        $output = fopen("php://memory", 'r+');
+        $idx = new Idephix(array(), new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
+        $idx->getApplication()->setAutoExit(false);
+
+        $idx->add('fooOk', function () use ($idx) {
+            $idx->local("echo 'God save the Queen'");
+        });
+
+        $idx->add('fooKo', function () use ($idx) {
+            $idx->local("God save the Queen but this command will fail!");
+        });
+
+        $this->assertEquals($expected, $idx->run());
     }
 }

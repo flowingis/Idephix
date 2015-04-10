@@ -13,10 +13,16 @@ use Idephix\Extension\IdephixAwareInterface;
 class PHPUnit implements IdephixAwareInterface
 {
     private $idx;
+    private $executable;
+
+    public function __construct($executable = 'phpunit')
+    {
+        $this->executable = $executable;
+    }
 
     public function runPhpUnit($params_string)
     {
-        $this->idx->local('phpunit '.$params_string);
+        $this->idx->local($this->executable.' '.$params_string);
     }
 
     public function setIdephix(IdephixInterface $idx)
