@@ -41,9 +41,12 @@ class Idephix implements IdephixInterface
         }
         $this->output = $output;
 
+        $this->removeIdxCustomFileParams();
+
         if (null === $input) {
             $input = new ArgvInput();
         }
+
         $this->input = $input;
         $this->addSelfUpdateCommand();
         $this->addInitIdxFileCommand();
@@ -61,7 +64,7 @@ class Idephix implements IdephixInterface
             }
         }
 
-        throw new \BadMethodCallException('Call to undefined method: "'.$name.'"');
+        throw new \BadMethodCallException('Call to undefined method: "' . $name . '"');
     }
 
     public function __get($name)
@@ -72,9 +75,9 @@ class Idephix implements IdephixInterface
 
         $trace = debug_backtrace();
         trigger_error(
-            'Undefined property: '.$name.
-            ' in '.$trace[0]['file'].
-            ' on line '.$trace[0]['line'],
+            'Undefined property: ' . $name .
+            ' in ' . $trace[0]['file'] .
+            ' on line ' . $trace[0]['line'],
             E_USER_NOTICE);
 
         return null;
@@ -164,7 +167,7 @@ class Idephix implements IdephixInterface
         try {
             $this->buildEnvironment($this->input);
         } catch (\Exception $e) {
-            $this->output->writeln('<error>'.$e->getMessage().'</error>');
+            $this->output->writeln('<error>' . $e->getMessage() . '</error>');
 
             return;
         }
@@ -242,8 +245,7 @@ class Idephix implements IdephixInterface
                 /**
                  * Create an example idxfile.php
                  */
-                function () use ($idx)
-                {
+                function () use ($idx) {
                     $idx->initIdxFile()->initFile();
                 }
             );
@@ -252,7 +254,7 @@ class Idephix implements IdephixInterface
     /**
      * Execute remote command.
      *
-     * @param string  $cmd    command
+     * @param string  $cmd command
      * @param boolean $dryRun
      */
     public function remote($cmd, $dryRun = false)
@@ -260,10 +262,10 @@ class Idephix implements IdephixInterface
         if (!$this->sshClient->isConnected()) {
             throw new \Exception("Remote function need a valid environment. Specify --env parameter.");
         }
-        $this->output->writeln('<info>Remote</info>: '.$cmd);
+        $this->output->writeln('<info>Remote</info>: ' . $cmd);
 
         if (!$dryRun && 0 != $this->sshClient->exec($cmd)) {
-            throw new \Exception("Remote command fail: ".$this->sshClient->getLastError());
+            throw new \Exception("Remote command fail: " . $this->sshClient->getLastError());
         }
     }
 
@@ -289,7 +291,7 @@ class Idephix implements IdephixInterface
             $output->write($buffer);
         });
         if (0 != $result) {
-            throw new \Exception("Local command fail: ".$process->getErrorOutput());
+            throw new \Exception("Local command fail: " . $process->getErrorOutput());
         }
 
         return $process->getOutput();
@@ -297,6 +299,7 @@ class Idephix implements IdephixInterface
 
     /**
      * Set local command invoker
+     *
      * @param string $invokerClassName class name of the local command invoker
      */
     public function setInvoker($invokerClassName)
@@ -306,10 +309,11 @@ class Idephix implements IdephixInterface
 
     /**
      * Build command invoker
-     * @param string  $cmd     The command line to run
-     * @param string  $cwd     The working directory
-     * @param array   $env     The environment variables or null to inherit
-     * @param string  $stdin   The STDIN content
+     *
+     * @param string  $cmd The command line to run
+     * @param string  $cwd The working directory
+     * @param array   $env The environment variables or null to inherit
+     * @param string  $stdin The STDIN content
      * @param integer $timeout The timeout in seconds
      * @param array   $options An array of options for proc_open
      *
@@ -330,5 +334,18 @@ class Idephix implements IdephixInterface
     public function getApplication()
     {
         return $this->application;
+    }
+
+    protected function removeIdxCustomFileParams()
+    {
+        $serverArgsCount = count($_SERVER['argv']);
+
+        for ($i = 0; $i < $serverArgsCount; $i ++) {
+            if ($_SERVER['argv'][$i] == '-f' || $_SERVER['argv'][$i] == '--file') {
+                unset($_SERVER['argv'][$i]);
+                unset($_SERVER['argv'][$i + 1]);
+                break;
+            }
+        }
     }
 }
