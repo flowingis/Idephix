@@ -9,6 +9,13 @@ $sshParams = array(
     'user' => 'ideato',
 );
 
+//grab your url from here: https://<your-team>.slack.com/services/new/incoming-webhook
+$slackParams = array(
+    'url' => "your_incoming_webhook_url",
+    'channel' => '#random',
+    'username' => 'idephix'
+);
+
 $targets = array(
     'prod' => array(
         'hosts' => array('127.0.0.1', '33.33.33.10'),
@@ -134,6 +141,29 @@ $idx->
             }
             $idx->runPhpUnit('-c app/ --stderr '.$filter.' --exclude-group=selenium  --log-junit junit.xml');
         })->
+    /**
+     * Send test message to Slack channel
+     * @see https://api.slack.com/docs/formatting
+     * @see https://api.slack.com/docs/attachments
+     */
+    add('slack',
+        function() use ($idx)
+        {
+			$idx->sendToSlack('Hi guys, I\'m Idephix and this is my first slack message!', array(
+				array(
+					'fallback' => "Hi guys, I'm Idephix and this is my first slack message!",
+					'pretest'  => "Hi guys, I'm Idephix and this is my first slack message!",
+					'color'    => "#43e17b",
+					'fields'   => array(
+						array(
+							'title' => 'I\'m Idephix',
+							'value' => "Hello world, aren't you using Idephix?\nWhy not? Please <http://getidephix.com|download Idephix> right now",
+							'short' => false
+						)
+					)
+				)
+			));
+        })->
     /** <========== RUN ME =========== */
     add('idephix:test-params',
         function ($param1, $param2, $param3 = 'default')
@@ -145,4 +175,5 @@ $idx->
 
 $idx->addLibrary('deploy', new Deploy());
 $idx->addLibrary('phpunit', new PHPUnit());
+$idx->addLibrary('slack', new Slack($slackParams));
 $idx->run();
