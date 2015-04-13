@@ -23,6 +23,8 @@ class Application extends BaseApplication
         $this->setAutoExit(false);
         $this->getDefinition()
              ->addOption(new InputOption('--env', null, InputOption::VALUE_REQUIRED, 'Set remote environment.'));
+        $this->getDefinition()
+             ->addOption(new InputOption('--file', '-f', InputOption::VALUE_OPTIONAL, 'Specify alternative idxfile.'));
     }
 
     public function doRun(InputInterface $input, OutputInterface $output)
