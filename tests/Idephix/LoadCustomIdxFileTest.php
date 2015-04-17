@@ -26,8 +26,7 @@ class LoadCustomIdxFileTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadDefaultIdxFile()
     {
-        $this->markTestSkipped("Return binary value but should return a string");
-        $output = shell_exec("php " . __DIR__ . "/../../bin/idx");
+        $output = shell_exec("php " . __DIR__ . "/../../bin/idx --no-ansi");
 
         $this->assertContains("Idephix version @package_version@", $output);
     }
