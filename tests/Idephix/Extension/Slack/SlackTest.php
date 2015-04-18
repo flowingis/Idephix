@@ -32,7 +32,7 @@ class SlackTest extends IdephixTestCase
 
     public function testSendMessage()
     {
-        $result = $this->slack->sendToSlack('ciao');
-        $this->assertEquals($result, 'ok');
+        $response = $this->slack->sendToSlack('ciao');
+        $this->assertEquals($response, 'ok');
     }
 }
