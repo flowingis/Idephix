@@ -47,9 +47,12 @@ class Idephix implements IdephixInterface
         }
         $this->output = $output;
 
+        $this->removeIdxCustomFileParams();
+
         if (null === $input) {
             $input = new ArgvInput();
         }
+
         $this->input = $input;
         $this->addSelfUpdateCommand();
         $this->addInitIdxFileCommand();
@@ -346,5 +349,18 @@ class Idephix implements IdephixInterface
     public function getApplication()
     {
         return $this->application;
+    }
+
+    protected function removeIdxCustomFileParams()
+    {
+        $serverArgsCount = count($_SERVER['argv']);
+
+        for ($i = 0; $i < $serverArgsCount; $i ++) {
+            if ($_SERVER['argv'][$i] == '-f' || $_SERVER['argv'][$i] == '--file') {
+                unset($_SERVER['argv'][$i]);
+                unset($_SERVER['argv'][$i + 1]);
+                break;
+            }
+        }
     }
 }

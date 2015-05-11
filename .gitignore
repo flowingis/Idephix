@@ -1,7 +1,10 @@
 /pecl
 /vendor
 idxfile.php
+idxfile_custom.php
 junit.xml
 bin/idephix.phar
+nbproject/
 .idea
+phpunit.xml
 bin/phpunit
