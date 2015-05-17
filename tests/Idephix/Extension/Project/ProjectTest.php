@@ -8,9 +8,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $this->idx = $this->getMockBuilder('Idephix\Idephix')
-                          ->disableOriginalConstructor()
-                          ->getMock();
+        $this->idx = $this->getMock('\Idephix\IdephixInterface');
 
         $this->idx->expects($this->exactly(1))
              ->method('local')
