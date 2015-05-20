@@ -2,6 +2,7 @@
 
 namespace Idephix\Extension\Deploy;
 
+use Idephix\Idephix;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
 
@@ -12,6 +13,9 @@ use Idephix\Extension\IdephixAwareInterface;
  */
 class Deploy implements IdephixAwareInterface
 {
+    /**
+     * @var Idephix
+     */
     private $idx;
     private $sshClient;
     private $localBaseFolder;
@@ -78,6 +82,14 @@ class Deploy implements IdephixAwareInterface
 
     public function getNextReleaseName()
     {
+        $releaseFolderNameFormat = $this->idx
+            ->getCurrentTarget()
+            ->get('deploy.release_folder_name_format');
+
+        if(! is_null($releaseFolderNameFormat)) {
+            return date($releaseFolderNameFormat);
+        }
+
         return $this->timestamp;
     }
 
@@ -330,7 +342,7 @@ class Deploy implements IdephixAwareInterface
         $this->deleteOldReleases($releasesToKeep);
 
     }
-   
+
     public function getStrategy()
     {
       return $this->strategy;
