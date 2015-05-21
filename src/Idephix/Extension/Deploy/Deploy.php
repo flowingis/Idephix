@@ -27,6 +27,7 @@ class Deploy implements IdephixAwareInterface
     private $strategy;
     private $sharedFolders = array();
     private $symfonyEnv;
+    private $message;
 
     public function __construct()
     {
@@ -86,11 +87,15 @@ class Deploy implements IdephixAwareInterface
             ->getCurrentTarget()
             ->get('deploy.release_folder_name_format');
 
-        if(! is_null($releaseFolderNameFormat)) {
-            return date($releaseFolderNameFormat);
+        if ($this->message !== '') {
+            $this->message = strtolower(str_replace(' ', '-', $this->message));
         }
 
-        return $this->timestamp;
+        if(! is_null($releaseFolderNameFormat)) {
+            return date($releaseFolderNameFormat) . $this->message;
+        }
+
+        return $this->timestamp . $this->message;
     }
 
     public function getNextReleaseFolder()
@@ -311,8 +316,9 @@ class Deploy implements IdephixAwareInterface
         return $this->hasToMigrate;
     }
 
-    public function deploySF2Copy($go, $releasesToKeep = 6, $automaticBootstrap = true)
+    public function deploySF2Copy($go, $releasesToKeep = 6, $automaticBootstrap = true, $message = '')
     {
+        $this->message = $message;
 
         $this->setDryRun(!$go);
 
