@@ -244,7 +244,6 @@ Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
 
     public function testDeployWithMessageToConcatToReleaseFolder()
     {
-        $expectedMessage = 'banana-apple';
         $remoteBaseDir = '/tmp/temp_dir';
 
         $this->initDeploy(
@@ -270,6 +269,6 @@ Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
         $releaseFolder = $this->deploy
             ->getNextReleaseFolder();
 
-        $this->assertEquals($remoteBaseDir . '/releases/' .date('Y_m_d') . $expectedMessage, $releaseFolder);
+        $this->assertEquals($remoteBaseDir . '/releases/' .date('Y_m_d') . 'banana-apple', $releaseFolder);
     }
 }
