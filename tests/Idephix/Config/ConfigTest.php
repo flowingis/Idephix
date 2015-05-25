@@ -29,4 +29,23 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('minni', $c->get('pippo.paperino'));
         $this->assertEquals('first level', $c->get('pippo.quo'));
     }
+
+    public function testSetterMultidimensionOverwritesNestedValues()
+    {
+        $c = new Config(
+            array(
+                'config' => array(
+                    'deploy' => array(
+                        'release_dir' => '/var/www'
+                    )
+                ),
+            ));
+
+        $this->assertEquals('/var/www', $c->get('config.deploy.release_dir'));
+
+        $c->set('config.deploy.release_dir', '/var/www');
+        $c->set('config.deploy.release_dir', '/var/www');
+
+        $this->assertEquals('/var/www', $c->get('config.deploy.release_dir'));
+    }
 }

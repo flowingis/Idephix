@@ -23,16 +23,16 @@ class Config
         }
 
         $name = explode('.', $name);
-        
+
         $result = $this->config;
-        
+
         foreach ($name as $i => $part) {
             if (!isset($result[$part])) {
                 return $default;
             }
             $result = $result[$part];
         }
-        
+
         return $result;
     }
 
@@ -47,15 +47,16 @@ class Config
 
             return;
         }
-        
+
         $name = array_reverse(explode('.', $name));
 
         $result = $value;
-        foreach ($name as $i => $part) {
+
+        foreach ($name as $part) {
             $result = array($part => $result);
         }
-        
-        $this->config = array_merge_recursive($this->config, $result);
+
+        $this->config = array_replace_recursive($this->config, $result);
     }
 
     /**
