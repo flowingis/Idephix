@@ -213,7 +213,7 @@ class Deploy implements IdephixAwareInterface
      *
      * @param boolean $current if true run commands on current release folder, on next release folder otherwise
      */
-    public function assetic($current = true)
+    public function assetic($current = false)
     {
         $folder = $current ? $this->getCurrentReleaseFolder() : $this->getNextReleaseFolder();
         $this->log("Asset and assetic stuff...");
