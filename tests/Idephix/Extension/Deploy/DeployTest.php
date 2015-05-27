@@ -232,6 +232,28 @@ Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
         $this->assertEquals(date('Y_m_d'), $releaseFolder);
     }
 
+    public function testGetNextReleaseFolderShouldBeIdempotent()
+    {
+        $this->initDeploy(
+            null,
+            array(
+                'deploy' => array(
+                    'release_folder_name_format' => 'Y_m_d-H:i:s'
+                )
+            )
+        );
+
+        $releaseFolder = $this->deploy
+            ->getNextReleaseFolder();
+
+        sleep("1");
+
+        $sameReleaseFolder = $this->deploy
+            ->getNextReleaseFolder();
+
+        $this->assertEquals($releaseFolder, $sameReleaseFolder);
+    }
+
     public function testDeployWithDefaultReleaseFormatNameWhenFormatIsNull()
     {
         $this->initDeploy();

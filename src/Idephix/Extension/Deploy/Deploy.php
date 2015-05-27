@@ -29,11 +29,6 @@ class Deploy implements IdephixAwareInterface
     private $symfonyEnv;
     private $message;
 
-    public function __construct()
-    {
-        $this->timestamp = date('YmdHis');
-    }
-
     public function setIdephix(IdephixInterface $idx)
     {
         $this->sshClient = $idx->sshClient;
@@ -83,19 +78,13 @@ class Deploy implements IdephixAwareInterface
 
     public function getNextReleaseName()
     {
-        $releaseFolderNameFormat = $this->idx
-            ->getCurrentTarget()
-            ->get('deploy.release_folder_name_format');
-
-        if ($this->message !== '') {
-            $this->message = strtolower(str_replace(' ', '-', $this->message));
+        if($this->releaseNameAlreadyExist()) {
+            return $this->timestamp;
         }
 
-        if(! is_null($releaseFolderNameFormat)) {
-            return date($releaseFolderNameFormat) . $this->message;
-        }
+        $this->createReleaseName();
 
-        return $this->timestamp . $this->message;
+        return $this->timestamp;
     }
 
     public function getNextReleaseFolder()
@@ -352,5 +341,32 @@ class Deploy implements IdephixAwareInterface
     public function getStrategy()
     {
       return $this->strategy;
+    }
+
+    /**
+     * @return bool
+     */
+    private function releaseNameAlreadyExist()
+    {
+        return !is_null($this->timestamp);
+    }
+
+    private function createReleaseName()
+    {
+        $releaseFolderNameFormat = $this->idx
+            ->getCurrentTarget()
+            ->get('deploy.release_folder_name_format');
+
+        if ($this->message !== '') {
+            $this->message = strtolower(str_replace(' ', '-', $this->message));
+        }
+
+        $this->timestamp = date('YmdHis');
+
+        if (!is_null($releaseFolderNameFormat)) {
+            $this->timestamp = date($releaseFolderNameFormat);
+        }
+
+        $this->timestamp .= $this->message;
     }
 }
