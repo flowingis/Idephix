@@ -305,10 +305,13 @@ class Deploy implements IdephixAwareInterface
         return $this->hasToMigrate;
     }
 
-    public function deploySF2Copy($go, $releasesToKeep = 6, $automaticBootstrap = true, $message = '')
+    public function setMessageForReleaseFolder($message)
     {
         $this->message = $message;
+    }
 
+    public function deploySF2Copy($go, $releasesToKeep = 6, $automaticBootstrap = true)
+    {
         $this->setDryRun(!$go);
 
         $this->setUpEnvironment();
@@ -357,16 +360,34 @@ class Deploy implements IdephixAwareInterface
             ->getCurrentTarget()
             ->get('deploy.release_folder_name_format');
 
-        if ($this->message !== '') {
-            $this->message = strtolower(str_replace(' ', '-', $this->message));
+        if ($this->messageIsRequested()) {
+            $this->message = '-' . strtolower(str_replace(' ', '-', $this->message));
         }
 
         $this->timestamp = date('YmdHis');
 
-        if (!is_null($releaseFolderNameFormat)) {
+        if ($this->releaseNameIsRequested($releaseFolderNameFormat)) {
             $this->timestamp = date($releaseFolderNameFormat);
         }
 
         $this->timestamp .= $this->message;
+    }
+
+    /**
+     * @return bool
+     */
+    private function messageIsRequested()
+    {
+        return !is_null($this->message);
+    }
+
+    /**
+     * @param $releaseFolderNameFormat
+     *
+     * @return bool
+     */
+    private function releaseNameIsRequested($releaseFolderNameFormat)
+    {
+        return !is_null($releaseFolderNameFormat);
     }
 }
