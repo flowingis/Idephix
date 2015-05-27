@@ -1,5 +1,6 @@
 /pecl
 /vendor
+/nbproject
 idxfile.php
 idxfile_custom.php
 junit.xml
