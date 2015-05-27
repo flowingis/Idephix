@@ -87,12 +87,12 @@ Remote: [ -e '$nextReleaseDir/web/uploads' ]
 Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
 Remote: cd $nextReleaseDir && ./app/console cache:clear --env=dev --no-debug
-Switch to next release...
-Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 Asset and assetic stuff...
 Remote: cd /tmp/temp_dir/current && php app/console assets:install --symlink web --env=dev
 Remote: cd /tmp/temp_dir/current && php app/console assetic:dump --env=dev --no-debug
 Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
+Switch to next release...
+Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 ";
 
         rewind($this->output);
@@ -136,12 +136,12 @@ Remote: [ -e '$nextReleaseDir/web/uploads' ]
 Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
 Remote: cd $nextReleaseDir && ./app/console cache:clear --env=prod --no-debug
-Switch to next release...
-Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 Asset and assetic stuff...
 Remote: cd /tmp/temp_dir/current && php app/console assets:install --symlink web --env=prod
 Remote: cd /tmp/temp_dir/current && php app/console assetic:dump --env=prod --no-debug
 Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
+Switch to next release...
+Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 ";
 
         rewind($this->output);
@@ -201,12 +201,12 @@ Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads 
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
 Remote: cd $nextReleaseDir && ./app/console doctrine:migration:migrate --env=dev
 Remote: cd $nextReleaseDir && ./app/console cache:clear --env=dev --no-debug
-Switch to next release...
-Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 Asset and assetic stuff...
 Remote: cd /tmp/temp_dir/current && php app/console assets:install --symlink web --env=dev
 Remote: cd /tmp/temp_dir/current && php app/console assetic:dump --env=dev --no-debug
 Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
+Switch to next release...
+Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 ";
 
         rewind($this->output);

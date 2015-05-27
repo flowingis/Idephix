@@ -335,10 +335,11 @@ class Deploy implements IdephixAwareInterface
         }
 
         $this->cacheClear();
-        $this->switchToTheNextRelease();
+
         $this->assetic();
         $this->deleteOldReleases($releasesToKeep);
 
+        $this->switchToTheNextRelease();
     }
 
     public function getStrategy()
