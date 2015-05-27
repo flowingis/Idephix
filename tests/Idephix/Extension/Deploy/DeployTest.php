@@ -6,6 +6,11 @@ use Idephix\Extension\Deploy\Deploy;
 
 class DeployTest extends IdephixTestCase
 {
+    /**
+     * @var Deploy
+     */
+    private $deploy;
+
     public function initDeploy($strategy = null, $config = array())
     {
         $defaultConfig = array(
@@ -210,4 +215,60 @@ Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
         $this->assertEquals($expected, $actualOutput);
     }
 
+    public function testDeployWithNonDefaultReleaseFormatName()
+    {
+        $this->initDeploy(
+            null,
+            array(
+                'deploy' => array(
+                    'release_folder_name_format' => 'Y_m_d'
+                )
+            )
+        );
+
+        $releaseFolder = $this->deploy
+            ->getNextReleaseFolder();
+
+        $this->assertEquals(date('Y_m_d'), $releaseFolder);
+    }
+
+    public function testDeployWithDefaultReleaseFormatNameWhenFormatIsNull()
+    {
+        $this->initDeploy();
+
+        $releaseFolder = $this->deploy
+            ->getNextReleaseFolder();
+
+        $this->assertEquals(date('YmdHis'), $releaseFolder);
+    }
+
+    public function testDeployWithMessageToConcatToReleaseFolder()
+    {
+        $remoteBaseDir = '/tmp/temp_dir';
+
+        $this->initDeploy(
+            null,
+            array(
+                'deploy' => array(
+                    'local_base_dir' => 'local_dir',
+                    'remote_base_dir' => $remoteBaseDir,
+                    'rsync_exclude_file' => 'rsync_exclude.txt',
+                    'rsync_include_file' => 'rsync_include.txt',
+                    'release_folder_name_format' => 'Y_m_d',
+                    'shared_folders' => array(
+                        'app/logs',
+                        'web/uploads'
+                    ),
+                )
+            )
+        );
+
+        $this->deploy
+            ->deploySF2Copy(true, 6, true, 'banana apple');
+
+        $releaseFolder = $this->deploy
+            ->getNextReleaseFolder();
+
+        $this->assertEquals($remoteBaseDir . '/releases/' .date('Y_m_d') . 'banana-apple', $releaseFolder);
+    }
 }

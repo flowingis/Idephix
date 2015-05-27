@@ -2,6 +2,7 @@
 
 namespace Idephix\Extension\Deploy;
 
+use Idephix\Idephix;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
 
@@ -12,6 +13,9 @@ use Idephix\Extension\IdephixAwareInterface;
  */
 class Deploy implements IdephixAwareInterface
 {
+    /**
+     * @var Idephix
+     */
     private $idx;
     private $sshClient;
     private $localBaseFolder;
@@ -23,6 +27,7 @@ class Deploy implements IdephixAwareInterface
     private $strategy;
     private $sharedFolders = array();
     private $symfonyEnv;
+    private $message;
 
     public function __construct()
     {
@@ -78,7 +83,19 @@ class Deploy implements IdephixAwareInterface
 
     public function getNextReleaseName()
     {
-        return $this->timestamp;
+        $releaseFolderNameFormat = $this->idx
+            ->getCurrentTarget()
+            ->get('deploy.release_folder_name_format');
+
+        if ($this->message !== '') {
+            $this->message = strtolower(str_replace(' ', '-', $this->message));
+        }
+
+        if(! is_null($releaseFolderNameFormat)) {
+            return date($releaseFolderNameFormat) . $this->message;
+        }
+
+        return $this->timestamp . $this->message;
     }
 
     public function getNextReleaseFolder()
@@ -299,8 +316,9 @@ class Deploy implements IdephixAwareInterface
         return $this->hasToMigrate;
     }
 
-    public function deploySF2Copy($go, $releasesToKeep = 6, $automaticBootstrap = true)
+    public function deploySF2Copy($go, $releasesToKeep = 6, $automaticBootstrap = true, $message = '')
     {
+        $this->message = $message;
 
         $this->setDryRun(!$go);
 
@@ -330,7 +348,7 @@ class Deploy implements IdephixAwareInterface
         $this->deleteOldReleases($releasesToKeep);
 
     }
-   
+
     public function getStrategy()
     {
       return $this->strategy;
