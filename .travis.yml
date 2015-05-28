@@ -9,7 +9,7 @@ php:
 script: bin/idephix.phar buildTravis
 
 after_script:
-  - vendor/bin/test-reporter
+  - bin/test-reporter
 
 branches:
   only:
