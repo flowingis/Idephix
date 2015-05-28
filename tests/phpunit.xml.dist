@@ -11,11 +11,11 @@
     processIsolation            = "false"
     stopOnFailure               = "false"
     syntaxCheck                 = "false"
-    bootstrap                   = "tests/bootstrap.php" >
+    bootstrap                   = "./bootstrap.php" >
 
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>tests/Idephix</directory>
+            <directory>Idephix</directory>
         </testsuite>
     </testsuites>
 </phpunit>

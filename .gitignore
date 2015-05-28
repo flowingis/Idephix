@@ -1,8 +1,12 @@
 /pecl
 /vendor
-idxfile.php
 idxfile_custom.php
 junit.xml
 bin/idephix.phar
 phpunit.xml
 bin/phpunit
+bin/box
+bin/coveralls
+bin/jsonlint
+bin/test-reporter
+bin/validate-json
