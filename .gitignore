@@ -2,7 +2,6 @@
 /vendor
 idxfile_custom.php
 junit.xml
-bin/idephix.phar
 phpunit.xml
 bin/phpunit
 bin/box
