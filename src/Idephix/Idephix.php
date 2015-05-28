@@ -20,6 +20,7 @@ use Idephix\Config\Config;
 class Idephix implements IdephixInterface
 {
     const VERSION = '@package_version@';
+
     private $application;
     private $library = array();
     private $input;
