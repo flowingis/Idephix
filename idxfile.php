@@ -7,14 +7,6 @@ use Idephix\SSH\SshClient;
 
 $idx = new Idephix();
 
-$createPhar = function() use ($idx)
-{
-    $idx->local('rm -rf /tmp/Idephix && mkdir -p /tmp/Idephix');
-    $idx->local("cp -R . /tmp/Idephix");
-    $idx->local('cd /tmp/Idephix && composer install --no-dev -o');
-    $idx->local('bin/box -vvv build -c /tmp/Idephix/box.json ');
-};
-
 $build = function() use ($idx)
 {
     $idx->local('composer install --prefer-source');
@@ -25,6 +17,27 @@ $buildTravis = function() use ($idx)
 {
     $idx->local('composer install --prefer-source');
     $idx->local('bin/phpunit -c tests --coverage-clover=clover.xml');
+    $idx->runTask('createPhar');
+};
+
+$createPhar = function() use ($idx)
+{
+    echo "Creating phar...\n";
+    $idx->local('rm -rf /tmp/Idephix && mkdir -p /tmp/Idephix');
+    $idx->local("cp -R . /tmp/Idephix");
+    $idx->local("cd /tmp/Idephix && git checkout -- .");
+    $idx->local('cd /tmp/Idephix && composer install --no-dev -o');
+    $idx->local('bin/box build -c /tmp/Idephix/box.json ');
+
+    echo "Smoke testing...\n";
+    $out = $idx->local('php idephix.phar');
+
+    if (false === strpos($out, 'Idephix version')) {
+        echo "Error!\n";
+        exit(0);
+    }
+
+    echo "\nAll good!";
 };
 
 $idx->add('createPhar', $createPhar);

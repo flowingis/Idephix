@@ -24,10 +24,9 @@
       "in": "vendor"
     }
   ],
-  "git-commit": "git-commit",
-  "git-commit-short" : "package_version",
+  "git-commit": "package_version",
   "git-version": "git-version",
   "main": "bin\/idx",
-  "output": "idephix-@git-version@.phar",
+  "output": "idephix.phar",
   "stub": true
 }
