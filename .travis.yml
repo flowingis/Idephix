@@ -9,7 +9,7 @@ php:
 script: bin/idephix.phar buildTravis
 
 after_script:
-  - bin/test-reporter
+  - bin/test-reporter --coverage-report=clover.xml
 
 branches:
   only:
