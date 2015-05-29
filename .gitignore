@@ -9,3 +9,4 @@ bin/coveralls
 bin/jsonlint
 bin/test-reporter
 bin/validate-json
+idephix.phar

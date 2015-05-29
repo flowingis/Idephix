@@ -25,6 +25,7 @@ $createPhar = function() use ($idx)
     echo "Creating phar...\n";
     $idx->local('rm -rf /tmp/Idephix && mkdir -p /tmp/Idephix');
     $idx->local("cp -R . /tmp/Idephix");
+    $idx->local("cd /tmp/Idephix && rm -rf vendor");
     $idx->local("cd /tmp/Idephix && git checkout -- .");
     $idx->local('cd /tmp/Idephix && composer install --no-dev -o');
     $idx->local('bin/box build -c /tmp/Idephix/box.json ');
@@ -37,7 +38,7 @@ $createPhar = function() use ($idx)
         exit(0);
     }
 
-    echo "\nAll good!";
+    echo "\nAll good!\n";
 };
 
 $idx->add('createPhar', $createPhar);
