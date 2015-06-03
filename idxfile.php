@@ -41,7 +41,20 @@ $createPhar = function() use ($idx)
     echo "\nAll good!\n";
 };
 
+$deployPhar = function () use ($idx) {
+    echo "Cloning website repository...\n";
+    $idx->local('rm -rf /tmp/getidephix && git clone git@github.com:ideatosrl/getidephix.com.git /tmp/getidephix/');
+    $idx->local('cp /tmp/Idephix/idephix.phar /tmp/getidephix/idephix.phar');
+
+    $version = $idx->local('cat /tmp/Idephix/.git/refs/heads/master');
+    $idx->local('cp /tmp/Idephix/.git/refs/heads/master /tmp/getidephix/version');
+    $idx->local(sprintf('cd /tmp/getidephix && git add . && git commit -m "Deploy phar version %s" && git push origin', $version));
+
+    echo "\nAll good!\n";
+};
+
 $idx->add('createPhar', $createPhar);
 $idx->add('buildTravis', $buildTravis);
+$idx->add('deployPhar', $deployPhar);
 $idx->add('build', $build);
 $idx->run();
