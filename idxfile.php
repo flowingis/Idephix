@@ -24,14 +24,8 @@ $deployPhar = function() use ($idx)
 {
     $idx->output->writeln('Releasing new phar version...');
 
-    // $idx->output->writeln('decrypting rsa key...');
-
-    // $key = '$encrypted_b26b356be257_key';
-    // $iv = '$encrypted_b26b356be257_iv';
-
     $idx->local('mkdir -p ~/.ssh');
-    $idx->local('chmod 600 ~/.ssh/id_rsa_idephix_doc');
-    $idx->local('ssh-add ~/.ssh/id_rsa_idephix_doc');
+    $idx->local('chmod 600 ~/.ssh/id_rsa');
 
     // clone doc repo
     $idx->local('cd ~ && git clone --branch gh-pages git@github.com:ideatosrl/getidephix.com.git docs');
