@@ -37,21 +37,22 @@ $deployPhar = function() use ($idx)
         exit(-1);
     }
 
+    $version = $idx->local('cat .git/refs/heads/master');
+
     // copy new phar & commit
     $idx->local('cp -f idephix.phar ~/docs');
-    $out = $idx->local('cd ~/docs && git status');
-    $idx->output->writeln($out);
+    $idx->local("cd ~/docs && echo $version > version");
+    $idx->local('cd ~/docs && git status');
 
-        // $idx->local('cp ~/docs && git push -q origin gh-pages');
-
-    // $version = $idx->local('cat /tmp/Idephix/.git/refs/heads/master');
-    // $idx->local(sprintf('cd /tmp/getidephix && git add . && git commit -m "Deploy phar version %s" && git push origin', $version));
-    // $idx->local('cp /tmp/Idephix/.git/refs/heads/master /tmp/getidephix/version');
+    $idx->local('cd ~/docs && git add -A .');
+    $idx->local("cd ~/docs && git commit -m 'deploy phar version $version'");
+    $idx->local('cd ~/docs && git push -q origin gh-pages');
 };
 
 $createPhar = function() use ($idx)
 {
-    echo "Creating phar...\n";
+    $idx->output->writeln('Creating phar...');
+
     $idx->local('rm -rf /tmp/Idephix && mkdir -p /tmp/Idephix');
     $idx->local("cp -R . /tmp/Idephix");
     $idx->local("cd /tmp/Idephix && rm -rf vendor");
@@ -59,7 +60,8 @@ $createPhar = function() use ($idx)
     $idx->local('cd /tmp/Idephix && composer install --prefer-source --no-dev -o');
     $idx->local('bin/box build -c /tmp/Idephix/box.json ');
 
-    echo "Smoke testing...\n";
+    $idx->output->writeln('Smoke testing...');
+
     $out = $idx->local('php idephix.phar');
 
     if (false === strpos($out, 'Idephix version')) {
@@ -67,7 +69,7 @@ $createPhar = function() use ($idx)
         exit(-1);
     }
 
-    echo "\nAll good!\n";
+    $idx->output->writeln('All good!');
 };
 
 $idx->add('deployPhar', $deployPhar);
