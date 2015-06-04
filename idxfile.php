@@ -20,10 +20,20 @@ $buildTravis = function() use ($idx)
     $idx->runTask('createPhar');
 };
 
-$dummy = function() use ($idx)
+$deployPhar = function() use ($idx)
 {
+    echo 'Releasing new phar version...';
+
     $branch = getenv('TRAVIS_BRANCH');
+    $pr = getenv('TRAVIS_PULL_REQUEST');
+
     $idx->local("echo '$branch'");
+    $idx->local("echo '$pr'");
+
+    if ('master' != $branch || $pr) {
+        echo "skipping phar release branch $branch, PR $pr";
+        exit(0);
+    }
 };
 
 $createPhar = function() use ($idx)
@@ -88,7 +98,7 @@ $releasePhar = function() use ($idx) {
     // $idx->local('cp /tmp/Idephix/.git/refs/heads/master /tmp/getidephix/version');
 };
 
-$idx->add('dummy', $dummy);
+$idx->add('deployPhar', $deployPhar);
 $idx->add('createPhar', $createPhar);
 $idx->add('releasePhar', $releasePhar);
 $idx->add('buildTravis', $buildTravis);
