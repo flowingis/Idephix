@@ -84,6 +84,5 @@ $releasePhar = function() use ($idx) {
 $idx->add('createPhar', $createPhar);
 $idx->add('releasePhar', $releasePhar);
 $idx->add('buildTravis', $buildTravis);
-$idx->add('deployPhar', $deployPhar);
 $idx->add('build', $build);
 $idx->run();
