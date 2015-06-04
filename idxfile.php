@@ -33,7 +33,7 @@ $createPhar = function() use ($idx)
     $idx->local("cp -R . /tmp/Idephix");
     $idx->local("cd /tmp/Idephix && rm -rf vendor");
     $idx->local("cd /tmp/Idephix && git checkout -- .");
-    $idx->local('cd /tmp/Idephix && composer install --no-dev -o');
+    $idx->local('cd /tmp/Idephix && composer install --prefer-source --no-dev -o');
     $idx->local('bin/box build -c /tmp/Idephix/box.json ');
 
     echo "Smoke testing...\n";
@@ -50,22 +50,22 @@ $createPhar = function() use ($idx)
 $releasePhar = function() use ($idx) {
     echo 'Releasing new phar version...';
 
-    $branch = getenv('TRAVIS_BRANCH');
-    $pr = getenv('TRAVIS_PULL_REQUEST');
+    // $branch = getenv('TRAVIS_BRANCH');
+    // $pr = getenv('TRAVIS_PULL_REQUEST');
 
-    if ('master' != $branch || $pr) {
-        echo "skipping phar release branch $branch, PR $pr";
-        exit(0);
-    }
+    // if ('master' != $branch || $pr) {
+    //     echo "skipping phar release branch $branch, PR $pr";
+    //     exit(0);
+    // }
 
     // decrypt and add key
-    $key = '$encrypted_b26b356be257_key';
-    $iv = '$encrypted_b26b356be257_iv';
+    // $key = '$encrypted_b26b356be257_key';
+    // $iv = '$encrypted_b26b356be257_iv';
 
-    $idx->local('mkdir -p ~/.ssh');
-    $idx->local("openssl aes-256-cbc -K $key -iv $iv -in ./id_rsa_idephix_doc.enc -out ~/.ssh/id_rsa_idephix_doc -d");
-    $idx->local('chmod 600 ~/.ssh/id_rsa_idephix_doc');
-    $idx->local('ssh-add ~/.ssh/id_rsa_idephix_doc');
+    // $idx->local('mkdir -p ~/.ssh');
+    // $idx->local("openssl aes-256-cbc -K $key -iv $iv -in ./id_rsa_idephix_doc.enc -out ~/.ssh/id_rsa_idephix_doc -d");
+    // $idx->local('chmod 600 ~/.ssh/id_rsa_idephix_doc');
+    // $idx->local('ssh-add ~/.ssh/id_rsa_idephix_doc');
 
     // clone doc repo
     // $idx->local('cd ~ && git clone --branch gh-pages git@github.com:ideatosrl/getidephix.com.git docs');
