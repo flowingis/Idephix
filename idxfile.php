@@ -42,6 +42,7 @@ $createPhar = function() use ($idx)
 };
 
 $releasePhar = function() use ($idx) {
+    echo 'Releasing new phar version...';
 
     $branch = getenv('TRAVIS_BRANCH');
     $pr = getenv('TRAVIS_PULL_REQUEST');
