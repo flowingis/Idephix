@@ -11,11 +11,7 @@ after_script:
   - bin/test-reporter --coverage-report=clover.xml
 
 after_success:
-  - git config --global user.email "info@ideato.it"
-  - git config --global user.name "Travis-CI"
-  - git config credential.helper "store --file=.git/credentials"
-  - echo "https://${GH_TOKEN}:@github.com" > .git/credentials
-  - bin/idephix.phar deployPhar
+  - bin/idephix.phar releasePhar
 
 branches:
   only:
@@ -25,9 +21,6 @@ addons:
   code_climate:
     repo_token: d78a2bee0da040438a789f86c200b705caaa43eea2358a2610cef18e3960f145
 
-env:
-  global:
-    secure: ZiaJOPBryAK372KmSpuvFKsmIpmmwH1Asl0sOR/r17ec8UMsOZMSDqtXLJIjURdj0UcGzv3JYmyjg5j7Uuh2AGrxh8Ll6NisRsgEaLk+4LBjQT/MV+5d4LW8oWKsxZThoz8FxZX3C2gDUboU2CEkIiTfB/IN9qbrjP2ZdzUdJ1HTjKqNtm2ykaNNV/QXC1PvO+vwRdgP/iirUXzK/8qdUVdrmadiE+J1uCqHm3E+EhNros64K2BVISTTfnTA0puMks6M1MFAzQzunmCfA2FIQGUUpoSf95cLCJCxCH7TuZbdGN0kIWhhIv7w9IOECPXYeXDDs2u79jcMNamMbSI0m6vZqoA/ByP7f2OvdvnkynhxudzQK9nKpPk3wmAR6Bz7tq4XcfZzk9EDVzycvdfHJUaAErFs8TAosqIyHVnlWOta1ZXr3PTLAE/ySz7+7d/RSpvL4foY82rZaktxdJbFypng+b07tj1KAYAavMEgfwTgCRi9MyrC8mCx1LtCnw83d4vFprkwn7SHf3sWtb+wRjRw6g5NXmvUcWNr4PUsrDNXUmG3qEq/2sbNUanjm5rSEfjl5OzQwqK6TJypSJsay1TEQiDWrvNFvJRlAcdW7BMHVIdkDKpD3WEcxj2P/4IhyEwdJMtLQFWw6RN4rjdPz+Fsu5iFyANOiGoblvCqx3E=
 notifications:
   slack:
     secure: URHeOIN40h7mayLQTVhjyT16y9ritiZQgYe1zz25xM7pLD0T3YiIeYB9QTx6SqOUwsya7Jv+jDUQXEtiIzZoXLkZS2ZoCJPAzPTI8NY/DgeGnMzt/NxAuM2t0K9l+ECWf3Bt8XFud881uZKj5Ir+uzAoI5mkyNrjQrw91l2U0ju/oY+DY4JtuS9NoSn3/WntczsKEP9r2xKvLojgKVpkhdsoFbb4cAWAwICLBhGq2AQMuakalV3tH80SaS0G02Zkfwo6eXQ5kkCrO6cjFHWeCcfETCW+WvcCQzatuKQg06KRCyt7DJUUp7qmDyqm0A34catPAh6jm3HdayE5g6WbTGcArGieEYJ9xd42Oc/C32u/Le58Qpe17sLD0tD6Hn79SP2s3vTTjpVdoML0Upgy3ZT1sTQzTBvUoObrDR/fxZnlewnRfcfRwSin8oLzLIvVIVB4frByBZidqcTpavR1EyJsUe1BgB68cef2l0FksTOugoVevU/55VLyP8rNlU6Hylk7ZNLBXOiGOnv7wkUnl6vKTIGpCSNgzh8aIGEXrCfpjdgHQOGcd5tktg4D16m1W3k26RXHssAImJ+BJuNu4hB3ouj21gh5k2sAz/jIQ7TfJBsFeo7+vEvym4FpPyqD/MM3dA2s5vYcWwe400MQfSdyK3p4ATYR2r8I8XlTlmE=
