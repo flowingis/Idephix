@@ -20,6 +20,12 @@ $buildTravis = function() use ($idx)
     $idx->runTask('createPhar');
 };
 
+$dummy = function() use ($idx)
+{
+    $branch = getenv('TRAVIS_BRANCH');
+    $idx->local("echo '$branch'");
+};
+
 $createPhar = function() use ($idx)
 {
     echo "Creating phar...\n";
@@ -82,6 +88,7 @@ $releasePhar = function() use ($idx) {
     // $idx->local('cp /tmp/Idephix/.git/refs/heads/master /tmp/getidephix/version');
 };
 
+$idx->add('dummy', $dummy);
 $idx->add('createPhar', $createPhar);
 $idx->add('releasePhar', $releasePhar);
 $idx->add('buildTravis', $buildTravis);
