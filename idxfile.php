@@ -24,6 +24,16 @@ $deployPhar = function() use ($idx)
 {
     $idx->output->writeln('Releasing new phar version...');
 
+    $new_version = $idx->local('cat .git/refs/heads/master');
+    $current_version = file_get_contents(
+        'https://raw.githubusercontent.com/ideatosrl/getidephix.com/gh-pages/version'
+    );
+
+    if ($new_version == $current_version) {
+        $idx->output->writeln("version $new_version already deployed");
+        exit(0);
+    }
+
     $idx->local('mkdir -p ~/.ssh');
     $idx->local('chmod 600 ~/.ssh/id_rsa');
 
@@ -36,8 +46,6 @@ $deployPhar = function() use ($idx)
         echo 'Idephix phar does not exists';
         exit(-1);
     }
-
-    $version = $idx->local('cat .git/refs/heads/master');
 
     // copy new phar & commit
     $idx->local('cp -f idephix.phar ~/docs');
