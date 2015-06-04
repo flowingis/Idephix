@@ -68,20 +68,20 @@ $releasePhar = function() use ($idx) {
     $idx->local('ssh-add ~/.ssh/id_rsa_idephix_doc');
 
     // clone doc repo
-    $idx->local('cd ~ && git clone --branch gh-pages git@github.com:ideatosrl/getidephix.com.git docs');
-    $idx->local('cd ~/docs && git config user.name "ideatobot"');
-    $idx->local('cd ~/docs && git config user.email "info@ideato.it"');
+    // $idx->local('cd ~ && git clone --branch gh-pages git@github.com:ideatosrl/getidephix.com.git docs');
+    // $idx->local('cd ~/docs && git config user.name "ideatobot"');
+    // $idx->local('cd ~/docs && git config user.email "info@ideato.it"');
 
-    if (!file_exists('./idephix.phar')) {
-        echo 'Idephix phar does not exists';
-        exit(-1);
-    }
+    // if (!file_exists('./idephix.phar')) {
+    //     echo 'Idephix phar does not exists';
+    //     exit(-1);
+    // }
 
     //copy new phar & commit
-    $idx->local('cp -f idephix.phar ~/docs');
-    $idx->local('cp ~/docs && git add -A .');
-    $idx->local('cp ~/docs && git commit -qm "release new idephix version"');
-    $idx->local('cp ~/docs && git push -q origin gh-pages');
+    // $idx->local('cp -f idephix.phar ~/docs');
+    // $idx->local('cp ~/docs && git add -A .');
+    // $idx->local('cp ~/docs && git commit -qm "release new idephix version"');
+    // $idx->local('cp ~/docs && git push -q origin gh-pages');
 
     // $version = $idx->local('cat /tmp/Idephix/.git/refs/heads/master');
     // $idx->local(sprintf('cd /tmp/getidephix && git add . && git commit -m "Deploy phar version %s" && git push origin', $version));
