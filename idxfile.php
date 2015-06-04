@@ -41,7 +41,7 @@ $deployPhar = function() use ($idx)
 
     // copy new phar & commit
     $idx->local('cp -f idephix.phar ~/docs');
-    $idx->local("cd ~/docs && echo $version > version");
+    file_put_contents('~/docs/version', $version);
     $idx->local('cd ~/docs && git status');
 
     $idx->local('cd ~/docs && git add -A .');
