@@ -14,7 +14,6 @@ after_script:
   - bin/test-reporter --coverage-report=clover.xml
 
 after_success:
-  - bin/idephix.phar dummy
   - bin/idephix.phar deployPhar
 
 branches:

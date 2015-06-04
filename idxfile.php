@@ -22,18 +22,20 @@ $buildTravis = function() use ($idx)
 
 $deployPhar = function() use ($idx)
 {
-    echo 'Releasing new phar version...';
+    $idx->output->writeln('Releasing new phar version...');
 
     $branch = getenv('TRAVIS_BRANCH');
     $pr = getenv('TRAVIS_PULL_REQUEST');
 
-    $idx->local("echo '$branch'");
-    $idx->local("echo '$pr'");
-
     if ('master' != $branch || $pr) {
-        echo "skipping phar release branch $branch, PR $pr";
+        $idx->output->writeln("skipping (branch '$branch', is PR: '$pr'");
         exit(0);
     }
+
+    $idx->output->writeln('decrypting rsa key...');
+
+    $key = '$encrypted_b26b356be257_key';
+    $iv = '$encrypted_b26b356be257_iv';
 };
 
 $createPhar = function() use ($idx)
@@ -58,7 +60,7 @@ $createPhar = function() use ($idx)
 };
 
 $releasePhar = function() use ($idx) {
-    echo 'Releasing new phar version...';
+    $idx->local('echo Releasing new phar version...');
 
     // $branch = getenv('TRAVIS_BRANCH');
     // $pr = getenv('TRAVIS_PULL_REQUEST');
