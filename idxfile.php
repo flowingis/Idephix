@@ -55,15 +55,15 @@ $releasePhar = function() use ($idx) {
     $key = '$encrypted_b26b356be257_key';
     $iv = '$encrypted_b26b356be257_iv';
 
-    $this->local('mkdir -p ~/.ssh');
-    $this->local("openssl aes-256-cbc -K $key -iv $iv -in ./id_rsa_idephix_doc.enc -out ~/.ssh/id_rsa_idephix_doc -d");
-    $this->local('chmod 600 ~/.ssh/id_rsa_idephix_doc');
-    $this->local('ssh-add ~/.ssh/id_rsa_idephix_doc');
+    $idx->local('mkdir -p ~/.ssh');
+    $idx->local("openssl aes-256-cbc -K $key -iv $iv -in ./id_rsa_idephix_doc.enc -out ~/.ssh/id_rsa_idephix_doc -d");
+    $idx->local('chmod 600 ~/.ssh/id_rsa_idephix_doc');
+    $idx->local('ssh-add ~/.ssh/id_rsa_idephix_doc');
 
     // clone doc repo
-    $this->local('cd ~ && git clone --branch gh-pages git@github.com:ideatosrl/getidephix.com.git docs');
-    $this->local('cd ~/docs && git config user.name "ideatobot"');
-    $this->local('cd ~/docs && git config user.email "info@ideato.it"');
+    $idx->local('cd ~ && git clone --branch gh-pages git@github.com:ideatosrl/getidephix.com.git docs');
+    $idx->local('cd ~/docs && git config user.name "ideatobot"');
+    $idx->local('cd ~/docs && git config user.email "info@ideato.it"');
 
     if (!file_exists('./idephix.phar')) {
         echo 'Idephix phar does not exists';
@@ -71,10 +71,10 @@ $releasePhar = function() use ($idx) {
     }
 
     //copy new phar & commit
-    $this->local('cp -f idephix.phar ~/docs');
-    $this->local('cp ~/docs && git add -A .');
-    $this->local('cp ~/docs && git commit -qm "release new idephix version"');
-    $this->local('cp ~/docs && git push -q origin gh-pages');
+    $idx->local('cp -f idephix.phar ~/docs');
+    $idx->local('cp ~/docs && git add -A .');
+    $idx->local('cp ~/docs && git commit -qm "release new idephix version"');
+    $idx->local('cp ~/docs && git push -q origin gh-pages');
 
     // $version = $idx->local('cat /tmp/Idephix/.git/refs/heads/master');
     // $idx->local(sprintf('cd /tmp/getidephix && git add . && git commit -m "Deploy phar version %s" && git push origin', $version));
