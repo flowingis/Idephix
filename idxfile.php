@@ -30,6 +30,13 @@ $deployPhar = function() use ($idx)
     }
 
     $new_version = $idx->local('cat .git/refs/heads/master');
+    $commit_msg = trim($idx->local('git log -1 --pretty=%B'));
+
+    if (false === strpos($commit_msg, '[release]')) {
+        $idx->output->writeln("skipping, commit msg was '$commit_msg'");
+        exit(0);
+    }
+
     $current_version = file_get_contents(
         'https://raw.githubusercontent.com/ideatosrl/getidephix.com/gh-pages/version'
     );
