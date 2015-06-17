@@ -68,8 +68,9 @@ interface IdephixInterface
      *
      * @param string $cmd Command
      * @param boolean $dryRun
+     * @param integer $timeout
      *
      * @return string the command output
      */
-    public function local($cmd, $dryRun = false);
+    public function local($cmd, $dryRun = false, $timeout = 60);
 }

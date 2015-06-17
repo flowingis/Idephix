@@ -28,7 +28,6 @@ class Idephix implements IdephixInterface
     private $output;
     private $sshClient;
     private $targets = array();
-    private $timeout = 600;
     protected $currentTarget;
     protected $currentTargetName;
     protected $currentHost;
@@ -296,10 +295,13 @@ class Idephix implements IdephixInterface
      * Execute local command.
      *
      * @param string $cmd Command
+     * @param bool $dryRun
+     * @param int $timeout
      *
      * @return string the command output
+     * @throws \Exception
      */
-    public function local($cmd, $dryRun = false)
+    public function local($cmd, $dryRun = false, $timeout = 600)
     {
         $output = $this->output;
         $output->writeln("<info>Local</info>: $cmd");
@@ -308,7 +310,7 @@ class Idephix implements IdephixInterface
             return $cmd;
         }
 
-        $process = $this->buildInvoker($cmd, null, null, null, $this->timeout);
+        $process = $this->buildInvoker($cmd, null, null, null, $timeout);
 
         $result = $process->run(function ($type, $buffer) use ($output) {
             $output->write($buffer);

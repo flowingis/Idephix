@@ -87,6 +87,26 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, stream_get_contents($output));
     }
 
+    public function testRunLocalShouldAllowToDefineTimeout()
+    {
+        $_SERVER['argv'] = array('idx', 'foo');
+
+        $output = fopen("php://memory", 'r+');
+        $idx = new Idephix(array(), null, new StreamOutput($output));
+        $idx->getApplication()->setAutoExit(false);
+
+        $idx->add('foo', function () use ($idx) {
+            $idx->local('sleep 2', false, 1);
+        });
+
+        $idx->run();
+
+        rewind($output);
+
+        $this->assertContains('ProcessTimedOutException', stream_get_contents($output));
+
+    }
+
     /**
      */
     public function testAddLibrary()
