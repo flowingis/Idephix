@@ -2,6 +2,7 @@
 
 namespace Idephix;
 
+use Idephix\Config\LazyConfig;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -124,10 +125,14 @@ class Idephix implements IdephixInterface
                 );
             }
 
-            $this->currentTarget = new Config(array_merge(
-                array('hosts' => array()),
-                $this->targets[$env]
-            ));
+            $this->currentTarget = new LazyConfig(
+                new Config(
+                    array_merge(
+                        array('hosts' => array()),
+                        $this->targets[$env]
+                    )
+                )
+            );
             $this->currentTargetName = $env;
         }
     }

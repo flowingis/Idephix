@@ -2,7 +2,7 @@
 
 namespace Idephix\Config;
 
-class Config
+class Config implements ConfigInterface
 {
     private $config = array();
 
