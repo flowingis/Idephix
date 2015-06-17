@@ -48,6 +48,14 @@ $sshParams = array(
     'user' => 'myuser',
 );
 
+//You could even define callable to
+//lazy load values
+//$sshParams = array(
+//    'user' => function(){
+//        return 'myuser'
+//    },
+//);
+
 $targets = array(
     'prod' => array(
         'hosts' => array('127.0.0.1'),
