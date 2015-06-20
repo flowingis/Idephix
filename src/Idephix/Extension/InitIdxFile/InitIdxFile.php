@@ -56,6 +56,10 @@ $sshParams = array(
 //    },
 //);
 
+/** @var \Idephix\IdephixInterface $idx */
+/** @var array $targets will be used to configure Idephix */
+/** @var array $sshClient will be used as ssh client. Default is an instance of \Idephix\SSH\SshClient */
+
 $targets = array(
     'prod' => array(
         'hosts' => array('127.0.0.1'),
@@ -70,8 +74,6 @@ $targets = array(
         ),
     ),
 );
-
-$idx = new Idephix($targets);
 
 $idx->
     /**
@@ -132,7 +134,6 @@ $idx->
 $idx->addLibrary('deploy', new Deploy());
 $idx->addLibrary('phpunit', new PHPUnit());
 
-$idx->run();
 DEFAULT;
         if (!is_writable($this->baseDir) || false === file_put_contents($idxFile, $data)) {
             throw new \Exception('Cannot write idxfile.php, check your permission configuration.');
