@@ -9,17 +9,19 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Idephix\Util\DocBlockParser;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class CommandWrapper extends Command
 {
+    private $idxTask;
+
     /**
      * @param callable $code
      */
     public function buildFromCode($code)
     {
         $this->assertCallable($code);
-
-        $this->setCode($code);
+        $this->idxTask = $code;
 
         $reflector = new \ReflectionFunction($code);
         $parser = new DocBlockParser($reflector->getDocComment());
@@ -31,28 +33,17 @@ class CommandWrapper extends Command
         }
     }
 
-    /**
-     * @param callable $code
-     * @return $this|Command
-     */
-    public function setCode($code)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->assertCallable($code);
+        $input = $this->filterByOriginalDefinition(
+            $input,
+            $this->getApplication()->getDefinition()
+        );
 
-        $command = $this;
-        parent::setCode(function (InputInterface $input) use ($code, $command) {
-            $input = $command->filterByOriginalDefinition(
-                $input,
-                $command->getApplication()->getDefinition()
-            );
+        $args = $input->getArguments();
+        $args += $input->getOptions();
 
-            $args = $input->getArguments();
-            $args += $input->getOptions();
-
-            return call_user_func_array($code, $args);
-        });
-
-        return $this;
+        return call_user_func_array($this->idxTask, $args);
     }
 
     /**
