@@ -57,10 +57,10 @@ $idx->
  * Execute a deploy for the specified environment
  * @param bool $go if not given it does a dry-run execution
  */
-add('hello',
-    function ()
+add('echo',
+    function ($value)
     {
-        echo 'Output by custom idx file!';
+        echo $value;
     })
 ->add('idephix:test-params',
     function ($param1, $param2, $param3 = 'default')

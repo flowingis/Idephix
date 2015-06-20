@@ -5,14 +5,14 @@ class LoadCustomIdxFileTest extends \PHPUnit_Framework_TestCase
 {
     public function testCallHelloTaskFromCustomIdxFile()
     {
-        $output = shell_exec("php " . __DIR__ . "/../../bin/idx -f " .__DIR__ . "/../Test/idxfile_test.php hello");
+        $output = shell_exec("php " . __DIR__ . "/../../bin/idx -f " .__DIR__ . "/../Test/idxfile_test.php echo 'Output by custom idx file!'");
 
         $this->assertContains("Output by custom idx file!", $output);
     }
 
     public function testCallHelloTaskFromCustomIdxFileWithLongOption()
     {
-        $output = shell_exec("php " . __DIR__ . "/../../bin/idx --file " .__DIR__ . "/../Test/idxfile_test.php hello");
+        $output = shell_exec("php " . __DIR__ . "/../../bin/idx --file " .__DIR__ . "/../Test/idxfile_test.php echo 'Output by custom idx file!'");
 
         $this->assertContains("Output by custom idx file!", $output);
     }
