@@ -5,8 +5,6 @@ use Idephix\Extension\Deploy\Deploy;
 use Idephix\Extension\PHPUnit\PHPUnit;
 use Idephix\SSH\SshClient;
 
-$idx = new Idephix();
-
 $build = function() use ($idx)
 {
     $idx->local('composer install --prefer-source');
@@ -92,4 +90,3 @@ $idx->add('deployPhar', $deployPhar);
 $idx->add('createPhar', $createPhar);
 $idx->add('buildTravis', $buildTravis);
 $idx->add('build', $build);
-$idx->run();

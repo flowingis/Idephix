@@ -50,7 +50,7 @@ $targets = array(
     ),
 );
 
-$idx = new Idephix($targets, new SshClient());
+
 
 $idx->add(
     'echo',
@@ -73,5 +73,4 @@ $idx->add(
 
 $idx->addLibrary('deploy', new Deploy());
 $idx->addLibrary('phpunit', new PHPUnit());
-$idx->run();
 
