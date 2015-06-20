@@ -15,8 +15,18 @@ class CommandWrapper extends Command
 {
     private $idxTask;
 
+    private $idx;
+
+    public function withIdx(IdephixInterface $idx)
+    {
+        $this->idx = $idx;
+
+        return $this;
+    }
+
     /**
      * @param callable $code
+     * @return $this
      */
     public function buildFromCode($code)
     {
@@ -29,8 +39,13 @@ class CommandWrapper extends Command
 
         foreach ($reflector->getParameters() as $parameter) {
             $description = $parser->getParamDescription($parameter->getName());
-            $this->addParameter($parameter, $description);
+
+            if($parameter->getName() !== 'idx'){
+                $this->addParameter($parameter, $description);
+            }
         }
+
+        return $this;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -40,8 +55,15 @@ class CommandWrapper extends Command
             $this->getApplication()->getDefinition()
         );
 
+        $idxTask = new \ReflectionFunction($this->idxTask);
+        $idxArguments = $idxTask->getParameters();
+
         $args = $input->getArguments();
         $args += $input->getOptions();
+
+        if(!empty($idxArguments) && $idxArguments[0]->getName() == 'idx'){
+            array_unshift($args, $this->idx);
+        }
 
         return call_user_func_array($this->idxTask, $args);
     }

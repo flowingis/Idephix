@@ -52,21 +52,24 @@ $targets = array(
 
 $idx = new Idephix($targets, new SshClient());
 
-$idx->
-/**
- * Execute a deploy for the specified environment
- * @param bool $go if not given it does a dry-run execution
- */
-add('echo',
-    function ($value)
-    {
+$idx->add(
+    'echo',
+    function ($value) {
         echo $value;
-    })
-->add('idephix:test-params',
-    function ($param1, $param2, $param3 = 'default')
-    {
+    }
+);
+$idx->add(
+    'greet',
+    function ($idx, $name) {
+        $idx->runTask('echo', 'Ciao ' . $name);
+    }
+);
+$idx->add(
+    'idephix:test-params',
+    function ($param1, $param2, $param3 = 'default') {
         echo "$param1 $param2 $param3";
-    });
+    }
+);
 
 $idx->addLibrary('deploy', new Deploy());
 $idx->addLibrary('phpunit', new PHPUnit());

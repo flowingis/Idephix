@@ -17,6 +17,13 @@ class LoadCustomIdxFileTest extends \PHPUnit_Framework_TestCase
         $this->assertContains("Output by custom idx file!", $output);
     }
 
+    public function testCallTaskThatDependsOnIdxInstance()
+    {
+        $output = shell_exec("php " . __DIR__ . "/../../bin/idx --file " .__DIR__ . "/../Test/idxfile_test.php greet 'Carlo'");
+
+        $this->assertContains("Ciao Carlo", $output);
+    }
+
     public function testCallTaskWithParamsFromCustomIdxFile()
     {
         $output = shell_exec("php " . __DIR__ . "/../../bin/idx -f " .__DIR__ . "/../Test/idxfile_test.php idephix:test-params non per me");

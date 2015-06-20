@@ -97,7 +97,7 @@ class Idephix implements IdephixInterface
     public function add($name, $code)
     {
         $command = new CommandWrapper($name);
-        $command->buildFromCode($code);
+        $command->buildFromCode($code)->withIdx($this);
 
         $this->application->add($command);
 
