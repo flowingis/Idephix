@@ -23,4 +23,15 @@ class LazyConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('pluto', $lazyConfig->get('pippo'));
         $this->assertEquals('qui', $lazyConfig->get('pluto.nonna papera'));
     }
+
+    public function testConfigShouldExecuteOnlyClosure()
+    {
+        $c = new Config(array(
+            'foo' => 'Copy'
+        ));
+
+        $lazyConfig = new LazyConfig($c);
+
+        $this->assertEquals('Copy', $lazyConfig->get('foo'));
+    }
 }
