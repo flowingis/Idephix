@@ -25,4 +25,9 @@ class LazyConfig implements ConfigInterface
     {
         $this->config->set($name, $value);
     }
+
+    public function getFixedPath($name, $default = '')
+    {
+        return $this->config->getFixedPath($name, $default);
+    }
 }
