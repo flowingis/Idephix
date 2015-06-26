@@ -27,6 +27,10 @@ interface IdephixInterface
      */
     public function add($name, $code);
 
+    public function output();
+
+    public function input();
+
     /**
      * @return null|Config\Config
      */

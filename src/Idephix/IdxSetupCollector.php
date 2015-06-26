@@ -5,7 +5,7 @@ use Idephix\SSH\SshClient;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class LazyIdephix implements IdephixInterface
+class IdxSetupCollector implements IdephixInterface
 {
 
     /**
@@ -37,11 +37,6 @@ class LazyIdephix implements IdephixInterface
      * @var array
      */
     private $libraries = [];
-
-    /**
-     * @var IdephixInterface
-     */
-    private $idx;
 
     public function __construct(
         array $targets = null,
@@ -83,62 +78,86 @@ class LazyIdephix implements IdephixInterface
 
     public function run()
     {
-        $this->idx = new Idephix($this->targets, $this->sshClient, $this->output, $this->input);
-
-        foreach($this->tasks as $name => $task)
-        {
-            $this->idx->add($name, $task);
-        }
-
-        foreach($this->libraries as $name => $library)
-        {
-            $this->idx->addLibrary($name, $library);
-        }
-
-        return $this->idx->run();
+        $this->disableRun();
     }
 
     public function getCurrentTarget()
     {
-        $this->checkIdxIsRunning();
-        return $this->idx->getCurrentTarget();
+        $this->disableRun();
     }
 
     public function getCurrentTargetHost()
     {
-        $this->checkIdxIsRunning();
-        return $this->idx->getCurrentTargetHost();
+        $this->disableRun();
     }
 
     public function getCurrentTargetName()
     {
-        $this->checkIdxIsRunning();
-        return $this->idx->getCurrentTargetName();
+        $this->disableRun();
     }
 
     public function runTask($name)
     {
-        $this->checkIdxIsRunning();
-        return $this->idx->runTask($name);
+        $this->disableRun();
     }
 
     public function remote($cmd, $dryRun = false)
     {
-        $this->checkIdxIsRunning();
-        return $this->idx->remote($cmd, $dryRun);
+        $this->disableRun();
     }
 
     public function local($cmd, $dryRun = false, $timeout = 60)
     {
-        $this->checkIdxIsRunning();
-        return $this->idx->local($cmd, $dryRun, $timeout);
+        $this->disableRun();
 
     }
 
-    private function checkIdxIsRunning()
+    /**
+     * @return array
+     */
+    public function getTargets()
     {
-        if(is_numeric($this->idx)){
-            throw new \RuntimeException('You must call the run method before performing any action');
-        }
+        return $this->targets;
+    }
+
+    /**
+     * @return SshClient
+     */
+    public function getSshClient()
+    {
+        return $this->sshClient;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTasks()
+    {
+        return $this->tasks;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLibraries()
+    {
+        return $this->libraries;
+    }
+
+    private function disableRun()
+    {
+        var_dump(debug_backtrace(false));
+        throw new \RuntimeException(
+            'This instance of IdephixInterface is not runnable, you should use it only for collecting setup information');
+    }
+
+    public function output()
+    {
+        return $this->output;
+    }
+
+    public function input()
+    {
+        return $this->input;
     }
 }
