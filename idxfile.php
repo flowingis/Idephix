@@ -1,10 +1,5 @@
 <?php
 
-use Idephix\Idephix;
-use Idephix\Extension\Deploy\Deploy;
-use Idephix\Extension\PHPUnit\PHPUnit;
-use Idephix\SSH\SshClient;
-
 $build = function($idx)
 {
     $idx->local('composer install --prefer-source');

@@ -1,9 +1,7 @@
 <?php
 
-use Idephix\Idephix;
 use Idephix\Extension\Deploy\Deploy;
 use Idephix\Extension\PHPUnit\PHPUnit;
-use Idephix\SSH\SshClient;
 
 $sshParams = array(
     'user' => 'ideato'
