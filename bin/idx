@@ -32,22 +32,8 @@ if (isset($idxFilePath["f"])) {
 
 if (is_file($configFile)) {
 
-    $idx = new Idephix\LazyIdephix();
-    include $configFile;
-
-    if(!isset($targets)){
-        $targets = array();
-    }
-
-    if(!isset($sshClient)) {
-        $sshClient = new Idephix\SSH\SshClient();
-    }
-
-    $idx->setTargets($targets);
-    $idx->setSshClient($sshClient);
-
+    $idx = Idephix\Idephix::fromFile(new \Idephix\File\StandardIdxFile($configFile));
     $idx->run();
-
     return;
 }
 
