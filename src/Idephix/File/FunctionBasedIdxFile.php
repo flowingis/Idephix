@@ -6,6 +6,7 @@ use Idephix\File\Node\IdxTaskVisitor;
 use Idephix\IdxSetupCollector;
 use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\Parser;
 
 class FunctionBasedIdxFile implements IdxFile
@@ -22,6 +23,7 @@ class FunctionBasedIdxFile implements IdxFile
 
         $this->parser = new Parser(new Lexer());
         $this->traverers = new NodeTraverser();
+        $this->traverers->addVisitor(new NameResolver());
         $this->traverers->addVisitor(new IdxTargetVisitor($this->setupCollector));
 		$this->traverers->addVisitor(new IdxTaskVisitor($this->setupCollector));
 

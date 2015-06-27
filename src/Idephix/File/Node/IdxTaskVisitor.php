@@ -28,17 +28,14 @@ class IdxTaskVisitor extends NodeVisitorAbstract
     {
         if($node instanceof Node\Stmt\Function_){
 
-            $params = $this->codePrinter->prettyPrint($node->params);
-            $code = $this->codePrinter->prettyPrint($node->stmts);
+            $closureName = 'task';
+            $closure = $this->convertFunctionToClosure($node, $closureName);
 
-            /** @var string $taskCode */
-            /** @var \Closure $task */
-            $taskCode = sprintf('$task = function(%s){%s};', $params, $code);
-            eval($taskCode);
+            eval($this->codePrinter->prettyPrint([$closure]));
 
             $this->idxCollector->add(
                 $this->cleanupTaskName($node),
-                $task
+                ${$closureName}
             );
         }
     }
@@ -50,5 +47,24 @@ class IdxTaskVisitor extends NodeVisitorAbstract
     private function cleanupTaskName(Node $node)
     {
         return str_replace('_', '', $node->name);
+    }
+
+    /**
+     * @param Node $functionNode
+     * @return Node\Expr\Assign
+     */
+    private function convertFunctionToClosure(Node $functionNode, $closureName)
+    {
+        $closure = new Node\Expr\Assign(
+            new Node\Expr\Variable($closureName),
+            new Node\Expr\Closure(
+                array(
+                    'params' => $functionNode->params,
+                    'stmts' => $functionNode->stmts,
+                    'params' => $functionNode->params
+                )
+            )
+        );
+        return $closure;
     }
 }
