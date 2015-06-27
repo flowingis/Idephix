@@ -65,6 +65,30 @@ EOD;
         $this->assertEquals(1, $task->getNumberOfParameters());
     }
 
+    public function testIsShouldResolveTasksTypeHinting()
+    {
+        $idxFileContent =<<<'EOD'
+<?php
+
+use Idephix\Idephix as Idx;
+
+function foo(Idx $idx, $bar){echo 'bar';};
+
+EOD;
+
+        $idxFile = $this->writeTestIdxFile($idxFileContent);
+        $file = new FunctionBasedIdxFile($idxFile);
+        $tasks = $file->tasks();
+
+        $task = new \ReflectionFunction($tasks['foo']);
+
+        $this->assertEquals(2, $task->getNumberOfParameters());
+        $parameters = $task->getParameters();
+        $this->assertEquals('Idephix\Idephix', $parameters[0]->getClass()->getName());
+        $this->assertEquals('idx', $parameters[0]->getName());
+        $this->assertEquals('bar', $parameters[1]->getName());
+    }
+
     /**
      * @param $idxFileContent
      * @return resource
