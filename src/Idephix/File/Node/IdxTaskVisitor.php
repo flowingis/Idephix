@@ -37,9 +37,18 @@ class IdxTaskVisitor extends NodeVisitorAbstract
             eval($taskCode);
 
             $this->idxCollector->add(
-                $node->name,
+                $this->cleanupTaskName($node),
                 $task
             );
         }
+    }
+
+    /**
+     * @param Node $node
+     * @return mixed
+     */
+    private function cleanupTaskName(Node $node)
+    {
+        return str_replace('_', '', $node->name);
     }
 }
