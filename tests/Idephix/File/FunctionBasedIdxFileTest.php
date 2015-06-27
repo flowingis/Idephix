@@ -40,6 +40,9 @@ EOD;
         $this->assertInternalType('array', $tasks = $file->tasks());
         $this->assertArrayHasKey('foo', $tasks);
         $this->assertInstanceOf('\Closure', $tasks['foo']);
+
+        $task = new \ReflectionFunction($tasks['foo']);
+        $this->assertEquals(1, $task->getNumberOfParameters());
     }
 
     public function testItShouldRemoveUnderscoreFromTaskName()
@@ -57,6 +60,9 @@ EOD;
         $this->assertInternalType('array', $tasks = $file->tasks());
         $this->assertArrayHasKey('echo', $tasks);
         $this->assertInstanceOf('\Closure', $tasks['echo']);
+
+        $task = new \ReflectionFunction($tasks['echo']);
+        $this->assertEquals(1, $task->getNumberOfParameters());
     }
 
     /**
