@@ -42,6 +42,23 @@ EOD;
         $this->assertInstanceOf('\Closure', $tasks['foo']);
     }
 
+    public function testItShouldRemoveUnderscoreFromTaskName()
+    {
+        $idxFileContent =<<<'EOD'
+<?php
+
+function _echo_($bar){ echo $bar; }
+
+EOD;
+
+        $idxFile = $this->writeTestIdxFile($idxFileContent);
+        $file = new FunctionBasedIdxFile($idxFile);
+
+        $this->assertInternalType('array', $tasks = $file->tasks());
+        $this->assertArrayHasKey('echo', $tasks);
+        $this->assertInstanceOf('\Closure', $tasks['echo']);
+    }
+
     /**
      * @param $idxFileContent
      * @return resource
