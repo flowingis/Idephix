@@ -25,6 +25,23 @@ EOD;
         $this->assertEquals(array('foo' => 'bar'), $file->targets());
     }
 
+    public function testItShouldUseFunctionsAsTasks()
+    {
+        $idxFileContent =<<<'EOD'
+<?php
+
+function foo($bar){ echo $bar; }
+
+EOD;
+
+        $idxFile = $this->writeTestIdxFile($idxFileContent);
+        $file = new FunctionBasedIdxFile($idxFile);
+
+        $this->assertInternalType('array', $tasks = $file->tasks());
+        $this->assertArrayHasKey('foo', $tasks);
+        $this->assertInstanceOf('\Closure', $tasks['foo']);
+    }
+
     /**
      * @param $idxFileContent
      * @return resource

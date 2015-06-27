@@ -2,7 +2,6 @@
 namespace Idephix\File;
 
 use Idephix\File\Node\IdxTargetVisitor;
-use Idephix\File\Node\IdxTaskVisitor;
 use Idephix\IdxSetupCollector;
 use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
@@ -22,8 +21,12 @@ class FunctionBasedIdxFile implements IdxFile
 
         $this->parser = new Parser(new Lexer());
         $this->traverers = new NodeTraverser();
+<<<<<<< Updated upstream
         $this->traverers->addVisitor(new IdxTargetVisitor($this->setupCollector));
-		$this->traverers->addVisitor(new IdxTaskVisitor($this->setupCollector));
+=======
+        $this->traverers->addVisitor(new IdxTargetVisitors($this->setupCollector));
+        $this->traverers->addVisitor(new IdxTaskVisitor($this->setupCollector));
+>>>>>>> Stashed changes
 
         $stmts = $this->parser->parse(file_get_contents($file));
         $this->traverers->traverse($stmts);
@@ -51,7 +54,11 @@ class FunctionBasedIdxFile implements IdxFile
 
     public function tasks()
     {
-        return $this->setupCollector->getTasks();
+        return [
+            'foo' => function(){
+                echo 'bar';
+            }
+        ];
     }
 
     public function libraries()
