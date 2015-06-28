@@ -66,6 +66,11 @@ class IdxSetupCollector implements IdephixInterface
         $this->sshClient = $sshClient;
     }
 
+    public function setOutput(OutputInterface $output)
+    {
+        $this->output = $output;
+    }
+
     public function add($name, $code)
     {
         $this->tasks[$name] = $code;
