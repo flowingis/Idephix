@@ -110,6 +110,40 @@ EOD;
         $this->assertEquals('bar', $parameters[1]->getName());
     }
 
+    public function testItShouldReadLibraries()
+    {
+        $this->markTestIncomplete('We need to decide how the user
+        should define libraries. Here are some options:
+        - variables, parsed by Type (an IdxLibrary interface maybe)
+        - a restricted function (i.e. idx_libraries() )
+        - including an external idxFile');
+    }
+
+    public function testItShouldParseVariablesFromTheTopLevelScope()
+    {
+        $this->markTestIncomplete("This will fail. It's a bit tricky to
+        understand the scope of a variable from a NodeVisitor implementation
+        so parsing 'by name' every \$targets variable will be used as idephix
+        targets configuration. Maybe enclosing everything (even configuration stuff)
+        within a function would be a better solution. The downside is that we need
+        to define and document e bunch of reserved functions, to be used as special
+        configuration tasks instead of idephix tasks.");
+        $idxFileContent =<<<'EOD'
+<?php
+
+$targets = array('foo' => 'bar');
+
+function myCustomTask(){
+    $targets = "I'm not supposed to be used as Idx targets";
+}
+EOD;
+
+        $idxFile = $this->writeTestIdxFile($idxFileContent);
+        $file = new FunctionBasedIdxFile($idxFile);
+
+        $this->assertEquals(array('foo' => 'bar'), $file->targets());
+    }
+
     /**
      * @param $idxFileContent
      * @return resource
