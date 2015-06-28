@@ -1,7 +1,7 @@
 <?php
 namespace Idephix\File;
 
-use Idephix\File\Node\IdxTargetVisitor;
+use Idephix\File\Node\IdxVariableVisitor;
 use Idephix\File\Node\IdxTaskVisitor;
 use Idephix\IdxSetupCollector;
 use PhpParser\Lexer;
@@ -24,7 +24,7 @@ class FunctionBasedIdxFile implements IdxFile
         $this->parser = new Parser(new Lexer());
         $this->traverers = new NodeTraverser();
         $this->traverers->addVisitor(new NameResolver());
-        $this->traverers->addVisitor(new IdxTargetVisitor($this->setupCollector));
+        $this->traverers->addVisitor(new IdxVariableVisitor($this->setupCollector));
 		$this->traverers->addVisitor(new IdxTaskVisitor($this->setupCollector));
 
         $stmts = $this->parser->parse(file_get_contents($file));
@@ -38,17 +38,17 @@ class FunctionBasedIdxFile implements IdxFile
 
     public function sshClient()
     {
-        // TODO: Implement sshClient() method.
+        return $this->setupCollector->getSshClient();
     }
 
     public function output()
     {
-        // TODO: Implement output() method.
+        $this->setupCollector->output();
     }
 
     public function input()
     {
-        // TODO: Implement input() method.
+        $this->setupCollector->input();
     }
 
     public function tasks()

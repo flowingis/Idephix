@@ -2,6 +2,10 @@
 
 namespace Idephix\File;
 
+use Idephix\SSH\SshClient;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+
 class FunctionBasedIdxFileTest extends \PHPUnit_Framework_TestCase
 {
     private $idxFile;
@@ -23,6 +27,23 @@ EOD;
         $file = new FunctionBasedIdxFile($idxFile);
 
         $this->assertEquals(array('foo' => 'bar'), $file->targets());
+    }
+
+    public function testItShouldReadClientFromVariable()
+    {
+
+        $idxFileContent =<<<'EOD'
+<?php
+
+use \Idephix\SSH\SshClient;
+
+$client = new SshClient();
+EOD;
+
+        $idxFile = $this->writeTestIdxFile($idxFileContent);
+        $file = new FunctionBasedIdxFile($idxFile);
+
+        $this->assertEquals(new SshClient(), $file->sshClient());
     }
 
     public function testItShouldUseFunctionsAsTasks()
