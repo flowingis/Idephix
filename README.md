@@ -5,6 +5,7 @@ Idephix is a PHP tool for building automated scripts
 
 [![Build Status](https://travis-ci.org/ideatosrl/Idephix.svg)](https://travis-ci.org/ideatosrl/Idephix)
 [![Code Climate](https://codeclimate.com/github/ideatosrl/Idephix/badges/gpa.svg)](https://codeclimate.com/github/ideatosrl/Idephix)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/47596bd6-4ac9-4314-b79a-1f2e50292c1f/mini.png)](https://insight.sensiolabs.com/projects/47596bd6-4ac9-4314-b79a-1f2e50292c1f)
 
 Installation / Usage
 --------------------
