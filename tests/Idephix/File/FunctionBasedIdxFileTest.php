@@ -23,14 +23,14 @@ class FunctionBasedIdxFileTest extends \PHPUnit_Framework_TestCase
         $configFileContent =<<<'EOD'
 <?php
 
-$targets = array('foo' => 'bar');
+$targets = array('foo' => 'bar', 'foolazy' => function(){return 'bar';});
 EOD;
 
         $configFile = $this->writeFile($this->configFile, $configFileContent);
         $idxFile = $this->writeFile($this->idxFile, '');
         $file = new FunctionBasedIdxFile($idxFile, $configFile);
 
-        $this->assertEquals(array('foo' => 'bar'), $file->targets());
+        $this->assertEquals(array('foo' => 'bar', 'foolazy' => function(){return 'bar';}), $file->targets());
     }
 
     public function testItShouldReadClientFromConfigFile()
