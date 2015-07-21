@@ -17,18 +17,23 @@ class FunctionBasedIdxFile implements IdxFile
      */
     private $parser;
 
-    public function __construct($file)
+    public function __construct($idxfile, $configFile = null)
     {
         $this->setupCollector = new IdxSetupCollector();
 
         $this->parser = new Parser(new Lexer());
         $this->traverers = new NodeTraverser();
         $this->traverers->addVisitor(new NameResolver());
-        $this->traverers->addVisitor(new IdxVariableVisitor($this->setupCollector));
 		$this->traverers->addVisitor(new IdxTaskVisitor($this->setupCollector));
 
-        $stmts = $this->parser->parse(file_get_contents($file));
+        $stmts = $this->parser->parse(file_get_contents($idxfile));
         $this->traverers->traverse($stmts);
+
+        if ($configFile) {
+            $this->traverers->addVisitor(new IdxVariableVisitor($this->setupCollector));
+            $stmts = $this->parser->parse(file_get_contents($configFile));
+            $this->traverers->traverse($stmts);
+        }
     }
 
     public function targets()

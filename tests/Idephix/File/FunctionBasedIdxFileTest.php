@@ -10,29 +10,33 @@ class FunctionBasedIdxFileTest extends \PHPUnit_Framework_TestCase
 {
     private $idxFile;
 
+    private $configFile;
+
     protected function setUp()
     {
         $this->idxFile = tmpfile();
+        $this->configFile = tmpfile();
     }
 
-    public function testItShouldReadTargetsFromVariable()
+    public function testItShouldReadTargetsConfigFile()
     {
-        $idxFileContent =<<<'EOD'
+        $configFileContent =<<<'EOD'
 <?php
 
 $targets = array('foo' => 'bar');
 EOD;
 
-        $idxFile = $this->writeTestIdxFile($idxFileContent);
-        $file = new FunctionBasedIdxFile($idxFile);
+        $configFile = $this->writeFile($this->configFile, $configFileContent);
+        $idxFile = $this->writeFile($this->idxFile, '');
+        $file = new FunctionBasedIdxFile($idxFile, $configFile);
 
         $this->assertEquals(array('foo' => 'bar'), $file->targets());
     }
 
-    public function testItShouldReadClientFromVariable()
+    public function testItShouldReadClientFromConfigFile()
     {
 
-        $idxFileContent =<<<'EOD'
+        $configFileContent =<<<'EOD'
 <?php
 
 use \Idephix\SSH\SshClient;
@@ -40,8 +44,9 @@ use \Idephix\SSH\SshClient;
 $client = new SshClient();
 EOD;
 
-        $idxFile = $this->writeTestIdxFile($idxFileContent);
-        $file = new FunctionBasedIdxFile($idxFile);
+        $idxFile = $this->writeFile($this->idxFile, '');
+        $configFile = $this->writeFile($this->configFile, $configFileContent);
+        $file = new FunctionBasedIdxFile($idxFile, $configFile);
 
         $this->assertEquals(new SshClient(), $file->sshClient());
     }
@@ -55,7 +60,7 @@ function foo($bar){ echo $bar; }
 
 EOD;
 
-        $idxFile = $this->writeTestIdxFile($idxFileContent);
+        $idxFile = $this->writeFile($this->idxFile, $idxFileContent);
         $file = new FunctionBasedIdxFile($idxFile);
 
         $this->assertInternalType('array', $tasks = $file->tasks());
@@ -75,7 +80,7 @@ function _echo_($bar){ echo $bar; }
 
 EOD;
 
-        $idxFile = $this->writeTestIdxFile($idxFileContent);
+        $idxFile = $this->writeFile($this->idxFile, $idxFileContent);
         $file = new FunctionBasedIdxFile($idxFile);
 
         $this->assertInternalType('array', $tasks = $file->tasks());
@@ -97,7 +102,7 @@ function foo(Idx $idx, $bar){echo 'bar';};
 
 EOD;
 
-        $idxFile = $this->writeTestIdxFile($idxFileContent);
+        $idxFile = $this->writeFile($this->idxFile, $idxFileContent);
         $file = new FunctionBasedIdxFile($idxFile);
         $tasks = $file->tasks();
 
@@ -119,6 +124,19 @@ EOD;
         - including an external idxFile');
     }
 
+    /**
+     * @param $file
+     * @param $content
+     * @return string created file uri
+     */
+    private function writeFile($file, $content)
+    {
+        fwrite($file, $content);
+        $tmpFileData = stream_get_meta_data($file);
+
+        return $tmpFileData['uri'];
+    }
+
     public function testItShouldParseVariablesFromTheTopLevelScope()
     {
         $this->markTestIncomplete("This will fail. It's a bit tricky to
@@ -138,21 +156,9 @@ function myCustomTask(){
 }
 EOD;
 
-        $idxFile = $this->writeTestIdxFile($idxFileContent);
+        $idxFile = $this->writeFile($this->idxFile, $idxFileContent);
         $file = new FunctionBasedIdxFile($idxFile);
 
         $this->assertEquals(array('foo' => 'bar'), $file->targets());
-    }
-
-    /**
-     * @param $idxFileContent
-     * @return resource
-     */
-    private function writeTestIdxFile($idxFileContent)
-    {
-        fwrite($this->idxFile, $idxFileContent);
-        $tmpFileData = stream_get_meta_data($this->idxFile);
-
-        return $tmpFileData['uri'];
     }
 }
