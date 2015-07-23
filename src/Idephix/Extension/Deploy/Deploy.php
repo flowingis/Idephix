@@ -330,11 +330,11 @@ class Deploy implements IdephixAwareInterface
 
         $this->remoteLinkSharedFolders();
 
+        $this->cacheClear();
+
         if ($this->hasToMigrate()) {
             $this->doctrineMigrate();
         }
-
-        $this->cacheClear();
 
         $this->assetic();
         $this->deleteOldReleases($releasesToKeep);
