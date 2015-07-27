@@ -8,7 +8,7 @@ php:
 before_script:
   - composer self-update
   - mkdir -p ~/.ssh
-  - openssl aes-256-cbc -K $encrypted_6ab1bc8a1906_key -iv $encrypted_6ab1bc8a1906_iv -in id_rsa_idephix_doc.enc -out ~/.ssh/id_rsa -d
+  - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && openssl aes-256-cbc -K $encrypted_6ab1bc8a1906_key -iv $encrypted_6ab1bc8a1906_iv -in id_rsa_idephix_doc.enc -out ~/.ssh/id_rsa -d'
 
 script: bin/idephix.phar buildTravis
 
@@ -16,7 +16,7 @@ after_script:
   - bin/test-reporter --coverage-report=clover.xml
 
 after_success:
-  - bin/idephix.phar deployPhar
+  - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && bin/idephix.phar deployPhar'
 
 branches:
   only:
