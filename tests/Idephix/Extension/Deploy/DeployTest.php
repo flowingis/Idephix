@@ -199,8 +199,8 @@ Linking shared folder $nextReleaseDir/web/uploads ...
 Remote: [ -e '$nextReleaseDir/web/uploads' ]
 Remote: unlink $nextReleaseDir/web/uploads || rmdir $nextReleaseDir/web/uploads || rm $nextReleaseDir/web/uploads
 Remote: ln -nfs /tmp/temp_dir/shared/web/uploads $nextReleaseDir/web/uploads
-Remote: cd $nextReleaseDir && ./app/console doctrine:migration:migrate --env=dev
 Remote: cd $nextReleaseDir && ./app/console cache:clear --env=dev --no-debug
+Remote: cd $nextReleaseDir && ./app/console doctrine:migration:migrate --env=dev
 Asset and assetic stuff...
 Remote: cd $nextReleaseDir && php app/console assets:install --symlink web --env=dev
 Remote: cd $nextReleaseDir && php app/console assetic:dump --env=dev --no-debug
