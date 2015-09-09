@@ -19,26 +19,33 @@ if (!defined('IDEPHIX_COMPOSER_INSTALL')) {
 require IDEPHIX_COMPOSER_INSTALL;
 
 const DEFAULT_IDXFILE = 'idxfile.php';
+const DEFAULT_CONFIGFILE = 'idxrc.php';
 
-$idxFilePath = getopt("f:", array("file:"));
+$options = getopt("f:c:", array("file:","config:"));
 
-$configFile = getcwd() . '/' . DEFAULT_IDXFILE;
+$idxFile = getcwd() . '/' . DEFAULT_IDXFILE;
+$configFile = getcwd() . '/' . DEFAULT_CONFIGFILE;
 
-if (isset($idxFilePath["f"])) {
-    $configFile = $idxFilePath["f"];
-} elseif (isset($idxFilePath["file"])) {
-    $configFile = $idxFilePath["file"];
+if (isset($options["f"])) {
+    $idxFile = $options["f"];
+} elseif (isset($options["file"])) {
+    $idxFile = $options["file"];
 }
 
-if (is_file($configFile)) {
+if (isset($options["c"])) {
+    $configFile = $options["c"];
+} elseif (isset($options["config"])) {
+    $configFile = $options["config"];
+}
 
-    $idx = Idephix\Idephix::fromFile(new \Idephix\File\StandardIdxFile($configFile));
+if (is_file($idxFile) && is_file($configFile)) {
+    $idx = Idephix\Idephix::fromFile(new \Idephix\File\FunctionBasedIdxFile($idxFile, $configFile));
     $idx->run();
     return;
 }
 
-if(false === strpos($configFile, DEFAULT_IDXFILE)) {
-    echo "$configFile file not exist!";
+if(false === strpos($idxFile, DEFAULT_IDXFILE)) {
+    echo "$idxFile file not exist!";
     exit;
 }
 
