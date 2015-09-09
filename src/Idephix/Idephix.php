@@ -387,14 +387,14 @@ class Idephix implements IdephixInterface
 
     protected function removeIdxCustomFileParams()
     {
-        $serverArgsCount = count($_SERVER['argv']);
-
-        for ($i = 0; $i < $serverArgsCount; $i ++) {
-            if ($_SERVER['argv'][$i] == '-f' || $_SERVER['argv'][$i] == '--file') {
-                unset($_SERVER['argv'][$i]);
-                unset($_SERVER['argv'][$i + 1]);
-                break;
+        while ($argument = current($_SERVER['argv'])) {
+            if ($argument == '-f' || $argument == '--file' || $argument == '-c' || $argument == '--config') {
+                unset($_SERVER['argv'][key($_SERVER['argv'])]);
+                unset($_SERVER['argv'][key($_SERVER['argv'])]);
+                reset($_SERVER['argv']);
             }
+
+            next($_SERVER['argv']);
         }
     }
 }

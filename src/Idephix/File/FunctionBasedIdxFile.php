@@ -63,7 +63,7 @@ class FunctionBasedIdxFile implements IdxFile
 
     public function libraries()
     {
-        // TODO: Implement libraries() method.
+        return [];
     }
 
 }
