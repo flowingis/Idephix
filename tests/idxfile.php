@@ -14,3 +14,8 @@ function testParams($param1, $param2, $param3 = 'default')
 {
     echo "$param1 $param2 $param3";
 }
+
+function aTestIdxFile()
+{
+    echo 'It is all I am';
+}
