@@ -1,6 +1,6 @@
 <?php
 
-namespace Idephix\Tests\Test;
+namespace Idephix\Test;
 
 use Idephix\IdephixInterface;
 use Idephix\Config\Config;
