@@ -38,7 +38,11 @@ if (isset($options["c"])) {
     $configFile = $options["config"];
 }
 
-if (is_file($idxFile) && is_file($configFile)) {
+if(!is_file($configFile)){
+    $configFile = null;
+}
+
+if (is_file($idxFile)) {
     $idx = Idephix\Idephix::fromFile(new \Idephix\File\FunctionBasedIdxFile($idxFile, $configFile));
     $idx->run();
     return;
