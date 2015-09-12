@@ -1,19 +1,7 @@
 <?php
 
-$build = function($idx)
-{
-    $idx->local('composer install --prefer-source');
-    $idx->local('bin/phpunit -c tests');
-};
 
-$buildTravis = function($idx)
-{
-    $idx->local('composer install --prefer-source');
-    $idx->local('bin/phpunit -c tests --coverage-clover=clover.xml');
-    $idx->runTask('createPhar');
-};
-
-$deployPhar = function($idx)
+function deployPhar($idx)
 {
     $idx->output()->writeln('Releasing new phar version...');
 
@@ -56,9 +44,9 @@ $deployPhar = function($idx)
     $idx->local('cd ~/docs && git add -A .');
     $idx->local("cd ~/docs && git commit -m 'deploy phar version $new_version'");
     $idx->local('cd ~/docs && git push -q origin gh-pages');
-};
+}
 
-$createPhar = function($idx)
+function createPhar($idx)
 {
     $idx->output()->writeln('Creating phar...');
 
@@ -79,9 +67,17 @@ $createPhar = function($idx)
     }
 
     $idx->output()->writeln('All good!');
-};
+}
 
-$idx->add('deployPhar', $deployPhar);
-$idx->add('createPhar', $createPhar);
-$idx->add('buildTravis', $buildTravis);
-$idx->add('build', $build);
+function buildTravis($idx)
+{
+    $idx->local('composer install --prefer-source');
+    $idx->local('bin/phpunit -c tests --coverage-clover=clover.xml');
+    $idx->runTask('createPhar');
+}
+
+function build($idx)
+{
+    $idx->local('composer install --prefer-source');
+    $idx->local('bin/phpunit -c tests');
+}

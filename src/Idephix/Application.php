@@ -25,6 +25,8 @@ class Application extends BaseApplication
              ->addOption(new InputOption('--env', null, InputOption::VALUE_REQUIRED, 'Set remote environment.'));
         $this->getDefinition()
              ->addOption(new InputOption('--file', '-f', InputOption::VALUE_OPTIONAL, 'Specify alternative idxfile.'));
+        $this->getDefinition()
+             ->addOption(new InputOption('--config', '-c', InputOption::VALUE_OPTIONAL, 'Specify alternative config file.'));
     }
 
     public function doRun(InputInterface $input, OutputInterface $output)

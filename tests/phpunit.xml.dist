@@ -15,7 +15,8 @@
 
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>Idephix</directory>
+            <directory>unit</directory>
+            <directory>functional</directory>
         </testsuite>
     </testsuites>
 </phpunit>

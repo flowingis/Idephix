@@ -11,7 +11,7 @@ class IdxSetupCollector implements IdephixInterface
     /**
      * @var array
      */
-    private $targets;
+    private $targets = [];
 
     /**
      * @var SshClient
@@ -39,7 +39,7 @@ class IdxSetupCollector implements IdephixInterface
     private $libraries = [];
 
     public function __construct(
-        array $targets = null,
+        array $targets = [],
         SshClient $sshClient = null,
         OutputInterface $output = null,
         InputInterface $input = null
@@ -64,6 +64,11 @@ class IdxSetupCollector implements IdephixInterface
     public function setSshClient(SshClient $sshClient)
     {
         $this->sshClient = $sshClient;
+    }
+
+    public function setOutput(OutputInterface $output)
+    {
+        $this->output = $output;
     }
 
     public function add($name, $code)
