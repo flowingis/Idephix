@@ -90,7 +90,7 @@ Remote: cd $nextReleaseDir && ./app/console cache:clear --env=dev --no-debug
 Asset and assetic stuff...
 Remote: cd $nextReleaseDir && php app/console assets:install --symlink web --env=dev
 Remote: cd $nextReleaseDir && php app/console assetic:dump --env=dev --no-debug
-Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
+Remote: cd '/tmp/temp_dir/releases/' && ls | sort | grep -v $(basename $(readlink '$currentReleaseDir')) | head -n -5 | xargs rm -Rf
 Switch to next release...
 Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 ";
@@ -139,7 +139,7 @@ Remote: cd $nextReleaseDir && ./app/console cache:clear --env=prod --no-debug
 Asset and assetic stuff...
 Remote: cd $nextReleaseDir && php app/console assets:install --symlink web --env=prod
 Remote: cd $nextReleaseDir && php app/console assetic:dump --env=prod --no-debug
-Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
+Remote: cd '/tmp/temp_dir/releases/' && ls | sort | grep -v $(basename $(readlink '$currentReleaseDir')) | head -n -5 | xargs rm -Rf
 Switch to next release...
 Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 ";
@@ -204,7 +204,7 @@ Remote: cd $nextReleaseDir && ./app/console doctrine:migration:migrate --env=dev
 Asset and assetic stuff...
 Remote: cd $nextReleaseDir && php app/console assets:install --symlink web --env=dev
 Remote: cd $nextReleaseDir && php app/console assetic:dump --env=dev --no-debug
-Remote: cd '/tmp/temp_dir/releases/' && ls | sort | head -n -6 | xargs rm -Rf
+Remote: cd '/tmp/temp_dir/releases/' && ls | sort | grep -v $(basename $(readlink '$currentReleaseDir')) | head -n -5 | xargs rm -Rf
 Switch to next release...
 Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next current
 ";

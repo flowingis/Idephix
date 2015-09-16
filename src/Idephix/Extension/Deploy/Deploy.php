@@ -241,11 +241,15 @@ class Deploy implements IdephixAwareInterface
      */
     public function deleteOldReleases($releasesToKeep)
     {
-        return $this->idx->remote(
+        if (!is_numeric($releasesToKeep) || $releasesToKeep < 2) {
+            return;
+        }
+        $this->idx->remote(
             sprintf(
-                "cd %s && ls | sort | head -n -%d | xargs rm -Rf",
+                "cd %s && ls | sort | grep -v $(basename $(readlink %s)) | head -n -%d | xargs rm -Rf",
                 escapeshellarg($this->releasesFolder),
-                $releasesToKeep
+                escapeshellarg($this->getCurrentReleaseFolder()),
+                $releasesToKeep - 1
             ),
             $this->dryRun
         );
