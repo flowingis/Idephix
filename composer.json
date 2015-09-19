@@ -34,6 +34,7 @@
         "bin-dir": "bin"
     },
     "autoload": {
+        "files": ["src/Idephix/bootstrap.php"],
         "psr-0": {"Idephix": "src/"}
     }
 }
