@@ -17,9 +17,17 @@ class Application extends BaseApplication
                |_|
 ';
 
-    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
+    private $release_date;
+
+    public function __construct(
+      $name = 'UNKNOWN',
+      $version = 'UNKNOWN',
+      $release_date = 'UNKNOWN')
     {
         parent::__construct($name, $version);
+
+        $this->release_date = $release_date;
+
         $this->setAutoExit(false);
         $this->getDefinition()
              ->addOption(new InputOption('--env', null, InputOption::VALUE_REQUIRED, 'Set remote environment.'));
@@ -35,5 +43,23 @@ class Application extends BaseApplication
     public function getHelp()
     {
         return $this->logo.parent::getHelp();
+    }
+
+    public function getLongVersion()
+    {
+        if ('UNKNOWN' === $this->getName() ||
+            'UNKNOWN' === $this->getVersion()) {
+
+            return '<info>Console Tool</info>';
+        }
+
+        $version = sprintf(
+            '<info>%s</info> version <comment>%s</comment> released %s',
+            $this->getName(),
+            $this->getVersion(),
+            $this->release_date
+        );
+
+        return $version;
     }
 }

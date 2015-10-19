@@ -21,6 +21,7 @@ use Idephix\Config\Config;
 class Idephix implements IdephixInterface
 {
     const VERSION = '@package_version@';
+    const RELEASE_DATE = '@release_date@';
 
     private $application;
     private $library = array();
@@ -33,9 +34,19 @@ class Idephix implements IdephixInterface
     protected $currentHost;
     protected $invokerClassName;
 
-    public function __construct(array $targets = array(), SshClient $sshClient = null, OutputInterface $output = null, InputInterface $input = null)
+    public function __construct(
+        array $targets = array(),
+        SshClient $sshClient = null,
+        OutputInterface $output = null,
+        InputInterface $input = null)
     {
-        $this->application = new Application('Idephix', self::VERSION);
+
+        $this->application = new Application(
+            'Idephix',
+            self::VERSION,
+            self::RELEASE_DATE
+            );
+
         $this->targets = $targets;
 
         if (null === $sshClient) {

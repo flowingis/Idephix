@@ -26,6 +26,7 @@
   ],
   "git-commit": "package_version",
   "git-version": "git-version",
+  "datetime": "release_date",
   "main": "bin\/idx",
   "output": "idephix.phar",
   "stub": true
