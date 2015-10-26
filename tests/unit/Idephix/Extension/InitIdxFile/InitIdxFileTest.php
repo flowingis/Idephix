@@ -22,7 +22,7 @@ class InitIdxFileTest extends IdephixTestCase
     {
         $idx = $this->getMock('\Idephix\IdephixInterface');
         $idx->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
-        $idx->output->expects($this->exactly(2))
+        $idx->output->expects($this->exactly(4))
             ->method('writeln');
 
         $initIdxFile = new InitIdxFile('vfs://root');
@@ -38,7 +38,7 @@ class InitIdxFileTest extends IdephixTestCase
 
         $idx = $this->getMock('\Idephix\IdephixInterface');
         $idx->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
-        $idx->output->expects($this->exactly(1))
+        $idx->output->expects($this->at(0))
             ->method('writeln')
             ->with("<error>An idxfile.php already exists, generation skipped.</error>")
             ;

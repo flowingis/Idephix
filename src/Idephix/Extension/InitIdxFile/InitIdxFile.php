@@ -2,6 +2,7 @@
 
 namespace Idephix\Extension\InitIdxFile;
 
+use Idephix\Extension\Deploy\Deploy;
 use Idephix\Idephix;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\IdephixInterface;
@@ -27,38 +28,14 @@ class InitIdxFile implements IdephixAwareInterface
      */
     public function initFile()
     {
-        $idxFile = $this->baseDir . DIRECTORY_SEPARATOR . 'idxfile.php';
-        if (file_exists($idxFile)) {
-            $this->idx->output->writeln("<error>An idxfile.php already exists, generation skipped.</error>");
+        $this->initIdxFile();
+        $this->initIdxRc();
+    }
 
-            return;
-        }
-
-        $this->idx->output->writeln("Creating basic idxfile.php file...");
-
+    private function initIdxRc()
+    {
         $data = <<<'DEFAULT'
 <?php
-
-use Idephix\Idephix;
-use Idephix\Extension\Deploy\Deploy;
-use Idephix\Extension\PHPUnit\PHPUnit;
-
-$localBaseDir = __DIR__;
-$sshParams = array(
-    'user' => 'myuser',
-);
-
-//You could even define callable to
-//lazy load values
-//$sshParams = array(
-//    'user' => function(){
-//        return 'myuser'
-//    },
-//);
-
-/** @var \Idephix\IdephixInterface $idx */
-/** @var array $targets will be used to configure Idephix */
-/** @var array $sshClient will be used as ssh client. Default is an instance of \Idephix\SSH\SshClient */
 
 $targets = array(
     'prod' => array(
@@ -75,70 +52,85 @@ $targets = array(
     ),
 );
 
-$idx->
-    /**
-     * Symfony2 basic deploy
-     */
-    add(
-        'sf2:deploy',
-        function($go = false) use ($idx)
-        {
-            if (!$go) {
-                echo "\nDry Run...\n";
-            }
-            $idx->deploySF2Copy($go);
-        }
-    )->
-    /**
-     * Build your Symfony project after you have downloaded it for the first time
-     */
-    add(
-        'build:fromscratch',
-        function () use ($idx)
-        {
-            if (!file_exists(__DIR__."/composer.phar")) {
-                $idx->output->writeln("Downloading composer.phar ...");
-                $idx->local("curl -sS https://getcomposer.org/installer | php");
-            }
+DEFAULT;
 
-            $idx->local("php composer.phar install");
-            $idx->local("./app/console doctrine:schema:update --force");
-            $idx->runTask('asset:install');
-            $idx->local("./app/console cache:clear --env=dev");
-            $idx->local("./app/console cache:clear --env=test");
-            $idx->runTask('test:run');
-        }
-    )->
-    /**
-     * Symfony2 installing assets and running assetic command
-     */
-    add(
-        'asset:install',
-        function () use ($idx)
-        {
-            $idx->local("app/console assets:install web");
-            $idx->local("app/console assetic:dump");
-        }
-    )->
-    /**
-     * run phpunit tests
-     */
-    add(
-        'test:run',
-        function () use ($idx)
-        {
-            $idx->phpunit()->runPhpUnit('-c app/');
-        }
-    );
+        $this->writeFile('idxrc.php', $data);
+    }
 
-$idx->addLibrary('deploy', new Deploy());
-$idx->addLibrary('phpunit', new PHPUnit());
+    private function initIdxFile()
+    {
+        $data = <<<'DEFAULT'
+<?php
+
+function sf2Deploy($idx, $go = false)
+{
+    if (!$go) {
+        echo "\nDry Run...\n";
+    }
+    $deploy = new \Idephix\Extension\Deploy\Deploy();
+    $deploy->setIdephix($idx);
+
+    $deploy->deploySF2Copy($go);
+}
+
+/**
+ * Build your Symfony project after you have downloaded it for the first time
+ */
+function buildFromscratch($idx)
+{
+    if (!file_exists(__DIR__ . "/composer.phar")) {
+        $idx->output->writeln("Downloading composer.phar ...");
+        $idx->local("curl -sS https://getcomposer.org/installer | php");
+    }
+
+    $idx->local("php composer.phar install");
+    $idx->local("./app/console doctrine:schema:update --force");
+    $idx->runTask('asset:install');
+    $idx->local("./app/console cache:clear --env=dev");
+    $idx->local("./app/console cache:clear --env=test");
+    $idx->runTask('test:run');
+}
+
+/**
+ * Symfony2 installing assets and running assetic command
+ */
+function assetInstall($idx)
+{
+    $idx->local("app/console assets:install web");
+    $idx->local("app/console assetic:dump");
+}
+/**
+ * run phpunit tests
+ */
+function testRun($idx)
+{
+    $phpunit = new \Idephix\Extension\PHPUnit\PHPUnit();
+    $phpunit->setIdephix($idx);
+
+    $phpunit->runPhpUnit('-c app/');
+}
 
 DEFAULT;
-        if (!is_writable($this->baseDir) || false === file_put_contents($idxFile, $data)) {
-            throw new \Exception('Cannot write idxfile.php, check your permission configuration.');
+
+        $this->writeFile('idxfile.php', $data);
+    }
+
+    private function writeFile($filename, $data)
+    {
+
+        $idxFile = $this->baseDir . DIRECTORY_SEPARATOR . $filename;
+        if (file_exists($idxFile)) {
+            $this->idx->output->writeln("<error>An {$filename} already exists, generation skipped.</error>");
+
+            return;
         }
 
-        $this->idx->output->writeln("idxfile.php file created.");
+        $this->idx->output->writeln("Creating basic {$filename} file...");
+
+        if (!is_writable($this->baseDir) || false === file_put_contents($idxFile, $data)) {
+            throw new \Exception("Cannot write {$filename}, check your permission configuration.");
+        }
+
+        $this->idx->output->writeln("{$filename} file created.");
     }
 }

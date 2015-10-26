@@ -38,7 +38,7 @@ function run()
         exit;
     }
 
-    $idx = new self();
+    $idx = new Idephix();
     $idx->run();
 }
 
