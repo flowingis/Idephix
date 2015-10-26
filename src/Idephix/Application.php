@@ -17,16 +17,16 @@ class Application extends BaseApplication
                |_|
 ';
 
-    private $release_date;
+    private $releaseDate;
 
     public function __construct(
       $name = 'UNKNOWN',
       $version = 'UNKNOWN',
-      $release_date = 'UNKNOWN')
+      $releaseDate = 'UNKNOWN')
     {
         parent::__construct($name, $version);
 
-        $this->release_date = $release_date;
+        $this->releaseDate = $releaseDate;
 
         $this->setAutoExit(false);
         $this->getDefinition()
@@ -57,7 +57,7 @@ class Application extends BaseApplication
             '<info>%s</info> version <comment>%s</comment> released %s',
             $this->getName(),
             $this->getVersion(),
-            $this->release_date
+            $this->releaseDate
         );
 
         return $version;
