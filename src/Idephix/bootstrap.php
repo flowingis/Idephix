@@ -2,6 +2,7 @@
 
 namespace Idephix;
 
+use Idephix\File\StandardIdxFile;
 use Symfony\Component\Console\Input\ArgvInput;
 use Idephix\Application;
 use Idephix\Idephix;
@@ -21,8 +22,14 @@ function run()
     }
 
     if (is_file($idxFile)) {
+        if(isLegacyIdxFile($idxFile)){
+            include $idxFile;
+            return;
+        }
+
         $idx = Idephix::fromFile(new FunctionBasedIdxFile($idxFile, $configFile));
         $idx->run();
+
         return;
     }
 
@@ -33,4 +40,13 @@ function run()
 
     $idx = new self();
     $idx->run();
+}
+
+/**
+ * @param $idxFile
+ * @return int
+ */
+function isLegacyIdxFile($idxFile)
+{
+    return preg_match('/new\sIdephix(\(|\\\\)/', file_get_contents($idxFile), $matches);
 }
