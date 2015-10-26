@@ -9,17 +9,29 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Idephix\Util\DocBlockParser;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class CommandWrapper extends Command
 {
+    private $idxTask;
+
+    private $idx;
+
+    public function withIdx(IdephixInterface $idx)
+    {
+        $this->idx = $idx;
+
+        return $this;
+    }
+
     /**
      * @param callable $code
+     * @return $this
      */
     public function buildFromCode($code)
     {
         $this->assertCallable($code);
-
-        $this->setCode($code);
+        $this->idxTask = $code;
 
         $reflector = new \ReflectionFunction($code);
         $parser = new DocBlockParser($reflector->getDocComment());
@@ -27,32 +39,33 @@ class CommandWrapper extends Command
 
         foreach ($reflector->getParameters() as $parameter) {
             $description = $parser->getParamDescription($parameter->getName());
-            $this->addParameter($parameter, $description);
+
+            if($parameter->getName() !== 'idx'){
+                $this->addParameter($parameter, $description);
+            }
         }
-    }
-
-    /**
-     * @param callable $code
-     * @return $this|Command
-     */
-    public function setCode($code)
-    {
-        $this->assertCallable($code);
-
-        $command = $this;
-        parent::setCode(function (InputInterface $input) use ($code, $command) {
-            $input = $command->filterByOriginalDefinition(
-                $input,
-                $command->getApplication()->getDefinition()
-            );
-
-            $args = $input->getArguments();
-            $args += $input->getOptions();
-
-            return call_user_func_array($code, $args);
-        });
 
         return $this;
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $input = $this->filterByOriginalDefinition(
+            $input,
+            $this->getApplication()->getDefinition()
+        );
+
+        $idxTask = new \ReflectionFunction($this->idxTask);
+        $idxArguments = $idxTask->getParameters();
+
+        $args = $input->getArguments();
+        $args += $input->getOptions();
+
+        if(!empty($idxArguments) && $idxArguments[0]->getName() == 'idx'){
+            array_unshift($args, $this->idx);
+        }
+
+        return call_user_func_array($this->idxTask, $args);
     }
 
     /**

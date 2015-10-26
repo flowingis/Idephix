@@ -1,31 +1,12 @@
 <?php
 
-use Idephix\Idephix;
-use Idephix\Extension\Deploy\Deploy;
-use Idephix\Extension\PHPUnit\PHPUnit;
-use Idephix\SSH\SshClient;
 
-$idx = new Idephix();
-
-$build = function() use ($idx)
+function deployPhar($idx)
 {
-    $idx->local('composer install --prefer-source');
-    $idx->local('bin/phpunit -c tests');
-};
-
-$buildTravis = function() use ($idx)
-{
-    $idx->local('composer install --prefer-source');
-    $idx->local('bin/phpunit -c tests --coverage-clover=clover.xml');
-    $idx->runTask('createPhar');
-};
-
-$deployPhar = function() use ($idx)
-{
-    $idx->output->writeln('Releasing new phar version...');
+    $idx->output()->writeln('Releasing new phar version...');
 
     if (!file_exists('./idephix.phar')) {
-        $idx->output->writeln('Idephix phar does not exists');
+        $idx->output()->writeln('Idephix phar does not exists');
         exit(-1);
     }
 
@@ -33,7 +14,7 @@ $deployPhar = function() use ($idx)
     $commit_msg = trim($idx->local('git log -1 --pretty=%B'));
 
     if (false === strpos($commit_msg, '[release]')) {
-        $idx->output->writeln("skipping, commit msg was '$commit_msg'");
+        $idx->output()->writeln("skipping, commit msg was '$commit_msg'");
         exit(0);
     }
 
@@ -42,7 +23,7 @@ $deployPhar = function() use ($idx)
     );
 
     if ($new_version == $current_version) {
-        $idx->output->writeln("version $new_version already deployed");
+        $idx->output()->writeln("version $new_version already deployed");
         exit(0);
     }
 
@@ -63,11 +44,11 @@ $deployPhar = function() use ($idx)
     $idx->local('cd ~/docs && git add -A .');
     $idx->local("cd ~/docs && git commit -m 'deploy phar version $new_version'");
     $idx->local('cd ~/docs && git push -q origin gh-pages');
-};
+}
 
-$createPhar = function() use ($idx)
+function createPhar($idx)
 {
-    $idx->output->writeln('Creating phar...');
+    $idx->output()->writeln('Creating phar...');
 
     $idx->local('rm -rf /tmp/Idephix && mkdir -p /tmp/Idephix');
     $idx->local("cp -R . /tmp/Idephix");
@@ -76,7 +57,7 @@ $createPhar = function() use ($idx)
     $idx->local('cd /tmp/Idephix && composer install --prefer-source --no-dev -o');
     $idx->local('bin/box build -c /tmp/Idephix/box.json ');
 
-    $idx->output->writeln('Smoke testing...');
+    $idx->output()->writeln('Smoke testing...');
 
     $out = $idx->local('php idephix.phar');
 
@@ -85,11 +66,18 @@ $createPhar = function() use ($idx)
         exit(-1);
     }
 
-    $idx->output->writeln('All good!');
-};
+    $idx->output()->writeln('All good!');
+}
 
-$idx->add('deployPhar', $deployPhar);
-$idx->add('createPhar', $createPhar);
-$idx->add('buildTravis', $buildTravis);
-$idx->add('build', $build);
-$idx->run();
+function buildTravis($idx)
+{
+    $idx->local('composer install --prefer-source');
+    $idx->local('bin/phpunit -c tests --coverage-clover=clover.xml');
+    $idx->runTask('createPhar');
+}
+
+function build($idx)
+{
+    $idx->local('composer install --prefer-source');
+    $idx->local('bin/phpunit -c tests');
+}
