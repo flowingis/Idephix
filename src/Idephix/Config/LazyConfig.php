@@ -14,7 +14,7 @@ class LazyConfig implements ConfigInterface
     {
         $config = $this->config->get($name, $default);
 
-        if($config instanceof \Closure){
+        if ($config instanceof \Closure) {
             $config = $config();
         }
 

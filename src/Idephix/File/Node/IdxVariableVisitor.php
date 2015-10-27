@@ -27,7 +27,7 @@ class IdxVariableVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node)
     {
-        if($node instanceof Node\Expr\Assign){
+        if ($node instanceof Node\Expr\Assign) {
             switch ($node->var->name) {
                 case 'targets':
                     $this->collectVariable($node, 'setTargets');
@@ -48,6 +48,4 @@ class IdxVariableVisitor extends NodeVisitorAbstract
         call_user_func([$this->idxCollector, $collectorMethod], ${$node->var->name});
 
     }
-
-
 }

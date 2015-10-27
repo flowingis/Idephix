@@ -26,7 +26,7 @@ class IdxTaskVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node)
     {
-        if($node instanceof Node\Stmt\Function_){
+        if ($node instanceof Node\Stmt\Function_) {
 
             $closureName = 'task';
             $closure = $this->convertFunctionToClosure($node, $closureName);

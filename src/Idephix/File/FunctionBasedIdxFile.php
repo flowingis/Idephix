@@ -24,7 +24,7 @@ class FunctionBasedIdxFile implements IdxFile
         $this->parser = new Parser(new Lexer());
         $this->traverers = new NodeTraverser();
         $this->traverers->addVisitor(new NameResolver());
-		$this->traverers->addVisitor(new IdxTaskVisitor($this->setupCollector));
+        $this->traverers->addVisitor(new IdxTaskVisitor($this->setupCollector));
 
         $stmts = $this->parser->parse(file_get_contents($idxfile));
         $this->traverers->traverse($stmts);
@@ -65,5 +65,4 @@ class FunctionBasedIdxFile implements IdxFile
     {
         return [];
     }
-
 }
