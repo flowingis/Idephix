@@ -2,7 +2,6 @@
 
 namespace Idephix\Test;
 
-use Idephix\IdephixInterface;
 use Idephix\Config\Config;
 use Idephix\SSH\SshClient;
 use Idephix\SSH\FakeSsh2Proxy;

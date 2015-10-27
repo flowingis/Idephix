@@ -2,7 +2,6 @@
 
 namespace Idephix;
 
-use Idephix\File\StandardIdxFile;
 use Symfony\Component\Console\Input\ArgvInput;
 use Idephix\Application;
 use Idephix\Idephix;
