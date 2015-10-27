@@ -151,7 +151,6 @@ class IdxSetupCollector implements IdephixInterface
 
     private function disableRun()
     {
-        var_dump(debug_backtrace(false));
         throw new \RuntimeException(
             'This instance of IdephixInterface is not runnable, you should use it only for collecting setup information');
     }
