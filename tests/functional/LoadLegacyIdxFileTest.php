@@ -4,8 +4,11 @@ namespace Idephix;
 
 class LoadLegacyIdxFileTest extends \PHPUnit_Framework_TestCase
 {
-    private $idxFile = __DIR__ . "/../legacyIdxFile.php";
-    private $idxBin = __DIR__ . "/../../bin/idx";
+    public function setUp()
+    {
+        $this->idxFile = __DIR__."/../legacyIdxFile.php";
+        $this->idxBin = __DIR__."/../../bin/idx";
+    }
 
     public function testItShouldBeAbleToRecognizeLegacyIdxFile()
     {

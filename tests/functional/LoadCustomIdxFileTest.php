@@ -3,9 +3,13 @@ namespace Idephix;
 
 class LoadCustomIdxFileTest extends \PHPUnit_Framework_TestCase
 {
-    private $idxFile = __DIR__ . "/../idxfile.php";
-    private $idxConfig = __DIR__ . "/../idxrc.php";
-    private $idxBin = __DIR__ . "/../../bin/idx";
+
+    public function setUp()
+    {
+        $this->idxFile = __DIR__ . "/../idxfile.php";
+        $this->idxConfig = __DIR__ . "/../idxrc.php";
+        $this->idxBin = __DIR__ . "/../../bin/idx";
+    }
 
     public function testItShouldBeAbleToUseCustomIdxFile()
     {
