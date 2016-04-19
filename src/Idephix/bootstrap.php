@@ -22,23 +22,20 @@ function run()
 
     if (is_file($idxFile)) {
         if(isLegacyIdxFile($idxFile)){
-            include $idxFile;
-            return;
+            return (include $idxFile);
         }
 
         $idx = Idephix::fromFile(new FunctionBasedIdxFile($idxFile, $configFile));
-        $idx->run();
-
-        return;
+        return $idx->run();
     }
 
     if(false === strpos($idxFile, $application->getDefinition()->getOption('file')->getDefault())) {
         echo "$idxFile file not exist!";
-        exit;
+        return 1;
     }
 
     $idx = new Idephix();
-    $idx->run();
+    return $idx->run();
 }
 
 /**

@@ -18,4 +18,4 @@ if (!defined('IDEPHIX_COMPOSER_INSTALL')) {
 
 require IDEPHIX_COMPOSER_INSTALL;
 
-$idx = Idephix\run();
+exit(Idephix\run());
