@@ -8,7 +8,7 @@ php:
 before_script:
   - composer self-update
   - mkdir -p ~/.ssh
-  - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && openssl aes-256-cbc -K $encrypted_6ab1bc8a1906_key -iv $encrypted_6ab1bc8a1906_iv -in id_rsa_idephix_doc.enc -out ~/.ssh/id_rsa -d'
+  - openssl aes-256-cbc -K $encrypted_6ab1bc8a1906_key -iv $encrypted_6ab1bc8a1906_iv -in id_rsa_idephix_doc.enc -out ~/.ssh/id_rsa -d'
 
 script: bin/idephix.phar buildTravis
 
