@@ -71,9 +71,14 @@ function createPhar($idx)
 
 function buildTravis($idx)
 {
-    $idx->local('composer install --prefer-source');
-    $idx->local('bin/phpunit -c tests --coverage-clover=clover.xml');
-    $idx->runTask('createPhar');
+    try {
+        $idx->local('composer install --prefer-source');
+        $idx->local('bin/phpunit -c tests --coverage-clover=clover.xml');
+        $idx->runTask('createPhar');
+    } catch(\Exception $e) {
+        $idx->output->writeln(sprintf("<error>Exception: \n%s</error>", $e->getMessage()));
+        exit(1);
+    }
 }
 
 function build($idx)
