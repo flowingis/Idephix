@@ -18,10 +18,6 @@ after_success:
   - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && openssl aes-256-cbc -K $encrypted_6ab1bc8a1906_key -iv $encrypted_6ab1bc8a1906_iv -in id_rsa_idephix_doc.enc -out ~/.ssh/id_rsa -d'
   - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && bin/idephix.phar deployPhar'
 
-branches:
-  only:
-    - master
-
 addons:
   code_climate:
     repo_token: d78a2bee0da040438a789f86c200b705caaa43eea2358a2610cef18e3960f145
