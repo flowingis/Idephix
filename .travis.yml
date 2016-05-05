@@ -8,7 +8,7 @@ php:
 before_script:
   - composer self-update
 
-script: bin/idephix.phar buildTravis
+script: bin/idx buildTravis
 
 after_script:
   - bin/test-reporter --coverage-report=clover.xml
