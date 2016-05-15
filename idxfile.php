@@ -1,7 +1,10 @@
 <?php
 
+use Idephix\Idephix;
 
-function deployPhar($idx)
+$idx = new Idephix();
+
+$deployPhar = function() use ($idx)
 {
     $idx->output()->writeln('Releasing new phar version...');
 
@@ -44,9 +47,9 @@ function deployPhar($idx)
     $idx->local('cd ~/docs && git add -A .');
     $idx->local("cd ~/docs && git commit -m 'deploy phar version $new_version'");
     $idx->local('cd ~/docs && git push -q origin gh-pages');
-}
+};
 
-function createPhar($idx)
+$createPhar = function() use ($idx)
 {
     $idx->output()->writeln('Creating phar...');
 
@@ -67,9 +70,9 @@ function createPhar($idx)
     }
 
     $idx->output()->writeln('All good!');
-}
+};
 
-function buildTravis($idx)
+$buildTravis = function() use ($idx)
 {
     try {
         $idx->local('composer install --prefer-source');
@@ -79,10 +82,17 @@ function buildTravis($idx)
         $idx->output->writeln(sprintf("<error>Exception: \n%s</error>", $e->getMessage()));
         exit(1);
     }
-}
+};
 
-function build($idx)
+$build = function() use ($idx)
 {
     $idx->local('composer install --prefer-source');
     $idx->local('bin/phpunit -c tests');
-}
+};
+
+$idx->add('deployPhar', $deployPhar);
+$idx->add('createPhar', $createPhar);
+$idx->add('buildTravis', $buildTravis);
+$idx->add('build', $build);
+
+$idx->run();
