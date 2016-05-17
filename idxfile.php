@@ -75,7 +75,7 @@ $createPhar = function() use ($idx)
 $buildTravis = function() use ($idx)
 {
     try {
-        $idx->local('composer install --prefer-source');
+        $idx->local('composer install');
         $idx->local('bin/phpunit -c tests --coverage-clover=clover.xml');
         $idx->runTask('createPhar');
     } catch(\Exception $e) {
