@@ -21,12 +21,17 @@ function run()
     }
 
     if (is_file($idxFile)) {
-        if(isLegacyIdxFile($idxFile)){
-            return (include $idxFile);
+        try {
+            if(isLegacyIdxFile($idxFile)){
+                include $idxFile;
+            } else {
+                $idx = Idephix::fromFile(new FunctionBasedIdxFile($idxFile, $configFile));
+                $idx->run();
+            }
+            return 0;
+        } catch (FailedCommandException $e) {
+            return 1;
         }
-
-        $idx = Idephix::fromFile(new FunctionBasedIdxFile($idxFile, $configFile));
-        return $idx->run();
     }
 
     if(false === strpos($idxFile, $application->getDefinition()->getOption('file')->getDefault())) {

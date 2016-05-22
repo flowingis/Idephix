@@ -19,3 +19,13 @@ function aTestIdxFile()
 {
     echo 'It is all I am';
 }
+
+function ping()
+{
+    echo 'pong';
+}
+
+function error()
+{
+    throw new Exception("Error for tests, ignore it :-)");
+}

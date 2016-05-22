@@ -14,10 +14,10 @@ class ExitStatusCodeTest extends \PHPUnit_Framework_TestCase
         $this->idxBin = __DIR__ . "/../../bin/idx";
     }
 
-    public function testExitStatusOnSuccess()
+    public function testNewSyntaxSuccess()
     {
         exec(
-            "php " . $this->idxBin . " -f {$this->idxFile} echo 'Output by legacy idx file!'",
+            "php " . $this->idxBin . " -f {$this->idxFile} ping",
             $output,
             $exitCode
         );
@@ -25,4 +25,36 @@ class ExitStatusCodeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $exitCode);
     }
 
+    public function testNewSyntaxFailure()
+    {
+        exec(
+            "php " . $this->idxBin . " -f {$this->idxFile} error",
+            $output,
+            $exitCode
+        );
+
+        $this->assertEquals(1, $exitCode);
+    }
+
+    public function testLegacySyntaxSuccess()
+    {
+        exec(
+            "php " . $this->idxBin . " -f {$this->idxLegacyFile} ping",
+            $output,
+            $exitCode
+        );
+
+        $this->assertEquals(0, $exitCode);
+    }
+
+    public function testLegacySyntaxFailure()
+    {
+        exec(
+            "php " . $this->idxBin . " -f {$this->idxLegacyFile} error",
+            $output,
+            $exitCode
+        );
+
+        $this->assertEquals(1, $exitCode);
+    }
 }

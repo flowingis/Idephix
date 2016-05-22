@@ -4,6 +4,7 @@ namespace Idephix;
 
 use Idephix\Config\LazyConfig;
 use Idephix\File\IdxFile;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -230,7 +231,9 @@ class Idephix implements IdephixInterface
             $this->closeRemoteConnection();
         }
 
-        return $hasErrors ? 1 : 0;
+        if ($hasErrors) {
+            throw new FailedCommandException();
+        }
     }
 
     /**
