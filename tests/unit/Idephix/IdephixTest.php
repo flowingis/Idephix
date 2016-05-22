@@ -99,7 +99,11 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
             $idx->local('sleep 2', false, 1);
         });
 
-        $idx->run();
+        try {
+            $idx->run();
+        } catch (FailedCommandException $e) {
+            // do nothing, is expected to fail
+        }
 
         rewind($output);
 
@@ -170,8 +174,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->idx->remote('echo foo');
     }
 
-    /**
-     */
     public function testLocal()
     {
         $this->idx->local('echo foo');
@@ -179,33 +181,4 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('/echo foo/m', stream_get_contents($this->output));
     }
 
-    public function getTaskAndReturnCode()
-    {
-        return array(
-            array('fooOk', 0),
-            array('fooKo', 1)
-        );
-    }
-
-    /**
-     * @dataProvider getTaskAndReturnCode
-     */
-    public function testReturnCode($task, $expected)
-    {
-        $_SERVER['argv'] = array('idx', $task);
-
-        $output = fopen("php://memory", 'r+');
-        $idx = new Idephix(array(), new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
-        $idx->getApplication()->setAutoExit(false);
-
-        $idx->add('fooOk', function () use ($idx) {
-            $idx->local("echo 'God save the Queen'");
-        });
-
-        $idx->add('fooKo', function () use ($idx) {
-            $idx->local("God save the Queen but this command will fail!");
-        });
-
-        $this->assertEquals($expected, $idx->run());
-    }
 }
