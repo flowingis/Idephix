@@ -10,11 +10,10 @@ use Idephix\File\FunctionBasedIdxFile;
 function run()
 {
     $input = new ArgvInput();
-    $application = new Application('Idephix', Idephix::VERSION);
-    $input->bind($application->getDefinition());
 
-    $configFile = $input->getOption('config');
-    $idxFile = $input->getOption('file');
+    $configFile = $input->getParameterOption(['--config', '-c'], getcwd() . '/' .'idxrc.php');
+    $defaultIdxFile = getcwd() . '/' . 'idxfile.php';
+    $idxFile = $input->getParameterOption(['--file', '-f'], $defaultIdxFile);
 
     if(!is_file($configFile)){
         $configFile = null;
@@ -34,7 +33,7 @@ function run()
         }
     }
 
-    if(false === strpos($idxFile, $application->getDefinition()->getOption('file')->getDefault())) {
+    if(false === strpos($idxFile, $defaultIdxFile)) {
         echo "$idxFile file not exist!";
         return 1;
     }
