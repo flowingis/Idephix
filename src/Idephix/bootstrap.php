@@ -11,9 +11,9 @@ function run()
 {
     $input = new ArgvInput();
 
-    $configFile = $input->getParameterOption(['--config', '-c'], getcwd() . '/' .'idxrc.php');
+    $configFile = $input->getParameterOption(array('--config', '-c'), getcwd() . '/' .'idxrc.php');
     $defaultIdxFile = getcwd() . '/' . 'idxfile.php';
-    $idxFile = $input->getParameterOption(['--file', '-f'], $defaultIdxFile);
+    $idxFile = $input->getParameterOption(array('--file', '-f'), $defaultIdxFile);
 
     if(!is_file($configFile)){
         $configFile = null;
