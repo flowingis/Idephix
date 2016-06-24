@@ -79,7 +79,7 @@ $buildTravis = function() use ($idx)
         $idx->local('bin/phpunit -c tests --coverage-clover=clover.xml');
         $idx->runTask('createPhar');
     } catch(\Exception $e) {
-        $idx->output->writeln(sprintf("<error>Exception: \n%s</error>", $e->getMessage()));
+        $idx->output()->writeln(sprintf("<error>Exception: \n%s</error>", $e->getMessage()));
         exit(1);
     }
 };
