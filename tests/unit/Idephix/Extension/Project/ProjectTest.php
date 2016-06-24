@@ -1,7 +1,7 @@
 <?php
+
 namespace Idephix\Extension\Project;
 
-use Idephix\Extension\Project\Project;
 use Idephix\Config\Config;
 
 class ProjectTest extends \PHPUnit_Framework_TestCase
@@ -20,7 +20,6 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 
         $this->project = new Project();
         $this->project->setIdephix($this->idx);
-
     }
 
     public function testRsyncProject()
@@ -44,5 +43,4 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals("rsync -rlDcz --force --delete --progress  -e 'ssh -p 20817' ./from kea@banana.com:/a/remote/", $result);
     }
-
 }

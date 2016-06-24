@@ -42,7 +42,6 @@ class Idephix implements IdephixInterface
         OutputInterface $output = null,
         InputInterface $input = null)
     {
-
         $this->application = new Application(
             'Idephix',
             self::VERSION,
@@ -80,7 +79,7 @@ class Idephix implements IdephixInterface
             $idx->add($taskName, $taskCode);
         }
 
-        foreach($file->libraries() as $name => $library){
+        foreach ($file->libraries() as $name => $library) {
             $idx->addLibrary($name, $library);
         }
 

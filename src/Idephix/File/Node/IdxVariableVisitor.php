@@ -45,7 +45,6 @@ class IdxVariableVisitor extends NodeVisitorAbstract
     private function collectVariable(Node $node, $collectorMethod)
     {
         eval($this->codePrinter->prettyPrintExpr($node) . ';');
-        call_user_func([$this->idxCollector, $collectorMethod], ${$node->var->name});
-
+        call_user_func(array($this->idxCollector, $collectorMethod), ${$node->var->name});
     }
 }

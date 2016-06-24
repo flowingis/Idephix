@@ -30,12 +30,11 @@ EOD;
         $idxFile = $this->writeFile($this->idxFile, '');
         $file = new FunctionBasedIdxFile($idxFile, $configFile);
 
-        $this->assertEquals(array('foo' => 'bar', 'foolazy' => function(){return 'bar';}), $file->targets());
+        $this->assertEquals(array('foo' => 'bar', 'foolazy' => function () {return 'bar';}), $file->targets());
     }
 
     public function testItShouldReadClientFromConfigFile()
     {
-
         $configFileContent =<<<'EOD'
 <?php
 

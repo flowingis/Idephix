@@ -40,7 +40,7 @@ class CommandWrapper extends Command
         foreach ($reflector->getParameters() as $parameter) {
             $description = $parser->getParamDescription($parameter->getName());
 
-            if($parameter->getName() !== 'idx'){
+            if ($parameter->getName() !== 'idx') {
                 $this->addParameter($parameter, $description);
             }
         }
@@ -61,7 +61,7 @@ class CommandWrapper extends Command
         $args = $input->getArguments();
         $args += $input->getOptions();
 
-        if(!empty($idxArguments) && $idxArguments[0]->getName() == 'idx'){
+        if (!empty($idxArguments) && $idxArguments[0]->getName() == 'idx') {
             array_unshift($args, $this->idx);
         }
 

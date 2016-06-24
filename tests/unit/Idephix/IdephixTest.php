@@ -108,7 +108,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         rewind($output);
 
         $this->assertContains('ProcessTimedOutException', stream_get_contents($output));
-
     }
 
     /**
@@ -180,5 +179,4 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         rewind($this->output);
         $this->assertRegExp('/echo foo/m', stream_get_contents($this->output));
     }
-
 }

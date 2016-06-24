@@ -15,13 +15,13 @@ function run()
     $defaultIdxFile = getcwd() . '/' . 'idxfile.php';
     $idxFile = $input->getParameterOption(array('--file', '-f'), $defaultIdxFile);
 
-    if(!is_file($configFile)){
+    if (!is_file($configFile)) {
         $configFile = null;
     }
 
     if (is_file($idxFile)) {
         try {
-            if(isLegacyIdxFile($idxFile)){
+            if (isLegacyIdxFile($idxFile)) {
                 include $idxFile;
             } else {
                 $idx = Idephix::fromFile(new FunctionBasedIdxFile($idxFile, $configFile));
@@ -33,7 +33,7 @@ function run()
         }
     }
 
-    if(false === strpos($idxFile, $defaultIdxFile)) {
+    if (false === strpos($idxFile, $defaultIdxFile)) {
         echo "$idxFile file not exist!";
         return 1;
     }

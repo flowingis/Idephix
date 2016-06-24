@@ -98,5 +98,4 @@ class Copy implements DeployStrategyInterface
             $this->target->get('deploy.dry_run')
         );
     }
-
 }

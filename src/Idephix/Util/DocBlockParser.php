@@ -54,7 +54,6 @@ class DocBlockParser
                     'description' => $matches['description'][0],
                 );
             }
-
         }
 
         return $params;

@@ -116,7 +116,6 @@ DEFAULT;
 
     private function writeFile($filename, $data)
     {
-
         $idxFile = $this->baseDir . DIRECTORY_SEPARATOR . $filename;
         if (file_exists($idxFile)) {
             $this->idx->output->writeln("<error>An {$filename} already exists, generation skipped.</error>");

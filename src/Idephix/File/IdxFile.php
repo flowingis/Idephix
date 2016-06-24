@@ -3,7 +3,6 @@
 
 namespace Idephix\File;
 
-
 interface IdxFile
 {
     public function targets();

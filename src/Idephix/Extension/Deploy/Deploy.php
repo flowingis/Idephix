@@ -78,7 +78,7 @@ class Deploy implements IdephixAwareInterface
 
     public function getNextReleaseName()
     {
-        if($this->releaseNameAlreadyExist()) {
+        if ($this->releaseNameAlreadyExist()) {
             return $this->timestamp;
         }
 
@@ -115,20 +115,15 @@ class Deploy implements IdephixAwareInterface
     public function isRemoteReady()
     {
         try {
-
             $this->idx->remote('ls '.$this->getCurrentReleaseFolder());
             $this->log("Host ready ".$this->sshClient->getHost());
 
             return true;
-
         } catch (\Exception $e) {
-
             $this->log(sprintf("Host %s NOT ready", $this->sshClient->getHost()));
 
             return false;
-
         }
-
     }
 
     /**
@@ -138,11 +133,9 @@ class Deploy implements IdephixAwareInterface
      */
     public function remotePrepare()
     {
-
         $cmd = "mkdir -p ".$this->getNextReleaseFolder();
 
         return $this->idx->remote($cmd, $this->dryRun);
-
     }
 
     /**
@@ -177,7 +170,6 @@ class Deploy implements IdephixAwareInterface
         $this->log("Updating symlink for shared folder ..");
 
         foreach ($this->sharedFolders as $folder) {
-
             $fullPathSharedFolder        = $this->remoteBaseFolder.'shared/'.$folder;
             $fullPathReleaseSharedFolder = $this->remoteBaseFolder.'releases/'.$this->getNextReleaseName()."/".$folder;
 
@@ -348,7 +340,7 @@ class Deploy implements IdephixAwareInterface
 
     public function getStrategy()
     {
-      return $this->strategy;
+        return $this->strategy;
     }
 
     /**

@@ -45,7 +45,6 @@ class Application extends BaseApplication
     {
         if ('UNKNOWN' === $this->getName() ||
             'UNKNOWN' === $this->getVersion()) {
-
             return '<info>Console Tool</info>';
         }
 
@@ -68,6 +67,4 @@ class Application extends BaseApplication
 
         return $inputDefinition;
     }
-
-
 }
