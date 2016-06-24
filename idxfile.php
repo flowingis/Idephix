@@ -90,9 +90,15 @@ $build = function() use ($idx)
     $idx->local('bin/phpunit -c tests');
 };
 
+$fixCs = function() use ($idx)
+{
+    $idx->local('bin/php-cs-fixer fix');
+};
+
 $idx->add('deployPhar', $deployPhar);
 $idx->add('createPhar', $createPhar);
 $idx->add('buildTravis', $buildTravis);
+$idx->add('fixCs', $fixCs);
 $idx->add('build', $build);
 
 $idx->run();
