@@ -2,9 +2,7 @@
 
 use Idephix\Idephix;
 
-$idx = new Idephix();
-
-$deployPhar = function() use ($idx)
+function deployPhar(\Idephix\IdephixInterface $idx)
 {
     $idx->output()->writeln('Releasing new phar version...');
 
@@ -49,7 +47,7 @@ $deployPhar = function() use ($idx)
     $idx->local('cd ~/docs && git push -q origin gh-pages');
 };
 
-$createPhar = function() use ($idx)
+function createPhar(\Idephix\IdephixInterface $idx)
 {
     $idx->output()->writeln('Creating phar...');
 
@@ -72,33 +70,25 @@ $createPhar = function() use ($idx)
     $idx->output()->writeln('All good!');
 };
 
-$buildTravis = function() use ($idx)
+function buildTravis(\Idephix\IdephixInterface $idx)
 {
     try {
         $idx->local('composer install');
         $idx->local('bin/phpunit -c tests --coverage-clover=clover.xml');
         $idx->runTask('createPhar');
-    } catch(\Exception $e) {
+    } catch (\Exception $e) {
         $idx->output()->writeln(sprintf("<error>Exception: \n%s</error>", $e->getMessage()));
         exit(1);
     }
 };
 
-$build = function() use ($idx)
+function build(\Idephix\IdephixInterface $idx)
 {
     $idx->local('composer install --prefer-source');
     $idx->local('bin/phpunit -c tests');
 };
 
-$fixCs = function() use ($idx)
+function fixCs(\Idephix\IdephixInterface $idx)
 {
     $idx->local('bin/php-cs-fixer fix');
 };
-
-$idx->add('deployPhar', $deployPhar);
-$idx->add('createPhar', $createPhar);
-$idx->add('buildTravis', $buildTravis);
-$idx->add('fixCs', $fixCs);
-$idx->add('build', $build);
-
-$idx->run();
