@@ -1,7 +1,5 @@
 <?php
 
-use Idephix\Idephix;
-
 function deployPhar(\Idephix\IdephixInterface $idx)
 {
     $idx->output()->writeln('Releasing new phar version...');
