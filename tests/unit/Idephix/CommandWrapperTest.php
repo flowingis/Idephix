@@ -9,44 +9,6 @@ use Idephix\CommandWrapper;
 
 class CommandWrapperTest extends \PHPUnit_Framework_TestCase
 {
-    private function buildInputDefinition()
-    {
-        $inputDefinition = new InputDefinition();
-        $inputDefinition->addArgument(
-            new InputArgument('uno', InputArgument::REQUIRED)
-        );
-        $inputDefinition->addOption(
-            new InputOption('due', null, InputOption::VALUE_NONE)
-        );
-
-        return $inputDefinition;
-    }
-
-    private function mergeInputDefinitions($cw, $inputDefinition)
-    {
-        $cw->getDefinition()->setArguments(array_merge(
-            $inputDefinition->getArguments(),
-            $cw->getDefinition()->getArguments()
-        ));
-
-        $cw->getDefinition()->addOptions($inputDefinition->getOptions());
-    }
-
-    private function buildCommandWrapper()
-    {
-        $cw = new CommandWrapper('pippo');
-        /**
-         * Esegue il touch di un file specificato in input
-         * @param string $name il nome del file
-         * @param bool   $go   se specificato esegue il comando, altrimenti dry-run
-         */
-        $cw->buildFromCode(function ($name, $go = false) {
-            // do nothing
-        });
-
-        return $cw;
-    }
-
     /**
      * Tests not enough arguments passed to command
      *
@@ -89,5 +51,43 @@ class CommandWrapperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($input->getArguments()));
         $this->assertEquals(array('name' => 'name_value'), $input->getArguments());
         $this->assertEquals(array('go' => true), $input->getOptions());
+    }
+
+    private function buildInputDefinition()
+    {
+        $inputDefinition = new InputDefinition();
+        $inputDefinition->addArgument(
+            new InputArgument('uno', InputArgument::REQUIRED)
+        );
+        $inputDefinition->addOption(
+            new InputOption('due', null, InputOption::VALUE_NONE)
+        );
+
+        return $inputDefinition;
+    }
+
+    private function mergeInputDefinitions($cw, $inputDefinition)
+    {
+        $cw->getDefinition()->setArguments(array_merge(
+            $inputDefinition->getArguments(),
+            $cw->getDefinition()->getArguments()
+        ));
+
+        $cw->getDefinition()->addOptions($inputDefinition->getOptions());
+    }
+
+    private function buildCommandWrapper()
+    {
+        $cw = new CommandWrapper('pippo');
+        /**
+         * Esegue il touch di un file specificato in input
+         * @param string $name il nome del file
+         * @param bool   $go   se specificato esegue il comando, altrimenti dry-run
+         */
+        $cw->buildFromCode(function ($name, $go = false) {
+            // do nothing
+        });
+
+        return $cw;
     }
 }
