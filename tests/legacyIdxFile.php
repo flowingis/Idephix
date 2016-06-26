@@ -28,4 +28,17 @@ add(
     }
 );
 
+$idx->
+add(
+    'fakedeploy',
+    function ($go = false) use ($idx) {
+        if ($go) {
+            echo 'real-run';
+        } else {
+            echo 'dry-run';
+        }
+    }
+);
+
+
 $idx->run();
