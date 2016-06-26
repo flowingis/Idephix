@@ -30,7 +30,8 @@ function error()
     throw new Exception("Error for tests, ignore it :-)");
 }
 
-function fakedeploy($go = false){
+function fakedeploy($go = false)
+{
     if ($go) {
         echo 'real-run';
     } else {

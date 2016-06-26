@@ -3,7 +3,6 @@
 
 namespace Idephix;
 
-
 class GoOptionTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
@@ -57,5 +56,4 @@ class GoOptionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('real-run'), $output);
     }
-
 }
