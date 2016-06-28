@@ -11,6 +11,11 @@ class Targets implements TargetsInterface
         $this->config = $config;
     }
 
+    public static function fromArray($targets)
+    {
+        return new static($targets);
+    }
+
     /**
      * @param string $name
      * @param mixed $default
@@ -71,6 +76,11 @@ class Targets implements TargetsInterface
         return rtrim($this->get($name, $default), '/').'/';
     }
 
+    public function all()
+    {
+        return $this->config;
+    }
+    
     /**
      * @param string[] $matches
      * @return bool

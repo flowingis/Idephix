@@ -8,4 +8,6 @@ interface TargetsInterface
     public function set($name, $value);
 
     public function getFixedPath($name, $default = '');
+
+    public function all();
 }

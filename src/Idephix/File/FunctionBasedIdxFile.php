@@ -1,7 +1,7 @@
 <?php
 namespace Idephix\File;
 
-use Idephix\File\Node\IdxVariableVisitor;
+use Idephix\Config\ConfigInterface;
 use Idephix\File\Node\IdxTaskVisitor;
 use Idephix\IdxSetupCollector;
 use PhpParser\Lexer;
@@ -30,9 +30,16 @@ class FunctionBasedIdxFile implements IdxFile
         $this->traverers->traverse($stmts);
 
         if ($configFile) {
-            $this->traverers->addVisitor(new IdxVariableVisitor($this->setupCollector));
-            $stmts = $this->parser->parse(file_get_contents($configFile));
-            $this->traverers->traverse($stmts);
+            /** @var ConfigInterface $config */
+            $config = require_once $configFile;
+
+            if ($sshClient = $config->getSshClient()) {
+                $this->setupCollector->setSshClient($sshClient);
+            }
+
+            if ($targets = $config->getTargets()) {
+                $this->setupCollector->setTargets($targets->all());
+            }
         }
     }
 

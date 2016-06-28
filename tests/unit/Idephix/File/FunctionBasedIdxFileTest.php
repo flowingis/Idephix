@@ -16,12 +16,18 @@ class FunctionBasedIdxFileTest extends \PHPUnit_Framework_TestCase
         $this->configFile = tmpfile();
     }
 
-    public function testItShouldReadTargetsConfigFile()
+    public function testItShouldReadConfigFromIdxrcFile()
     {
         $configFileContent =<<<'EOD'
 <?php
 
-$targets = array('foo' => 'bar', 'foolazy' => function(){return 'bar';});
+use \Idephix\Config;
+use \Idephix\SSH\SshClient;
+use \Idephix\Config\Targets\Targets;
+
+return Config::create()
+    ->targets(Targets::fromArray(array('foo' => 'bar', 'foolazy' => function(){return 'bar';})))
+    ->sshClient(new SshClient());
 EOD;
 
         $configFile = $this->writeFile($this->configFile, $configFileContent);
@@ -29,22 +35,6 @@ EOD;
         $file = new FunctionBasedIdxFile($idxFile, $configFile);
 
         $this->assertEquals(array('foo' => 'bar', 'foolazy' => function () {return 'bar';}), $file->targets());
-    }
-
-    public function testItShouldReadClientFromConfigFile()
-    {
-        $configFileContent =<<<'EOD'
-<?php
-
-use \Idephix\SSH\SshClient;
-
-$client = new SshClient();
-EOD;
-
-        $idxFile = $this->writeFile($this->idxFile, '');
-        $configFile = $this->writeFile($this->configFile, $configFileContent);
-        $file = new FunctionBasedIdxFile($idxFile, $configFile);
-
         $this->assertEquals(new SshClient(), $file->sshClient());
     }
 
@@ -132,30 +122,5 @@ EOD;
         $tmpFileData = stream_get_meta_data($file);
 
         return $tmpFileData['uri'];
-    }
-
-    public function testItShouldParseVariablesFromTheTopLevelScope()
-    {
-        $this->markTestIncomplete("This will fail. It's a bit tricky to
-        understand the scope of a variable from a NodeVisitor implementation
-        so parsing 'by name' every \$targets variable will be used as idephix
-        targets configuration. Maybe enclosing everything (even configuration stuff)
-        within a function would be a better solution. The downside is that we need
-        to define and document e bunch of reserved functions, to be used as special
-        configuration tasks instead of idephix tasks.");
-        $idxFileContent =<<<'EOD'
-<?php
-
-$targets = array('foo' => 'bar');
-
-function myCustomTask(){
-    $targets = "I'm not supposed to be used as Idx targets";
-}
-EOD;
-
-        $idxFile = $this->writeFile($this->idxFile, $idxFileContent);
-        $file = new FunctionBasedIdxFile($idxFile);
-
-        $this->assertEquals(array('foo' => 'bar'), $file->targets());
     }
 }
