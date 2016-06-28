@@ -17,12 +17,30 @@ Installation / Usage
     ```
 
 
-2. Create a idxfile.php in the root directory of you project. Define your tasks.
+2. Create a idxfile.php in the root directory of your project. Define your tasks.
+
+``` php
+    <?php
+    
+    /**
+     * Execute the touch of a file specified in input
+     * @param string $name the name of the file to be touch-ed
+     * @param bool   $go   if not specified the script execute a dry-run
+     */
+    function testParams($idx, $name, $go = false)
+    {
+         $idx->local('touch /tmp/'.$name);
+         $idx->remote('touch /tmp/'.$name.'_remote');
+    }
+
+    $idx->run();
+
+    ```
+    
+3. Create a idxrc.php in the root directory of your project. Define your targets and configurations (the file must only contain a `$target` variable). 
 
     ``` php
     <?php
-
-    use Idephix\Idephix;
 
     $targets = array(
         'test' => array(
@@ -30,26 +48,9 @@ Installation / Usage
             'ssh_params' => array('user' => 'kea')
         ),
     );
-
-    $idx = new Idephix($targets);
-
-    $idx->
-        /**
-         * Execute the touch of a file specified in input
-         * @param string $name the name of the file to be touch-ed
-         * @param bool   $go   if not specified the script execute a dry-run
-         */
-        add('idephix:test-params',
-           function ($name, $go = false) use ($idx) {
-             $idx->local('touch /tmp/'.$name);
-             $idx->remote('touch /tmp/'.$name.'_remote');
-           });
-
-    $idx->run();
-
     ```
 
-3. Run Idephix: `php idephix.phar --env=test idephix:test-params Nome_file`
+4. Run Idephix: `php idephix.phar --env=test idephix:test-params Nome_file`
 
 Global installation of Idephix
 ----------------------------------------
