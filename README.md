@@ -37,17 +37,20 @@ Installation / Usage
 
     ```
     
-3. Create a idxrc.php in the root directory of your project. Define your targets and configurations (the file must only contain a `$target` variable). 
+3. Create a idxrc.php in the root directory of your project. The file must return a `ConfigInterface` 
+implementation. The returned object will contains all targets info and the SSH client to uso for remote
+connections
 
     ```php
     <?php
 
-    $targets = array(
-        'test' => array(
-            'hosts' => array('127.0.0.1'),
-            'ssh_params' => array('user' => 'kea')
-        ),
-    );
+    use \Idephix\Config;
+    use \Idephix\SSH\SshClient;
+    use \Idephix\Config\Targets\Targets;
+    
+    return Config::create()
+        ->targets(Targets::fromArray(array('foo' => 'bar', 'foolazy' => function(){return 'bar';})))
+        ->sshClient(new SshClient());
     ```
 
 4. Run Idephix: `php idephix.phar --env=test idephix:test-params Nome_file`
