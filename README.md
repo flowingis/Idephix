@@ -39,7 +39,7 @@ Installation / Usage
     
 3. Create a idxrc.php in the root directory of your project. Define your targets and configurations (the file must only contain a `$target` variable). 
 
-    ``` php
+``` php
     <?php
 
     $targets = array(
