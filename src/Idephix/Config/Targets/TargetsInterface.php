@@ -1,7 +1,7 @@
 <?php
-namespace Idephix\Config;
+namespace Idephix\Config\Targets;
 
-interface ConfigInterface
+interface TargetsInterface
 {
     public function get($name, $default = null);
 

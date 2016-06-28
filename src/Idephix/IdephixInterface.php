@@ -32,7 +32,7 @@ interface IdephixInterface
     public function input();
 
     /**
-     * @return null|Config\Config
+     * @return null|\Idephix\Config\Targets\Targets
      */
     public function getCurrentTarget();
 

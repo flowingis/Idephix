@@ -2,12 +2,12 @@
 
 namespace Idephix\Extension\Deploy\Strategy;
 
-use Idephix\Config\ConfigInterface;
+use Idephix\Config\Targets\TargetsInterface;
 use Idephix\IdephixInterface;
 
 class None implements DeployStrategyInterface
 {
-    public function __construct(IdephixInterface $idx, ConfigInterface $target)
+    public function __construct(IdephixInterface $idx, TargetsInterface $target)
     {
     }
 

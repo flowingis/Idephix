@@ -1,11 +1,11 @@
 <?php
-namespace Idephix\Config;
+namespace Idephix\Config\Targets;
 
-class LazyConfigTest extends \PHPUnit_Framework_TestCase
+class LazyTest extends \PHPUnit_Framework_TestCase
 {
     public function testConfigShouldBeAbleToLazyLoadValues()
     {
-        $c = new Config(
+        $c = new Targets(
             array(
                 'pippo' => function () {
                     return 'pluto';
@@ -18,7 +18,7 @@ class LazyConfigTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $lazyConfig = new LazyConfig($c);
+        $lazyConfig = new Lazy($c);
 
         $this->assertEquals('pluto', $lazyConfig->get('pippo'));
         $this->assertEquals('qui', $lazyConfig->get('pluto.nonna papera'));
@@ -26,11 +26,11 @@ class LazyConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigShouldExecuteOnlyClosure()
     {
-        $c = new Config(array(
+        $c = new Targets(array(
             'foo' => 'Copy'
         ));
 
-        $lazyConfig = new LazyConfig($c);
+        $lazyConfig = new Lazy($c);
 
         $this->assertEquals('Copy', $lazyConfig->get('foo'));
     }

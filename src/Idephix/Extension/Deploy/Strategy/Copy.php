@@ -2,7 +2,7 @@
 
 namespace Idephix\Extension\Deploy\Strategy;
 
-use Idephix\Config\ConfigInterface;
+use Idephix\Config\Targets\TargetsInterface;
 use Idephix\IdephixInterface;
 use Idephix\SSH\SshClient;
 use Symfony\Component\Console\Output\Output;
@@ -23,7 +23,7 @@ class Copy implements DeployStrategyInterface
      */
     protected $sshClient;
 
-    public function __construct(IdephixInterface $idx, ConfigInterface $target)
+    public function __construct(IdephixInterface $idx, TargetsInterface $target)
     {
         $this->idx = $idx;
         if (!$idx->output instanceof Output) {

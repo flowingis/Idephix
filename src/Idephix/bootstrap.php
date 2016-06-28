@@ -2,7 +2,8 @@
 
 namespace Idephix;
 
-use Symfony\Component\Console\Input\ArgvInput;use Idephix\File\FunctionBasedIdxFile;
+use Symfony\Component\Console\Input\ArgvInput;
+use Idephix\File\FunctionBasedIdxFile;
 
 function run()
 {

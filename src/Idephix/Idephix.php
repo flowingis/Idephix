@@ -2,7 +2,7 @@
 
 namespace Idephix;
 
-use Idephix\Config\LazyConfig;
+use Idephix\Config\Targets\Lazy;
 use Idephix\File\IdxFile;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -12,7 +12,7 @@ use Idephix\SSH\SshClient;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Extension\SelfUpdate\SelfUpdate;
 use Idephix\Extension\InitIdxFile\InitIdxFile;
-use Idephix\Config\Config;
+use Idephix\Config\Targets\Targets;
 
 /**
  * Class Idephix
@@ -160,8 +160,8 @@ class Idephix implements IdephixInterface
                 );
             }
 
-            $this->currentTarget = new LazyConfig(
-                new Config(
+            $this->currentTarget = new Lazy(
+                new Targets(
                     array_merge(
                         array('hosts' => array()),
                         $this->targets[$env]

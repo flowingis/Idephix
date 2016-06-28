@@ -1,11 +1,11 @@
 <?php
-namespace Idephix\Config;
+namespace Idephix\Config\Targets;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class TargetsTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetter()
     {
-        $c = new Config(array('pippo' => 'pluto', 'paperino' => 'minni'));
+        $c = new Targets(array('pippo' => 'pluto', 'paperino' => 'minni'));
 
         $this->assertEquals('pluto', $c->get('pippo'));
         $this->assertEquals('minni', $c->get('paperino', 'default'));
@@ -15,7 +15,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testGetterMultidimension()
     {
-        $c = new Config(
+        $c = new Targets(
             array(
                 'pippo' => array(
                     'nonna papera' => 'qui',
@@ -32,7 +32,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testSetterMultidimensionOverwritesNestedValues()
     {
-        $c = new Config(
+        $c = new Targets(
             array(
                 'config' => array(
                     'deploy' => array(

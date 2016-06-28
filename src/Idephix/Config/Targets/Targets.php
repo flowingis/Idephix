@@ -1,8 +1,8 @@
 <?php
 
-namespace Idephix\Config;
+namespace Idephix\Config\Targets;
 
-class Config implements ConfigInterface
+class Targets implements TargetsInterface
 {
     private $config = array();
 
