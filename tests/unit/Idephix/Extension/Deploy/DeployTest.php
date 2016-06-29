@@ -2,7 +2,6 @@
 namespace Idephix\Extension\Deploy;
 
 use Idephix\Test\IdephixTestCase;
-use Idephix\Extension\Deploy\Deploy;
 
 class DeployTest extends IdephixTestCase
 {

@@ -4,7 +4,6 @@ namespace Idephix\Extension\Deploy\Strategy;
 
 use Idephix\Config\ConfigInterface;
 use Idephix\IdephixInterface;
-use Idephix\Config\Config;
 use Idephix\SSH\SshClient;
 use Symfony\Component\Console\Output\Output;
 

@@ -2,7 +2,6 @@
 
 namespace Idephix\Extension\InitIdxFile;
 
-use Idephix\Idephix;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\IdephixInterface;
 

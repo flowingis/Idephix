@@ -3,8 +3,6 @@
 namespace Idephix\File;
 
 use Idephix\SSH\SshClient;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Output\ConsoleOutput;
 
 class FunctionBasedIdxFileTest extends \PHPUnit_Framework_TestCase
 {
