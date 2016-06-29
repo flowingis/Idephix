@@ -36,7 +36,7 @@ function run()
         return 1;
     }
 
-    $idx = new Idephix();
+    $idx = new Idephix(Environment::dry());
     return $idx->run();
 }
 

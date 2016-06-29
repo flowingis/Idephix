@@ -4,18 +4,15 @@ namespace Idephix;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Idephix\SSH\SshClient;
 
 interface IdephixInterface
 {
     /**
-     * @param array $targets
-     * @param SshClient $sshClient
+     * @param Environment $env
      * @param OutputInterface $output
      * @param InputInterface $input
-     * @return \Idephix\IdephixInterface
      */
-    public function __construct(array $targets = null, SshClient $sshClient = null, OutputInterface $output = null, InputInterface $input = null);
+    public function __construct(Environment $env, OutputInterface $output = null, InputInterface $input = null);
 
     /**
      * Add a Command to the application.
@@ -32,7 +29,7 @@ interface IdephixInterface
     public function input();
 
     /**
-     * @return null|\Idephix\Config\Targets\Targets
+     * @return null|Environment
      */
     public function getCurrentTarget();
 

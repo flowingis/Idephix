@@ -1,7 +1,7 @@
 <?php
 namespace Idephix\File;
 
-use Idephix\Config\ConfigInterface;
+use Idephix\Environment;
 use Idephix\File\Node\IdxTaskVisitor;
 use Idephix\IdxSetupCollector;
 use PhpParser\Lexer;
@@ -19,7 +19,8 @@ class FunctionBasedIdxFile implements IdxFile
 
     public function __construct($idxfile, $configFile = null)
     {
-        $this->setupCollector = new IdxSetupCollector();
+        $executionContext = $this->extractEnvFromConfigFile($configFile);
+        $this->setupCollector = new IdxSetupCollector($executionContext);
 
         $this->parser = new Parser(new Lexer());
         $this->traverers = new NodeTraverser();
@@ -28,29 +29,11 @@ class FunctionBasedIdxFile implements IdxFile
 
         $stmts = $this->parser->parse(file_get_contents($idxfile));
         $this->traverers->traverse($stmts);
-
-        if ($configFile) {
-            /** @var ConfigInterface $config */
-            $config = require_once $configFile;
-
-            if ($sshClient = $config->getSshClient()) {
-                $this->setupCollector->setSshClient($sshClient);
-            }
-
-            if ($targets = $config->getTargets()) {
-                $this->setupCollector->setTargets($targets->all());
-            }
-        }
     }
 
-    public function targets()
+    public function executionContext()
     {
-        return $this->setupCollector->getTargets();
-    }
-
-    public function sshClient()
-    {
-        return $this->setupCollector->getSshClient();
+        return $this->setupCollector->getExecutionContext();
     }
 
     public function output()
@@ -71,5 +54,21 @@ class FunctionBasedIdxFile implements IdxFile
     public function libraries()
     {
         return array();
+    }
+
+    /**
+     * @param $configFile
+     * @return Environment
+     */
+    private function extractEnvFromConfigFile($configFile)
+    {
+        if ($configFile) {
+            /** @var Environment $executionContext */
+            $executionContext = require_once $configFile;
+        } else {
+            $executionContext = Environment::dry();
+        }
+
+        return $executionContext;
     }
 }

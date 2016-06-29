@@ -21,21 +21,20 @@ class FunctionBasedIdxFileTest extends \PHPUnit_Framework_TestCase
         $configFileContent =<<<'EOD'
 <?php
 
-use \Idephix\Config;
 use \Idephix\SSH\SshClient;
-use \Idephix\Config\Targets\Targets;
 
-return Config::create()
-    ->targets(Targets::fromArray(array('foo' => 'bar', 'foolazy' => function(){return 'bar';})))
-    ->sshClient(new SshClient());
+$targets = array('foo' => 'bar', 'foolazy' => function(){return 'bar';});
+return \Idephix\Environment::fromArray(array('targets' => $targets, 'sshClient' => new SshClient()));
+
 EOD;
 
         $configFile = $this->writeFile($this->configFile, $configFileContent);
         $idxFile = $this->writeFile($this->idxFile, '');
         $file = new FunctionBasedIdxFile($idxFile, $configFile);
 
-        $this->assertEquals(array('foo' => 'bar', 'foolazy' => function () {return 'bar';}), $file->targets());
-        $this->assertEquals(new SshClient(), $file->sshClient());
+        $executionContext = $file->executionContext();
+        $this->assertEquals(array('foo' => 'bar', 'foolazy' => function () {return 'bar';}), $executionContext['targets']);
+        $this->assertEquals(new SshClient(), $executionContext['sshClient']);
     }
 
     public function testItShouldUseFunctionsAsTasks()

@@ -5,10 +5,8 @@ namespace Idephix\File;
 
 interface IdxFile
 {
-    public function targets();
-
-    public function sshClient();
-
+    public function executionContext();
+    
     public function output();
 
     public function input();

@@ -12,13 +12,19 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      * @var Idephix
      */
     protected $idx;
+    
+    protected $output;
 
     protected function setUp()
     {
         $this->output = fopen('php://memory', 'r+');
         $output = new StreamOutput($this->output);
 
-        $this->idx = new Idephix(array(), new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), $output);
+        $this->idx = new Idephix(
+            Environment::fromArray(
+                array('targets' => array(), 'sshClient' => new SSH\SshClient(new SSH\FakeSsh2Proxy($this)))
+            ), $output
+        );
     }
 
     /**
@@ -68,12 +74,19 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getArgvAndTargets
      */
-    public function testRunALocalTask($argv, $target, $expected)
+    public function testRunALocalTask($argv, $targets, $expected)
     {
         $_SERVER['argv'] = $argv;
 
+        $sshClient = new SSH\SshClient(
+            new SSH\FakeSsh2Proxy($this)
+        );
         $output = fopen('php://memory', 'r+');
-        $idx = new Idephix($target, new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
+        $idx = new Idephix(
+            Environment::fromArray(
+                array('targets' => $targets, 'sshClient' => $sshClient)
+            ), new StreamOutput($output)
+        );
         $idx->getApplication()->setAutoExit(false);
 
         $idx->add('foo', function () use ($idx) {
@@ -92,7 +105,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $_SERVER['argv'] = array('idx', 'foo');
 
         $output = fopen('php://memory', 'r+');
-        $idx = new Idephix(array(), null, new StreamOutput($output));
+        $idx = new Idephix(Environment::dry(), new StreamOutput($output));
         $idx->getApplication()->setAutoExit(false);
 
         $idx->add('foo', function () use ($idx) {
@@ -153,7 +166,11 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     public function testRemote()
     {
         $output = new StreamOutput($this->output);
-        $this->idx = new Idephix(array('test_target' => array()), new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), $output);
+        $sshClient = new SSH\SshClient(new SSH\FakeSsh2Proxy($this));
+        $this->idx = new Idephix(
+            Environment::fromArray(array('targets' => array('test_target' => array()), 'sshClient' => $sshClient)),
+            $output
+        );
 
         $this->idx->sshClient->setHost('host');
         $this->idx->sshClient->connect();
@@ -169,7 +186,11 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     public function testRemoteException()
     {
         $output = new StreamOutput($this->output);
-        $this->idx = new Idephix(array('test_target' => array()), new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), $output);
+        $sshClient = new SSH\SshClient(new SSH\FakeSsh2Proxy($this));
+        $this->idx = new Idephix(
+            Environment::fromArray(array('targets' => array('test_target' => array()), 'sshClient' => $sshClient)),
+            $output
+        );
         $this->idx->remote('echo foo');
     }
 

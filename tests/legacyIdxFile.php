@@ -2,7 +2,7 @@
 
 use Idephix\Idephix;
 
-$idx = new Idephix(array('prod' => array()));
+$idx = new Idephix(\Idephix\Environment::fromArray(array(array('prod' => array()))));
 
 $idx->
 add(

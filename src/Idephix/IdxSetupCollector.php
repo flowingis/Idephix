@@ -7,16 +7,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class IdxSetupCollector implements IdephixInterface
 {
-
     /**
-     * @var array
+     * @var Environment
      */
-    private $targets = array();
-
-    /**
-     * @var SshClient
-     */
-    private $sshClient;
+    private $executionContext;
 
     /**
      * @var OutputInterface
@@ -39,31 +33,13 @@ class IdxSetupCollector implements IdephixInterface
     private $libraries = array();
 
     public function __construct(
-        array $targets = array(),
-        SshClient $sshClient = null,
+        Environment $env,
         OutputInterface $output = null,
         InputInterface $input = null
     ) {
-        $this->targets = $targets;
-        $this->sshClient = $sshClient;
+        $this->executionContext = $env;
         $this->output = $output;
         $this->input = $input;
-    }
-
-    /**
-     * @param array $targets
-     */
-    public function setTargets($targets)
-    {
-        $this->targets = $targets;
-    }
-
-    /**
-     * @param SshClient $sshClient
-     */
-    public function setSshClient(SshClient $sshClient)
-    {
-        $this->sshClient = $sshClient;
     }
 
     public function setOutput(OutputInterface $output)
@@ -116,20 +92,9 @@ class IdxSetupCollector implements IdephixInterface
         $this->disableRun();
     }
 
-    /**
-     * @return array
-     */
-    public function getTargets()
+    public function getExecutionContext()
     {
-        return $this->targets;
-    }
-
-    /**
-     * @return SshClient
-     */
-    public function getSshClient()
-    {
-        return $this->sshClient;
+        return $this->executionContext;
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Idephix;
 
-use Idephix\Config\Targets\Lazy;
 use Idephix\File\IdxFile;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -12,7 +11,6 @@ use Idephix\SSH\SshClient;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Extension\SelfUpdate\SelfUpdate;
 use Idephix\Extension\InitIdxFile\InitIdxFile;
-use Idephix\Config\Targets\Targets;
 
 /**
  * Class Idephix
@@ -30,14 +28,14 @@ class Idephix implements IdephixInterface
     private $output;
     private $sshClient;
     private $targets = array();
+    /** @var  Environment */
     protected $currentTarget;
     protected $currentTargetName;
     protected $currentHost;
     protected $invokerClassName;
 
     public function __construct(
-        array $targets = array(),
-        SshClient $sshClient = null,
+        Environment $env,
         OutputInterface $output = null,
         InputInterface $input = null)
     {
@@ -47,7 +45,8 @@ class Idephix implements IdephixInterface
             self::RELEASE_DATE
             );
 
-        $this->targets = $targets;
+        $this->targets = $env['targets'];
+        $sshClient = $env['sshClient'];
 
         if (null === $sshClient) {
             $sshClient = new SshClient();
@@ -72,7 +71,7 @@ class Idephix implements IdephixInterface
 
     public static function fromFile(IdxFile $file)
     {
-        $idx = new self($file->targets(), $file->sshClient(), $file->output(), $file->input());
+        $idx = new self($file->executionContext(), $file->output(), $file->input());
 
         foreach ($file->tasks() as $taskName => $taskCode) {
             $idx->add($taskName, $taskCode);
@@ -160,12 +159,10 @@ class Idephix implements IdephixInterface
                 );
             }
 
-            $this->currentTarget = new Lazy(
-                new Targets(
-                    array_merge(
-                        array('hosts' => array()),
-                        $this->targets[$env]
-                    )
+            $this->currentTarget = Environment::fromArray(
+                array_merge(
+                    array('hosts' => array()),
+                    $this->targets[$env]
                 )
             );
             $this->currentTargetName = $env;
@@ -180,7 +177,7 @@ class Idephix implements IdephixInterface
     protected function openRemoteConnection($host)
     {
         if ($this->hasTarget()) {
-            $this->sshClient->setParameters($this->currentTarget->get('ssh_params'));
+            $this->sshClient->setParameters($this->currentTarget['ssh_params']);
             $this->sshClient->setHost($host);
             $this->sshClient->connect();
         }
@@ -218,7 +215,7 @@ class Idephix implements IdephixInterface
             return;
         }
 
-        $hosts = $this->hasTarget() ? $this->currentTarget->get('hosts') : array(null);
+        $hosts = $this->hasTarget() ? $this->currentTarget['hosts'] : array(null);
 
         $hasErrors = false;
         foreach ($hosts as $host) {
