@@ -2,7 +2,7 @@
 
 namespace Idephix\Extension\Deploy\Strategy;
 
-use Idephix\Config\Targets\TargetsInterface;
+use Idephix\Context;
 use Idephix\IdephixInterface;
 use Idephix\SSH\SshClient;
 use Symfony\Component\Console\Output\Output;
@@ -23,7 +23,7 @@ class Copy implements DeployStrategyInterface
      */
     protected $sshClient;
 
-    public function __construct(IdephixInterface $idx, TargetsInterface $target)
+    public function __construct(IdephixInterface $idx, Context $currentContext)
     {
         $this->idx = $idx;
         if (!$idx->output instanceof Output) {
@@ -36,9 +36,9 @@ class Copy implements DeployStrategyInterface
         }
         $this->sshClient = $idx->sshClient;
 
-        $this->target = $target;
-        $this->rsyncExcludeFile = $target->get('deploy.rsync_exclude_file');
-        $this->rsyncIncludeFile = $target->get('deploy.rsync_include_file');
+        $this->target = $currentContext;
+        $this->rsyncExcludeFile = $currentContext->get('deploy.rsync_exclude_file');
+        $this->rsyncIncludeFile = $currentContext->get('deploy.rsync_include_file');
     }
 
     /**
@@ -56,7 +56,7 @@ class Copy implements DeployStrategyInterface
 
         $this->output->writeln('Sync code to the next release');
         $this->rsync(
-            $this->target->getFixedPath('deploy.local_base_dir'),
+            $this->target->getAsPath('deploy.local_base_dir'),
             ($this->target->get('deploy.dry_run')) ? $this->target->get('deploy.current_release_dir').'/' : $this->target->get('deploy.next_release_dir')
         );
         $out .= $this->sshClient->getLastOutput();

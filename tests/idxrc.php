@@ -45,4 +45,4 @@ $targets = array(
     ),
 );
 
-return \Idephix\Environment::fromArray(array('targets' => $targets));
+return \Idephix\Config::fromArray(array('targets' => $targets));

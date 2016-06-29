@@ -1,17 +1,17 @@
 <?php
 namespace Idephix;
 
-class EnvironmentTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
      */
     public function it_should_give_array_access()
     {
-        $context = Environment::fromArray(array('foo' => 'bar'));
+        $context = Config::fromArray(array('foo' => 'bar'));
         $this->assertEquals('bar', $context['foo']);
 
-        $context = Environment::fromArray(array());
+        $context = Config::fromArray(array());
         $context['foo'] = 'bar';
         $this->assertEquals('bar', $context['foo']);
     }
@@ -19,10 +19,11 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_should_allow_default_vaule()
+    public function it_should_allow_default_value()
     {
-        $context = Environment::fromArray(array('foo' => 'bar'));
+        $context = Config::fromArray(array('foo' => 'bar', 'targets' => array('host' => 'localhost')));
         $this->assertEquals('i-am-default', $context->get('not-present', 'i-am-default'));
+        $this->assertEquals('localhost', $context->get('targets.host', 'i-am-default'));
     }
 
     /**
@@ -30,7 +31,7 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_allow_to_retrieve_data_using_dot_notation()
     {
-        $context = Environment::fromArray(
+        $context = Config::fromArray(
             array(
                 'targets' => array(
                     'prod' => array(
@@ -49,7 +50,7 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_allow_to_set_data_using_dot_notation()
     {
-        $context = Environment::fromArray(array());
+        $context = Config::fromArray(array());
         $context['targets'] = array('prod' => array('release_dir' => '/var/www'));
 
         $this->assertEquals('/var/www', $context['targets.prod.release_dir']);
@@ -60,7 +61,7 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_return_null_for_non_existing_key()
     {
-        $context = Environment::fromArray(array('targets' => array('prod' => array('release_dir' => '/var/www'))));
+        $context = Config::fromArray(array('targets' => array('prod' => array('release_dir' => '/var/www'))));
 
         $this->assertNull($context['sshClient']);
     }
@@ -71,7 +72,7 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase
     public function it_should_allow_to_resolve_callable_elements()
     {
         $spy = new EnvironmentSpy();
-        $context = Environment::fromArray(
+        $context = Config::fromArray(
             array(
                 'foo' => function () use ($spy) {
                     $spy->resolved = true;

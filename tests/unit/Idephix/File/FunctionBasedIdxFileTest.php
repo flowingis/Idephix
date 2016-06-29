@@ -24,7 +24,7 @@ class FunctionBasedIdxFileTest extends \PHPUnit_Framework_TestCase
 use \Idephix\SSH\SshClient;
 
 $targets = array('foo' => 'bar', 'foolazy' => function(){return 'bar';});
-return \Idephix\Environment::fromArray(array('targets' => $targets, 'sshClient' => new SshClient()));
+return \Idephix\Config::fromArray(array('targets' => $targets, 'sshClient' => new SshClient()));
 
 EOD;
 

@@ -2,18 +2,20 @@
 
 namespace Idephix\Test;
 
-use Idephix\Config\Targets\Targets;
+use Idephix\Context;
 use Idephix\SSH\SshClient;
 use Idephix\SSH\FakeSsh2Proxy;
 use Symfony\Component\Console\Output\StreamOutput;
 
 class IdephixTestCase extends \PHPUnit_Framework_TestCase
 {
+    protected $output;
+
     public function getIdephixMock($targets, $targetName)
     {
         $this->output = fopen('php://memory', 'r+');
         $output = new StreamOutput($this->output);
-        $currentTarget = new Targets($targets[$targetName]);
+        $currentTarget = Context::fromArray($targets[$targetName]);
         $sshClient = new SshClient(new FakeSsh2Proxy($this));
         $sshClient->setParameters($currentTarget->get('ssh_params'));
         $sshClient->setHost(current($currentTarget->get('hosts')));

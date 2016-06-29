@@ -1,7 +1,7 @@
 <?php
 namespace Idephix;
 
-class Environment implements \ArrayAccess
+abstract class Dictionary implements \ArrayAccess
 {
     private $data = array();
 
@@ -111,13 +111,18 @@ class Environment implements \ArrayAccess
         unset($this->data[$offset]);
     }
 
-    public function get($offset, $default)
+    public function get($offset, $default = null)
     {
-        if(!$this->offsetExists($offset)){
+        if(is_null($this->offsetGet($offset))){
             return $default;
         }
 
-        return $this[$offset];
+        return $this->offsetGet($offset);
+    }
+
+    public function set($key, $value)
+    {
+        $this->offsetSet($key, $value);
     }
 
     /**

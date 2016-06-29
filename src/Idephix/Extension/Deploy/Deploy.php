@@ -2,6 +2,7 @@
 
 namespace Idephix\Extension\Deploy;
 
+use Idephix\Context;
 use Idephix\Idephix;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
@@ -41,6 +42,7 @@ class Deploy implements IdephixAwareInterface
             throw new \Exception('You must specify an environment [--env]');
         }
 
+        /** @var Context $target */
         $target = $this->idx->getCurrentTarget();
 
         if (!$target->get('deploy.remote_base_dir', false)) {
@@ -49,8 +51,8 @@ class Deploy implements IdephixAwareInterface
 
         $this->symfonyEnv = $target->get('symfony_env', 'dev');
         $this->hasToMigrate = $target->get('deploy.migrations', false);
-        $this->localBaseFolder  = $target->getFixedPath('deploy.local_base_dir');
-        $this->remoteBaseFolder = $target->getFixedPath('deploy.remote_base_dir');
+        $this->localBaseFolder  = $target->getAsPath('deploy.local_base_dir');
+        $this->remoteBaseFolder = $target->getAsPath('deploy.remote_base_dir');
         $this->releasesFolder   = $this->remoteBaseFolder.'releases/';
         $this->sharedFolders    = $target->get('deploy.shared_folders', array());
 

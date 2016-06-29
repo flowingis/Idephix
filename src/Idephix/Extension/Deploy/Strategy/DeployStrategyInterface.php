@@ -2,17 +2,16 @@
 
 namespace Idephix\Extension\Deploy\Strategy;
 
-use Idephix\Config\Targets\TargetsInterface;
+use Idephix\Context;
 use Idephix\IdephixInterface;
 
 interface DeployStrategyInterface
 {
     /**
      * @param IdephixInterface $idx
-     * @param Config $target
-     * @return void
+     * @param Context $currentContext
      */
-    public function __construct(IdephixInterface $idx, TargetsInterface $target);
+    public function __construct(IdephixInterface $idx, Context $currentContext);
 
     /**
      * The main deploy method

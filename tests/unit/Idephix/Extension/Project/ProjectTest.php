@@ -2,7 +2,7 @@
 
 namespace Idephix\Extension\Project;
 
-use Idephix\Config\Targets\Targets;
+use Idephix\Context;
 
 class ProjectTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,7 +26,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     {
         $this->idx->expects($this->exactly(1))
           ->method('getCurrentTarget')
-          ->will($this->returnValue(new Targets(array('ssh_params' => array('user' => 'kea')))));
+          ->will($this->returnValue(Context::fromArray(array('ssh_params' => array('user' => 'kea')))));
 
         $result = $this->project->rsyncProject('/a/remote', './from');
 
@@ -37,7 +37,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     {
         $this->idx->expects($this->exactly(1))
           ->method('getCurrentTarget')
-          ->will($this->returnValue(new Targets(array('ssh_params' => array('user' => 'kea', 'port' => 20817)))));
+          ->will($this->returnValue(Context::fromArray(array('ssh_params' => array('user' => 'kea', 'port' => 20817)))));
 
         $result = $this->project->rsyncProject('/a/remote', './from');
 

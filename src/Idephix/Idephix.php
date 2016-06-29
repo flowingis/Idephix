@@ -28,14 +28,14 @@ class Idephix implements IdephixInterface
     private $output;
     private $sshClient;
     private $targets = array();
-    /** @var  Environment */
+    /** @var  Config */
     protected $currentTarget;
     protected $currentTargetName;
     protected $currentHost;
     protected $invokerClassName;
 
     public function __construct(
-        Environment $env,
+        Config $env,
         OutputInterface $output = null,
         InputInterface $input = null)
     {
@@ -159,7 +159,7 @@ class Idephix implements IdephixInterface
                 );
             }
 
-            $this->currentTarget = Environment::fromArray(
+            $this->currentTarget = Context::fromArray(
                 array_merge(
                     array('hosts' => array()),
                     $this->targets[$env]

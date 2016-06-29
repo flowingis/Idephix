@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class IdxSetupCollector implements IdephixInterface
 {
     /**
-     * @var Environment
+     * @var Config
      */
     private $executionContext;
 
@@ -33,7 +33,7 @@ class IdxSetupCollector implements IdephixInterface
     private $libraries = array();
 
     public function __construct(
-        Environment $env,
+        Config $env,
         OutputInterface $output = null,
         InputInterface $input = null
     ) {

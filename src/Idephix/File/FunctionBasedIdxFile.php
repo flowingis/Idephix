@@ -1,7 +1,7 @@
 <?php
 namespace Idephix\File;
 
-use Idephix\Environment;
+use Idephix\Config;
 use Idephix\File\Node\IdxTaskVisitor;
 use Idephix\IdxSetupCollector;
 use PhpParser\Lexer;
@@ -58,15 +58,15 @@ class FunctionBasedIdxFile implements IdxFile
 
     /**
      * @param $configFile
-     * @return Environment
+     * @return Config
      */
     private function extractEnvFromConfigFile($configFile)
     {
         if ($configFile) {
-            /** @var Environment $executionContext */
+            /** @var Config $executionContext */
             $executionContext = require_once $configFile;
         } else {
-            $executionContext = Environment::dry();
+            $executionContext = Config::dry();
         }
 
         return $executionContext;

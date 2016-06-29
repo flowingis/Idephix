@@ -21,7 +21,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $output = new StreamOutput($this->output);
 
         $this->idx = new Idephix(
-            Environment::fromArray(
+            Config::fromArray(
                 array('targets' => array(), 'sshClient' => new SSH\SshClient(new SSH\FakeSsh2Proxy($this)))
             ), $output
         );
@@ -83,7 +83,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         );
         $output = fopen('php://memory', 'r+');
         $idx = new Idephix(
-            Environment::fromArray(
+            Config::fromArray(
                 array('targets' => $targets, 'sshClient' => $sshClient)
             ), new StreamOutput($output)
         );
@@ -105,7 +105,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $_SERVER['argv'] = array('idx', 'foo');
 
         $output = fopen('php://memory', 'r+');
-        $idx = new Idephix(Environment::dry(), new StreamOutput($output));
+        $idx = new Idephix(Config::dry(), new StreamOutput($output));
         $idx->getApplication()->setAutoExit(false);
 
         $idx->add('foo', function () use ($idx) {
@@ -168,7 +168,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $output = new StreamOutput($this->output);
         $sshClient = new SSH\SshClient(new SSH\FakeSsh2Proxy($this));
         $this->idx = new Idephix(
-            Environment::fromArray(array('targets' => array('test_target' => array()), 'sshClient' => $sshClient)),
+            Config::fromArray(array('targets' => array('test_target' => array()), 'sshClient' => $sshClient)),
             $output
         );
 
@@ -188,7 +188,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $output = new StreamOutput($this->output);
         $sshClient = new SSH\SshClient(new SSH\FakeSsh2Proxy($this));
         $this->idx = new Idephix(
-            Environment::fromArray(array('targets' => array('test_target' => array()), 'sshClient' => $sshClient)),
+            Config::fromArray(array('targets' => array('test_target' => array()), 'sshClient' => $sshClient)),
             $output
         );
         $this->idx->remote('echo foo');
