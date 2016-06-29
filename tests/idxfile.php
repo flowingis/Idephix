@@ -27,7 +27,7 @@ function ping()
 
 function error()
 {
-    throw new Exception("Error for tests, ignore it :-)");
+    throw new Exception('Error for tests, ignore it :-)');
 }
 
 function fakedeploy($go = false)

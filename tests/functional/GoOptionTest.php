@@ -7,16 +7,16 @@ class GoOptionTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $this->idxFile = __DIR__ . "/../idxfile.php";
-        $this->idxLegacyFile = __DIR__."/../legacyIdxFile.php";
-        $this->idxConfig = __DIR__ . "/../idxrc.php";
-        $this->idxBin = __DIR__ . "/../../bin/idx";
+        $this->idxFile = __DIR__ . '/../idxfile.php';
+        $this->idxLegacyFile = __DIR__.'/../legacyIdxFile.php';
+        $this->idxConfig = __DIR__ . '/../idxrc.php';
+        $this->idxBin = __DIR__ . '/../../bin/idx';
     }
 
     public function testLegacySyntaxDryRun()
     {
         exec(
-            "php " . $this->idxBin . " -f {$this->idxLegacyFile} fakedeploy",
+            'php ' . $this->idxBin . " -f {$this->idxLegacyFile} fakedeploy",
             $output,
             $exitCode
         );
@@ -27,7 +27,7 @@ class GoOptionTest extends \PHPUnit_Framework_TestCase
     public function testLegacySyntaxRealRun()
     {
         exec(
-            "php " . $this->idxBin . " -f {$this->idxLegacyFile} fakedeploy --go",
+            'php ' . $this->idxBin . " -f {$this->idxLegacyFile} fakedeploy --go",
             $output,
             $exitCode
         );
@@ -38,7 +38,7 @@ class GoOptionTest extends \PHPUnit_Framework_TestCase
     public function testNewSyntaxDryRun()
     {
         exec(
-            "php " . $this->idxBin . " -f {$this->idxFile} fakedeploy",
+            'php ' . $this->idxBin . " -f {$this->idxFile} fakedeploy",
             $output,
             $exitCode
         );
@@ -49,7 +49,7 @@ class GoOptionTest extends \PHPUnit_Framework_TestCase
     public function testNewSyntaxRealRun()
     {
         exec(
-            "php " . $this->idxBin . " -f {$this->idxFile} fakedeploy --go",
+            'php ' . $this->idxBin . " -f {$this->idxFile} fakedeploy --go",
             $output,
             $exitCode
         );

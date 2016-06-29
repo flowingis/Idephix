@@ -40,7 +40,7 @@ class InitIdxFileTest extends IdephixTestCase
         $idx->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
         $idx->output->expects($this->at(0))
             ->method('writeln')
-            ->with("<error>An idxfile.php already exists, generation skipped.</error>")
+            ->with('<error>An idxfile.php already exists, generation skipped.</error>')
             ;
 
         $initIdxFile = new InitIdxFile('vfs://root');

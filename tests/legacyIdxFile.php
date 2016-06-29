@@ -8,7 +8,7 @@ $idx->
 add(
     'ping',
     function () use ($idx) {
-        echo "pong";
+        echo 'pong';
     }
 );
 
@@ -16,7 +16,7 @@ $idx->
 add(
     'error',
     function () use ($idx) {
-        throw new Exception("Error for tests, ignore it :-)");
+        throw new Exception('Error for tests, ignore it :-)');
     }
 );
 

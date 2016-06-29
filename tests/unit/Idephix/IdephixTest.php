@@ -4,7 +4,7 @@ namespace Idephix;
 use Symfony\Component\Console\Output\StreamOutput;
 use Idephix\Test\LibraryMock;
 
-include_once(__DIR__."/PassTester.php");
+include_once(__DIR__.'/PassTester.php');
 
 class IdephixTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,7 +15,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->output = fopen("php://memory", 'r+');
+        $this->output = fopen('php://memory', 'r+');
         $output = new StreamOutput($this->output);
 
         $this->idx = new Idephix(array(), new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), $output);
@@ -72,7 +72,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     {
         $_SERVER['argv'] = $argv;
 
-        $output = fopen("php://memory", 'r+');
+        $output = fopen('php://memory', 'r+');
         $idx = new Idephix($target, new SSH\SshClient(new SSH\FakeSsh2Proxy($this)), new StreamOutput($output));
         $idx->getApplication()->setAutoExit(false);
 
@@ -91,7 +91,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     {
         $_SERVER['argv'] = array('idx', 'foo');
 
-        $output = fopen("php://memory", 'r+');
+        $output = fopen('php://memory', 'r+');
         $idx = new Idephix(array(), null, new StreamOutput($output));
         $idx->getApplication()->setAutoExit(false);
 
@@ -133,7 +133,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function testRunTask()
     {
-        $mock = $this->getMock("\\Idephix\\PassTester");
+        $mock = $this->getMock('\\Idephix\\PassTester');
         $mock->expects($this->exactly(1))
             ->method('pass')
             ->with('foo');

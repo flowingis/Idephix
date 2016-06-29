@@ -142,7 +142,7 @@ class CommandWrapper extends Command
     protected function assertCallable($code)
     {
         if (!is_callable($code)) {
-            throw new \InvalidArgumentException("Code must be a callable");
+            throw new \InvalidArgumentException('Code must be a callable');
         }
     }
 }

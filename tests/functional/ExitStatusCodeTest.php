@@ -7,16 +7,16 @@ class ExitStatusCodeTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $this->idxFile = __DIR__ . "/../idxfile.php";
-        $this->idxLegacyFile = __DIR__."/../legacyIdxFile.php";
-        $this->idxConfig = __DIR__ . "/../idxrc.php";
-        $this->idxBin = __DIR__ . "/../../bin/idx";
+        $this->idxFile = __DIR__ . '/../idxfile.php';
+        $this->idxLegacyFile = __DIR__.'/../legacyIdxFile.php';
+        $this->idxConfig = __DIR__ . '/../idxrc.php';
+        $this->idxBin = __DIR__ . '/../../bin/idx';
     }
 
     public function testNewSyntaxSuccess()
     {
         exec(
-            "php " . $this->idxBin . " -f {$this->idxFile} ping",
+            'php ' . $this->idxBin . " -f {$this->idxFile} ping",
             $output,
             $exitCode
         );
@@ -27,7 +27,7 @@ class ExitStatusCodeTest extends \PHPUnit_Framework_TestCase
     public function testNewSyntaxFailure()
     {
         exec(
-            "php " . $this->idxBin . " -f {$this->idxFile} error",
+            'php ' . $this->idxBin . " -f {$this->idxFile} error",
             $output,
             $exitCode
         );
@@ -38,7 +38,7 @@ class ExitStatusCodeTest extends \PHPUnit_Framework_TestCase
     public function testLegacySyntaxSuccess()
     {
         exec(
-            "php " . $this->idxBin . " -f {$this->idxLegacyFile} ping",
+            'php ' . $this->idxBin . " -f {$this->idxLegacyFile} ping",
             $output,
             $exitCode
         );
@@ -49,7 +49,7 @@ class ExitStatusCodeTest extends \PHPUnit_Framework_TestCase
     public function testLegacySyntaxFailure()
     {
         exec(
-            "php " . $this->idxBin . " -f {$this->idxLegacyFile} error",
+            'php ' . $this->idxBin . " -f {$this->idxLegacyFile} error",
             $output,
             $exitCode
         );

@@ -29,7 +29,7 @@ class Project implements IdephixAwareInterface
         $target = $this->idx->getCurrentTarget();
 
         if ($target === null) {
-            throw new \InvalidArgumentException("Target not provided. Please provide a valid target.");
+            throw new \InvalidArgumentException('Target not provided. Please provide a valid target.');
         }
 
         $user = $target->get('ssh_params.user');

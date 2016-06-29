@@ -47,22 +47,22 @@ class SshClient
     public function connect()
     {
         if (null === $this->host) {
-            throw new \Exception("You must set the host");
+            throw new \Exception('You must set the host');
         }
         if (!$this->proxy->connect($this->host, $this->params['ssh_port'])) {
-            throw new \Exception("Unable to connect");
+            throw new \Exception('Unable to connect');
         }
 
         if (!empty($this->params['password']) && !$this->proxy->authByPassword($this->params['user'], $this->params['password'])) {
-            throw new \Exception("Unable to authenticate via password");
+            throw new \Exception('Unable to authenticate via password');
         }
 
         if (!empty($this->params['public_key_file']) && !$this->proxy->authByPublicKey($this->params['user'], $this->params['public_key_file'], $this->params['private_key_file'], $this->params['private_key_file_pwd'])) {
-            throw new \Exception("Unable to authenticate via public/private keys");
+            throw new \Exception('Unable to authenticate via public/private keys');
         }
 
         if (empty($this->params['password']) && empty($this->params['public_key_file']) && !$this->proxy->authByAgent($this->params['user'])) {
-            throw new \Exception("Unable to authenticate via agent");
+            throw new \Exception('Unable to authenticate via agent');
         }
 
         $this->connected = true;
@@ -136,7 +136,7 @@ class SshClient
     public function put($localPath, $remotePath)
     {
         if (!$this->isConnected()) {
-            throw new \Exception("SSH Client is not connected");
+            throw new \Exception('SSH Client is not connected');
         }
 
         return $this->proxy->put($localPath, $remotePath);
@@ -153,7 +153,7 @@ class SshClient
     public function get($remotePath, $localPath)
     {
         if (!$this->isConnected()) {
-            throw new \Exception("SSH Client is not connected");
+            throw new \Exception('SSH Client is not connected');
         }
 
         return $this->proxy->get($remotePath, $localPath);

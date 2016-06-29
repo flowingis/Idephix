@@ -29,7 +29,7 @@ class PeclSsh2Proxy extends BaseProxy
     public function authByAgent($user)
     {
         if (!function_exists('ssh2_auth_agent')) {
-            throw new \Exception("ssh2_auth_agent does not exists");
+            throw new \Exception('ssh2_auth_agent does not exists');
         }
 
         return ssh2_auth_agent($this->connection, $user);

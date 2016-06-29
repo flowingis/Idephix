@@ -24,7 +24,7 @@ class SelfUpdate implements IdephixAwareInterface
         $latest = trim(file_get_contents($baseUrl.'version'));
 
         if (Idephix::VERSION !== $latest) {
-            $this->idx->output->writeln(sprintf("Updating to version <info>%s</info>.", $latest));
+            $this->idx->output->writeln(sprintf('Updating to version <info>%s</info>.', $latest));
 
             $remoteFilename = $baseUrl.'idephix.phar';
             $localFilename = $_SERVER['argv'][0];
@@ -48,7 +48,7 @@ class SelfUpdate implements IdephixAwareInterface
                 $this->idx->output->writeln('<error>Please re-run the self-update command to try again.</error>');
             }
         } else {
-            $this->idx->output->writeln("<info>You are using the latest idephix version.</info>");
+            $this->idx->output->writeln('<info>You are using the latest idephix version.</info>');
         }
     }
 }

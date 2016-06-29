@@ -38,13 +38,13 @@ class Deploy implements IdephixAwareInterface
     public function setUpEnvironment()
     {
         if (null === $this->idx->getCurrentTargetName()) {
-            throw new \Exception("You must specify an environment [--env]");
+            throw new \Exception('You must specify an environment [--env]');
         }
 
         $target = $this->idx->getCurrentTarget();
 
         if (!$target->get('deploy.remote_base_dir', false)) {
-            throw new \Exception("No deploy parameters found. Check you configuration.");
+            throw new \Exception('No deploy parameters found. Check you configuration.');
         }
 
         $this->symfonyEnv = $target->get('symfony_env', 'dev');
@@ -62,7 +62,7 @@ class Deploy implements IdephixAwareInterface
         $strategyClass = 'Idephix\\Extension\\Deploy\\Strategy\\'.$target->get('deploy.strategy', 'Copy');
 
         if (!class_exists($strategyClass)) {
-            throw new \Exception(sprintf("No deploy strategy %s found. Check you configuration.", $strategyClass));
+            throw new \Exception(sprintf('No deploy strategy %s found. Check you configuration.', $strategyClass));
         }
 
         $this->strategy = new $strategyClass($this->idx, $target);
@@ -116,11 +116,11 @@ class Deploy implements IdephixAwareInterface
     {
         try {
             $this->idx->remote('ls '.$this->getCurrentReleaseFolder());
-            $this->log("Host ready ".$this->sshClient->getHost());
+            $this->log('Host ready '.$this->sshClient->getHost());
 
             return true;
         } catch (\Exception $e) {
-            $this->log(sprintf("Host %s NOT ready", $this->sshClient->getHost()));
+            $this->log(sprintf('Host %s NOT ready', $this->sshClient->getHost()));
 
             return false;
         }
@@ -133,7 +133,7 @@ class Deploy implements IdephixAwareInterface
      */
     public function remotePrepare()
     {
-        $cmd = "mkdir -p ".$this->getNextReleaseFolder();
+        $cmd = 'mkdir -p '.$this->getNextReleaseFolder();
 
         return $this->idx->remote($cmd, $this->dryRun);
     }
@@ -143,8 +143,8 @@ class Deploy implements IdephixAwareInterface
      */
     public function switchToTheNextRelease()
     {
-        $this->log("Switch to next release...");
-        $this->idx->remote("cd ".$this->remoteBaseFolder." && ln -s releases/".$this->getNextReleaseName()." next && mv -fT next current", $this->dryRun);
+        $this->log('Switch to next release...');
+        $this->idx->remote('cd '.$this->remoteBaseFolder.' && ln -s releases/'.$this->getNextReleaseName().' next && mv -fT next current', $this->dryRun);
     }
 
     /**
@@ -167,19 +167,19 @@ class Deploy implements IdephixAwareInterface
      */
     public function remoteLinkSharedFolders()
     {
-        $this->log("Updating symlink for shared folder ..");
+        $this->log('Updating symlink for shared folder ..');
 
         foreach ($this->sharedFolders as $folder) {
             $fullPathSharedFolder        = $this->remoteBaseFolder.'shared/'.$folder;
-            $fullPathReleaseSharedFolder = $this->remoteBaseFolder.'releases/'.$this->getNextReleaseName()."/".$folder;
+            $fullPathReleaseSharedFolder = $this->remoteBaseFolder.'releases/'.$this->getNextReleaseName().'/'.$folder;
 
-            $this->log("Linking shared folder ".$fullPathReleaseSharedFolder." ...");
+            $this->log('Linking shared folder '.$fullPathReleaseSharedFolder.' ...');
 
             if ($this->remoteFileExits($fullPathReleaseSharedFolder)) {
                 try {
                     $this->idx->remote(
                         sprintf(
-                            "unlink %s || rmdir %s || rm %s",
+                            'unlink %s || rmdir %s || rm %s',
                             $fullPathReleaseSharedFolder,
                             $fullPathReleaseSharedFolder,
                             $fullPathReleaseSharedFolder
@@ -208,7 +208,7 @@ class Deploy implements IdephixAwareInterface
     public function assetic($current = false)
     {
         $folder = $current ? $this->getCurrentReleaseFolder() : $this->getNextReleaseFolder();
-        $this->log("Asset and assetic stuff...");
+        $this->log('Asset and assetic stuff...');
         $this->idx->remote('cd '.$folder." && php app/console assets:install --symlink web --env=$this->symfonyEnv", $this->dryRun);
         $this->idx->remote('cd '.$folder." && php app/console assetic:dump --env=$this->symfonyEnv --no-debug", $this->dryRun);
     }
@@ -223,7 +223,7 @@ class Deploy implements IdephixAwareInterface
     public function updateSchema($env = 'dev')
     {
         return $this->idx->remote(
-            "cd ".$this->getNextReleaseFolder()." && php app/console doctrine:schema:update --force --env=".$env,
+            'cd '.$this->getNextReleaseFolder().' && php app/console doctrine:schema:update --force --env='.$env,
             $this->dryRun
         );
     }
@@ -238,7 +238,7 @@ class Deploy implements IdephixAwareInterface
         }
         $this->idx->remote(
             sprintf(
-                "cd %s && ls | sort | grep -v $(basename $(readlink %s)) | head -n -%d | xargs rm -Rf",
+                'cd %s && ls | sort | grep -v $(basename $(readlink %s)) | head -n -%d | xargs rm -Rf',
                 escapeshellarg($this->releasesFolder),
                 escapeshellarg($this->getCurrentReleaseFolder()),
                 $releasesToKeep - 1
@@ -269,18 +269,18 @@ class Deploy implements IdephixAwareInterface
      */
     public function bootstrap()
     {
-        $this->log("Boostrapping environment ...");
+        $this->log('Boostrapping environment ...');
 
         $bootstrapFolder = $this->releasesFolder.'bootstrap';
-        $this->idx->remote("mkdir -p ".$bootstrapFolder);
+        $this->idx->remote('mkdir -p '.$bootstrapFolder);
         $out = $this->sshClient->getLastOutput();
-        $this->idx->remote("cd ".$this->remoteBaseFolder." && ln -s releases/bootstrap current");
+        $this->idx->remote('cd '.$this->remoteBaseFolder.' && ln -s releases/bootstrap current');
         $out .= $this->sshClient->getLastOutput();
 
-        $this->log("Creating shared folders...");
+        $this->log('Creating shared folders...');
 
         foreach ($this->sharedFolders as $folder) {
-            $this->log("Creating shared folder ".$folder." ...");
+            $this->log('Creating shared folder '.$folder.' ...');
             $this->idx->remote('mkdir -p '.$this->remoteBaseFolder.'shared/'.$folder);
         }
 
@@ -316,7 +316,7 @@ class Deploy implements IdephixAwareInterface
             if ($automaticBootstrap) {
                 $this->bootstrap();
             } else {
-                throw new \Exception("Remote host not ready for deploy");
+                throw new \Exception('Remote host not ready for deploy');
             }
         }
 

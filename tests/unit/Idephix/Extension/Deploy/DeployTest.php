@@ -18,7 +18,7 @@ class DeployTest extends IdephixTestCase
             'ssh_params' => array('user' => 'kea', 'ssh_port' => 23),
             'deploy' => array(
                 'local_base_dir' => 'local_dir',
-                'remote_base_dir' => "/tmp/temp_dir",
+                'remote_base_dir' => '/tmp/temp_dir',
                 'rsync_exclude_file' => 'rsync_exclude.txt',
                 'rsync_include_file' => 'rsync_include.txt',
                 'shared_folders' => array(
@@ -157,7 +157,7 @@ Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next
             array(
                 'deploy' => array(
                     'local_base_dir' => 'local_dir',
-                    'remote_base_dir' => "/tmp/temp_dir",
+                    'remote_base_dir' => '/tmp/temp_dir',
                     'rsync_exclude_file' => 'rsync_exclude.txt',
                     'rsync_include_file' => 'rsync_include.txt',
                     'migrations' => true,
@@ -246,7 +246,7 @@ Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next
         $releaseFolder = $this->deploy
             ->getNextReleaseFolder();
 
-        sleep("1");
+        sleep('1');
 
         $sameReleaseFolder = $this->deploy
             ->getNextReleaseFolder();

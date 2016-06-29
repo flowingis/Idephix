@@ -321,12 +321,12 @@ class Idephix implements IdephixInterface
     public function remote($cmd, $dryRun = false)
     {
         if (!$this->sshClient->isConnected()) {
-            throw new \Exception("Remote function need a valid environment. Specify --env parameter.");
+            throw new \Exception('Remote function need a valid environment. Specify --env parameter.');
         }
         $this->output->writeln('<info>Remote</info>: '.$cmd);
 
         if (!$dryRun && !$this->sshClient->exec($cmd)) {
-            throw new \Exception("Remote command fail: ".$this->sshClient->getLastError());
+            throw new \Exception('Remote command fail: '.$this->sshClient->getLastError());
         }
     }
 
@@ -355,7 +355,7 @@ class Idephix implements IdephixInterface
             $output->write($buffer);
         });
         if (0 != $result) {
-            throw new \Exception("Local command fail: ".$process->getErrorOutput());
+            throw new \Exception('Local command fail: '.$process->getErrorOutput());
         }
 
         return $process->getOutput();

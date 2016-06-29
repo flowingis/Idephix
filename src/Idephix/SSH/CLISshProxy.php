@@ -27,7 +27,7 @@ class CLISshProxy extends BaseProxy
     private function assertConnected()
     {
         if (empty($this->host)) {
-            throw new \Exception("You first need to connect");
+            throw new \Exception('You first need to connect');
         }
     }
 
@@ -63,7 +63,7 @@ class CLISshProxy extends BaseProxy
      */
     public function authByPassword($user, $pwd)
     {
-        throw new \Exception("Not implemented");
+        throw new \Exception('Not implemented');
     }
 
     /**
@@ -130,7 +130,7 @@ class CLISshProxy extends BaseProxy
         $keyFile = $this->privateKeyFile ? '-i '.$this->privateKeyFile : '';
 
         $preparedCmd = sprintf(
-            "scp -pP %s %s %s %s%s:%s",
+            'scp -pP %s %s %s %s%s:%s',
             $this->port,
             $keyFile,
             escapeshellarg($localPath),
@@ -151,7 +151,7 @@ class CLISshProxy extends BaseProxy
         $keyFile = $this->privateKeyFile ? '-i '.$this->privateKeyFile : '';
 
         $preparedCmd = sprintf(
-            "scp -pP %s %s %s%s:%s %s",
+            'scp -pP %s %s %s%s:%s %s',
             $this->port,
             $keyFile,
             $user,
@@ -173,7 +173,7 @@ class CLISshProxy extends BaseProxy
         $keyFile = $this->privateKeyFile ? '-i '.$this->privateKeyFile : '';
 
         return sprintf(
-            "%s -p %s %s %s %s %s",
+            '%s -p %s %s %s %s %s',
             $this->executable,
             $this->port,
             $keyFile,

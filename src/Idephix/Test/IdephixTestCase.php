@@ -11,7 +11,7 @@ class IdephixTestCase extends \PHPUnit_Framework_TestCase
 {
     public function getIdephixMock($targets, $targetName)
     {
-        $this->output = fopen("php://memory", 'r+');
+        $this->output = fopen('php://memory', 'r+');
         $output = new StreamOutput($this->output);
         $currentTarget = new Config($targets[$targetName]);
         $sshClient = new SshClient(new FakeSsh2Proxy($this));

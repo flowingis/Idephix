@@ -8,7 +8,7 @@ $targets = array(
         ),
         'deploy' => array(
             'local_base_dir' => __DIR__,
-            'remote_base_dir' => "/var/www/my-project/",
+            'remote_base_dir' => '/var/www/my-project/',
             'rsync_exclude_file' => 'rsync_exclude.txt',
             'shared_folders' => array(
                 'app/logs',
@@ -23,7 +23,7 @@ $targets = array(
         ),
         'deploy' => array(
             'local_base_dir' => __DIR__,
-            'remote_base_dir' => "/var/www/my-project.ideato.it/",
+            'remote_base_dir' => '/var/www/my-project.ideato.it/',
             'rsync_exclude_file' => 'rsync_exclude.txt',
             'shared_folders' => array(
                 'app/logs',
@@ -36,7 +36,7 @@ $targets = array(
         'ssh_params' => array('user' => 'kea'),
         'deploy' => array(
             'local_base_dir' => __DIR__,
-            'remote_base_dir' => "/tmp/my-project.test/",
+            'remote_base_dir' => '/tmp/my-project.test/',
             'shared_folders' => array(
                 'app/logs',
                 'web/uploads'

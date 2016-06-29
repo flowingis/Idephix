@@ -28,12 +28,12 @@ class Copy implements DeployStrategyInterface
     {
         $this->idx = $idx;
         if (!$idx->output instanceof Output) {
-            throw new \InvalidArgumentException("Idx output should be a writable console");
+            throw new \InvalidArgumentException('Idx output should be a writable console');
         }
         $this->output = $idx->output;
 
         if (!$idx->sshClient instanceof SshClient) {
-            throw new \InvalidArgumentException("Idx should have an SSH client connected");
+            throw new \InvalidArgumentException('Idx should have an SSH client connected');
         }
         $this->sshClient = $idx->sshClient;
 
@@ -48,14 +48,14 @@ class Copy implements DeployStrategyInterface
      */
     public function deploy()
     {
-        $this->output->writeln("Copy code to the next release dir");
+        $this->output->writeln('Copy code to the next release dir');
         $this->remoteCopyRecursive(
             $this->target->get('deploy.current_release_dir').'/.',
             $this->target->get('deploy.next_release_dir')
         );
         $out = $this->sshClient->getLastOutput();
 
-        $this->output->writeln("Sync code to the next release");
+        $this->output->writeln('Sync code to the next release');
         $this->rsync(
             $this->target->getFixedPath('deploy.local_base_dir'),
             ($this->target->get('deploy.dry_run')) ? $this->target->get('deploy.current_release_dir').'/' : $this->target->get('deploy.next_release_dir')
@@ -81,7 +81,7 @@ class Copy implements DeployStrategyInterface
         $exclude = $this->rsyncExcludeFile ? '--exclude-from='.$this->rsyncExcludeFile : '';
         $include = $this->rsyncIncludeFile ? '--include-from='.$this->rsyncIncludeFile : '';
         $sshCmd = "-e 'ssh";
-        $sshCmd.= $this->sshClient->getPort() ? " -p ".$this->sshClient->getPort() : "";
+        $sshCmd.= $this->sshClient->getPort() ? ' -p '.$this->sshClient->getPort() : '';
         $sshCmd.= "'";
 
         return $this->idx->local("rsync -rlpDvcz --delete $sshCmd $dryFlag $exclude $include $from $user@$host:$to");
@@ -94,7 +94,7 @@ class Copy implements DeployStrategyInterface
     public function remoteCopyRecursive($from, $to)
     {
         return $this->idx->remote(
-            sprintf("cp -pPR %s %s", escapeshellarg($from), escapeshellarg($to)),
+            sprintf('cp -pPR %s %s', escapeshellarg($from), escapeshellarg($to)),
             $this->target->get('deploy.dry_run')
         );
     }
