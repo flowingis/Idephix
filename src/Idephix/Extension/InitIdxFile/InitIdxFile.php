@@ -35,12 +35,7 @@ class InitIdxFile implements IdephixAwareInterface
         $data = <<<'DEFAULT'
 <?php
 
-use \Idephix\Config;
-use \Idephix\SSH\SshClient;
-use \Idephix\Config\Targets\Targets;
-    
-return Config::create()
-    ->targets(Targets::fromArray(array(
+$targets = array(
     'prod' => array(
         'hosts' => array('127.0.0.1'),
         'ssh_params' => $sshParams,
@@ -53,9 +48,13 @@ return Config::create()
             // 'strategy' => 'Copy'
         ),
     ),
-)))
-    ->sshClient(new SshClient());
-
+);
+return \Idephix\Config::fromArray(
+    array(
+        'targets' => $targets, 
+        'sshClient' => new \Idephix\SSH\SshClient(new \Idephix\SSH\CLISshProxy())
+    )
+);
 DEFAULT;
 
         $this->writeFile('idxrc.php', $data);
