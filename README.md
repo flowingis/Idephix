@@ -37,20 +37,32 @@ Installation / Usage
 
     ```
     
-3. Create a idxrc.php in the root directory of your project. The file must return a `ConfigInterface` 
-implementation. The returned object will contains all targets info and the SSH client to uso for remote
-connections
+3. Create a idxrc.php in the root directory of your project. The file must return a `Config` Dictionary. 
+The returned object will contains all targets info and the SSH client to uso for remote
+connections.
 
     ```php
-    <?php
 
-    use \Idephix\Config;
-    use \Idephix\SSH\SshClient;
-    use \Idephix\Config\Targets\Targets;
-    
-    return Config::create()
-        ->targets(Targets::fromArray(array('foo' => 'bar', 'foolazy' => function(){return 'bar';})))
-        ->sshClient(new SshClient());
+    $targets = array(
+        'prod' => array(
+            'hosts' => array('127.0.0.1'),
+            'ssh_params' => $sshParams,
+            'deploy' => array(
+                'local_base_dir' => $localBaseDir,
+                'remote_base_dir' => "/var/www/myfantasticserver/",
+                // 'rsync_exclude_file' => 'rsync_exclude.txt'
+                // 'rsync_include_file' => 'rsync_include.txt'
+                // 'migrations' => true
+                // 'strategy' => 'Copy'
+            ),
+        ),
+    );
+    return \Idephix\Config::fromArray(
+        array(
+            'targets' => $targets, 
+            'sshClient' => new \Idephix\SSH\SshClient(new \Idephix\SSH\CLISshProxy())
+        )
+    );
     ```
 
 4. Run Idephix: `php idephix.phar --env=test idephix:test-params Nome_file`
