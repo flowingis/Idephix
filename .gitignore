@@ -11,3 +11,8 @@ bin/test-reporter
 bin/validate-json
 /idephix.phar
 .idea
+
+#docs
+docs/_build
+docs/_static
+docs/_templates

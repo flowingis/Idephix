@@ -37,7 +37,7 @@ function deployPhar(\Idephix\IdephixInterface $idx)
 
     // copy new phar & commit
     $idx->local('cp -f idephix.phar ~/docs');
-    $idx->local("cp -f .git/refs/heads/master ~/docs/version");
+    $idx->local('cp -f .git/refs/heads/master ~/docs/version');
     $idx->local('cd ~/docs && git status');
 
     $idx->local('cd ~/docs && git add -A .');
@@ -50,9 +50,9 @@ function createPhar(\Idephix\IdephixInterface $idx)
     $idx->output()->writeln('Creating phar...');
 
     $idx->local('rm -rf /tmp/Idephix && mkdir -p /tmp/Idephix');
-    $idx->local("cp -R . /tmp/Idephix");
-    $idx->local("cd /tmp/Idephix && rm -rf vendor");
-    $idx->local("cd /tmp/Idephix && git checkout -- .");
+    $idx->local('cp -R . /tmp/Idephix');
+    $idx->local('cd /tmp/Idephix && rm -rf vendor');
+    $idx->local('cd /tmp/Idephix && git checkout -- .');
     $idx->local('cd /tmp/Idephix && composer install --prefer-source --no-dev -o');
     $idx->local('bin/box build -c /tmp/Idephix/box.json ');
 
@@ -90,3 +90,17 @@ function fixCs(\Idephix\IdephixInterface $idx)
 {
     $idx->local('bin/php-cs-fixer fix');
 };
+
+function buildDoc(\Idephix\IdephixInterface $idx, $open = false)
+{
+    $idx->local('make  -C ./docs html');
+
+    if ($open) {
+        $idx->runTask('openDoc');
+    }
+}
+
+function openDoc(\Idephix\IdephixInterface $idx)
+{
+    $idx->local('open docs/_build/html/index.html');
+}
