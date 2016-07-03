@@ -41,7 +41,10 @@ EOD;
     {
         $idxFileContent =<<<'EOD'
 <?php
-
+/**
+ * This is foo description
+ *
+ */
 function foo($bar){ echo $bar; }
 
 EOD;
@@ -54,6 +57,9 @@ EOD;
         $this->assertInstanceOf('\Closure', $tasks['foo']);
 
         $task = new \ReflectionFunction($tasks['foo']);
+
+        $this->assertNotFalse($task->getDocComment());
+        $this->assertContains('This is foo description', $task->getDocComment());
         $this->assertEquals(1, $task->getNumberOfParameters());
     }
 

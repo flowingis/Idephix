@@ -2,6 +2,7 @@
 namespace Idephix\File\Node;
 
 use Idephix\IdxSetupCollector;
+use PhpParser\Comment\Doc;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\PrettyPrinter\Standard;
@@ -54,6 +55,11 @@ class IdxTaskVisitor extends NodeVisitorAbstract
      */
     private function convertFunctionToClosure(Node $functionNode, $closureName)
     {
+        $attributes = array();
+        if($functionNode->getDocComment()){
+            $attributes['comments'] = array($functionNode->getDocComment());
+        }
+
         $closure = new Node\Expr\Assign(
             new Node\Expr\Variable($closureName),
             new Node\Expr\Closure(
@@ -62,7 +68,8 @@ class IdxTaskVisitor extends NodeVisitorAbstract
                     'stmts' => $functionNode->stmts,
                     'params' => $functionNode->params
                 )
-            )
+            ),
+            $attributes
         );
         return $closure;
     }

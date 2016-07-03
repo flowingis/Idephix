@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @param \Idephix\IdephixInterface $idx
+ */
 function deployPhar(\Idephix\IdephixInterface $idx)
 {
     $idx->output()->writeln('Releasing new phar version...');
@@ -103,4 +105,15 @@ function buildDoc(\Idephix\IdephixInterface $idx, $open = false)
 function openDoc(\Idephix\IdephixInterface $idx)
 {
     $idx->local('open docs/_build/html/index.html');
+}
+
+/**
+ * This command will yell at you
+ *
+ *
+ * @param string $what What you want to yell
+ */
+function yell($what = 'foo')
+{
+    echo $what . PHP_EOL;
 }

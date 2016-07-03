@@ -81,3 +81,33 @@ Using flags should be useful to implement a dry-run approach in your script
          return;
      }
  }
+
+Documenting tasks
+-----------------
+
+Tasks and arguments can have a description. You can define descriptions using
+simple and well known phpdoc block.
+
+.. code-block:: php
+
+    /**
+     * This command will yell at you
+     *
+     *
+     * @param string $what What you want to yell
+     */
+    function yell($what = 'foo')
+    {
+        echo $what . PHP_EOL;
+    }
+
+Configure a task like
+
+.. code-block:: bash
+
+    $ bin/idx help yell
+    Usage:
+        yell [what]
+
+    Arguments:
+        what    What you want to yell (default: "foo")
