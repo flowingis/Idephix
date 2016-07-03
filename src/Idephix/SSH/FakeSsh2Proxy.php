@@ -5,10 +5,14 @@ namespace Idephix\SSH;
 class FakeSsh2Proxy extends BaseProxy
 {
     protected $test;
+    protected $lastOutput;
+    protected $lastError;
 
-    public function __construct($test)
+    public function __construct(\PHPUnit_Framework_TestCase $test, $fakeOutput = 'test out ', $fakeError = 'test err ')
     {
         $this->test = $test;
+        $this->lastOutput = $fakeOutput;
+        $this->lastError = $fakeError;
     }
 
     public function connect($host, $port)
@@ -46,8 +50,8 @@ class FakeSsh2Proxy extends BaseProxy
     public function exec($cmd)
     {
         $this->test->assertTrue(true);
-        $this->lastOutput = 'test out '.$cmd;
-        $this->lastError = 'test err '.$cmd;
+        $this->lastOutput .= $cmd;
+        $this->lastError .= $cmd;
 
         return $cmd;
     }

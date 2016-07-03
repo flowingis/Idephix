@@ -1,6 +1,7 @@
 <?php
 namespace Idephix;
 
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Idephix\Test\LibraryMock;
 
@@ -165,8 +166,8 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemote()
     {
-        $output = new StreamOutput($this->output);
-        $sshClient = new SSH\SshClient(new SSH\FakeSsh2Proxy($this));
+        $output = new BufferedOutput($this->output);
+        $sshClient = new SSH\SshClient(new SSH\FakeSsh2Proxy($this, "Remote output from "));
         $this->idx = new Idephix(
             Config::fromArray(array('targets' => array('test_target' => array()), 'sshClient' => $sshClient)),
             $output
@@ -175,8 +176,11 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->idx->sshClient->setHost('host');
         $this->idx->sshClient->connect();
         $this->idx->remote('echo foo');
-        rewind($this->output);
-        $this->assertRegExp('/echo foo/m', stream_get_contents($this->output));
+
+        $rows = explode("\n", $output->fetch());
+        $this->assertCount(3, $rows);
+        $this->assertEquals("Remote: echo foo", $rows[0]);
+        $this->assertEquals('Remote output from echo foo', $rows[1]);
     }
 
     /**
