@@ -2,7 +2,7 @@
 
 namespace Idephix\Extension\Slack;
 
-use Idephix\Tests\Test\IdephixTestCase;
+use Idephix\Test\IdephixTestCase;
 
 //mock curl_exec
 function curl_exec($ch, $error = false)
