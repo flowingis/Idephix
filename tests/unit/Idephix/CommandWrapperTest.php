@@ -12,7 +12,7 @@ class CommandWrapperTest extends \PHPUnit_Framework_TestCase
      * Tests not enough arguments passed to command
      *
      * @expectedException RuntimeException
-     * @expectedExceptionMessage Not enough arguments.
+     * @expectedExceptionMessageRegExp  /^Not enough arguments/
      */
     public function testParametersNotEnoughArguments()
     {
