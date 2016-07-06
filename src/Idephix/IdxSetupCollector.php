@@ -137,4 +137,9 @@ class IdxSetupCollector implements IdephixInterface
             $this->addLibrary($name, $library);
         }
     }
+
+    public function sshClient()
+    {
+        return null;
+    }
 }

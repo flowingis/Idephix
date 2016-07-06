@@ -28,6 +28,8 @@ interface IdephixInterface
 
     public function input();
 
+    public function sshClient();
+
     /**
      * @return null|Context
      */

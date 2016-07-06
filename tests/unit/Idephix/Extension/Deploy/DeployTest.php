@@ -60,13 +60,13 @@ class DeployTest extends IdephixTestCase
         $nextReleaseName = $this->deploy->getNextReleaseName();
         $currentReleaseDir = $this->deploy->getCurrentReleaseFolder();
 
-        $user = $this->idx->sshClient->getUser();
+        $user = $this->idx->sshClient()->getUser();
         $this->assertEquals('kea', $user);
 
-        $host = $this->idx->sshClient->getHost();
+        $host = $this->idx->sshClient()->getHost();
         $this->assertEquals('banana.com', $host);
 
-        $port = $this->idx->sshClient->getPort();
+        $port = $this->idx->sshClient()->getPort();
         $this->assertEquals('23', $port);
 
         $expected = "Remote: ls /tmp/temp_dir/current
@@ -109,13 +109,13 @@ Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next
         $nextReleaseName = $this->deploy->getNextReleaseName();
         $currentReleaseDir = $this->deploy->getCurrentReleaseFolder();
 
-        $user = $this->idx->sshClient->getUser();
+        $user = $this->idx->sshClient()->getUser();
         $this->assertEquals('kea', $user);
 
-        $host = $this->idx->sshClient->getHost();
+        $host = $this->idx->sshClient()->getHost();
         $this->assertEquals('banana.com', $host);
 
-        $port = $this->idx->sshClient->getPort();
+        $port = $this->idx->sshClient()->getPort();
         $this->assertEquals('23', $port);
 
         $expected = "Remote: ls /tmp/temp_dir/current
@@ -173,13 +173,13 @@ Remote: cd /tmp/temp_dir/ && ln -s releases/$nextReleaseName next && mv -fT next
         $nextReleaseName = $this->deploy->getNextReleaseName();
         $currentReleaseDir = $this->deploy->getCurrentReleaseFolder();
 
-        $user = $this->idx->sshClient->getUser();
+        $user = $this->idx->sshClient()->getUser();
         $this->assertEquals('kea', $user);
 
-        $host = $this->idx->sshClient->getHost();
+        $host = $this->idx->sshClient()->getHost();
         $this->assertEquals('banana.com', $host);
 
-        $port = $this->idx->sshClient->getPort();
+        $port = $this->idx->sshClient()->getPort();
         $this->assertEquals('23', $port);
 
         $expected = "Remote: ls /tmp/temp_dir/current

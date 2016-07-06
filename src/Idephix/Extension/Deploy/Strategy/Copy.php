@@ -26,15 +26,15 @@ class Copy implements DeployStrategyInterface
     public function __construct(IdephixInterface $idx, Context $currentContext)
     {
         $this->idx = $idx;
-        if (!$idx->output instanceof Output) {
+        if (!$idx->output() instanceof Output) {
             throw new \InvalidArgumentException('Idx output should be a writable console');
         }
-        $this->output = $idx->output;
+        $this->output = $idx->output();
 
-        if (!$idx->sshClient instanceof SshClient) {
+        if (!$idx->sshClient() instanceof SshClient) {
             throw new \InvalidArgumentException('Idx should have an SSH client connected');
         }
-        $this->sshClient = $idx->sshClient;
+        $this->sshClient = $idx->sshClient();
 
         $this->target = $currentContext;
         $this->rsyncExcludeFile = $currentContext->get('deploy.rsync_exclude_file');

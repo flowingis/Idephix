@@ -32,7 +32,7 @@ class Deploy implements IdephixAwareInterface
 
     public function setIdephix(IdephixInterface $idx)
     {
-        $this->sshClient = $idx->sshClient;
+        $this->sshClient = $idx->sshClient();
         $this->idx = $idx;
     }
 
@@ -295,7 +295,7 @@ class Deploy implements IdephixAwareInterface
      */
     private function log($message)
     {
-        $this->idx->output->writeln($message);
+        $this->idx->output()->writeln($message);
     }
 
     public function hasToMigrate()

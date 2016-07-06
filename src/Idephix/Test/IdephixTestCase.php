@@ -22,9 +22,13 @@ class IdephixTestCase extends \PHPUnit_Framework_TestCase
         $sshClient->connect();
 
         $idx = $this->getMock('\Idephix\IdephixInterface');
-        $idx->sshClient = $sshClient;
-        $idx->output = $output;
 
+        $idx->expects($this->any())
+            ->method('sshClient')
+            ->will($this->returnValue($sshClient));
+        $idx->expects($this->any())
+            ->method('output')
+            ->will($this->returnValue($output));
         $idx->expects($this->any())
             ->method('getCurrentTarget')
             ->will($this->returnValue($currentTarget));

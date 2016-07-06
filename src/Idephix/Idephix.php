@@ -408,4 +408,12 @@ class Idephix implements IdephixInterface
             next($_SERVER['argv']);
         }
     }
+
+    /**
+     * @return SshClient
+     */
+    public function sshClient()
+    {
+        return $this->sshClient;
+    }
 }
