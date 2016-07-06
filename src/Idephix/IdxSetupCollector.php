@@ -1,7 +1,6 @@
 <?php
 namespace Idephix;
 
-use Idephix\SSH\SshClient;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -40,6 +39,8 @@ class IdxSetupCollector implements IdephixInterface
         $this->config = $config;
         $this->output = $output;
         $this->input = $input;
+
+        $this->collectLibraries($this->config);
     }
 
     public function setOutput(OutputInterface $output)
@@ -128,5 +129,12 @@ class IdxSetupCollector implements IdephixInterface
     public function input()
     {
         return $this->input;
+    }
+
+    private function collectLibraries(Config $config)
+    {
+        foreach ($config->get('libraries', array()) as $name => $library) {
+            $this->addLibrary($name, $library);
+        }
     }
 }
