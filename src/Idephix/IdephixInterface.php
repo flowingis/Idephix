@@ -8,11 +8,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 interface IdephixInterface
 {
     /**
-     * @param Config $env
+     * @param Config $config
      * @param OutputInterface $output
      * @param InputInterface $input
      */
-    public function __construct(Config $env, OutputInterface $output = null, InputInterface $input = null);
+    public function __construct(Config $config, OutputInterface $output = null, InputInterface $input = null);
 
     /**
      * Add a Command to the application.

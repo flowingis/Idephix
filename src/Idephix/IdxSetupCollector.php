@@ -10,7 +10,7 @@ class IdxSetupCollector implements IdephixInterface
     /**
      * @var Config
      */
-    private $executionContext;
+    private $config;
 
     /**
      * @var OutputInterface
@@ -33,11 +33,11 @@ class IdxSetupCollector implements IdephixInterface
     private $libraries = array();
 
     public function __construct(
-        Config $env,
+        Config $config,
         OutputInterface $output = null,
         InputInterface $input = null
     ) {
-        $this->executionContext = $env;
+        $this->config = $config;
         $this->output = $output;
         $this->input = $input;
     }
@@ -92,9 +92,9 @@ class IdxSetupCollector implements IdephixInterface
         $this->disableRun();
     }
 
-    public function getExecutionContext()
+    public function getConfig()
     {
-        return $this->executionContext;
+        return $this->config;
     }
 
     /**

@@ -35,7 +35,7 @@ class Idephix implements IdephixInterface
     protected $invokerClassName;
 
     public function __construct(
-        Config $env,
+        Config $config,
         OutputInterface $output = null,
         InputInterface $input = null)
     {
@@ -45,8 +45,8 @@ class Idephix implements IdephixInterface
             self::RELEASE_DATE
             );
 
-        $this->targets = $env['targets'];
-        $sshClient = $env['sshClient'];
+        $this->targets = $config['targets'];
+        $sshClient = $config['sshClient'];
 
         if (null === $sshClient) {
             $sshClient = new SshClient();

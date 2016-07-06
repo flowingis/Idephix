@@ -19,8 +19,8 @@ class FunctionBasedIdxFile implements IdxFile
 
     public function __construct($idxfile, $configFile = null)
     {
-        $executionContext = $this->extractEnvFromConfigFile($configFile);
-        $this->setupCollector = new IdxSetupCollector($executionContext);
+        $config = $this->readConfig($configFile);
+        $this->setupCollector = new IdxSetupCollector($config);
 
         $this->parser = new Parser(new Lexer());
         $this->traverers = new NodeTraverser();
@@ -33,7 +33,7 @@ class FunctionBasedIdxFile implements IdxFile
 
     public function executionContext()
     {
-        return $this->setupCollector->getExecutionContext();
+        return $this->setupCollector->getConfig();
     }
 
     public function output()
@@ -60,7 +60,7 @@ class FunctionBasedIdxFile implements IdxFile
      * @param $configFile
      * @return Config
      */
-    private function extractEnvFromConfigFile($configFile)
+    private function readConfig($configFile)
     {
         if ($configFile) {
             /** @var Config $executionContext */
