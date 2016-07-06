@@ -90,7 +90,7 @@ class Copy implements DeployStrategyInterface
      * @param string $from
      * @param string $to
      */
-    public function remoteCopyRecursive($from, $to)
+    private function remoteCopyRecursive($from, $to)
     {
         return $this->idx->remote(
             sprintf('cp -pPR %s %s', escapeshellarg($from), escapeshellarg($to)),

@@ -3,6 +3,8 @@
 namespace Idephix\Extension\Deploy;
 
 use Idephix\Context;
+use Idephix\Extension\Deploy\Strategy\Factory;
+use Idephix\Extension\Deploy\Strategy\FactoryInterface;
 use Idephix\Idephix;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
@@ -29,6 +31,17 @@ class Deploy implements IdephixAwareInterface
     private $sharedFolders = array();
     private $symfonyEnv;
     private $message;
+    private $strategyFactory;
+
+    public function __construct(FactoryInterface $strategyFactory)
+    {
+        $this->strategyFactory = $strategyFactory;
+    }
+
+    public static function create()
+    {
+        return new static(new Factory);
+    }
 
     public function setIdephix(IdephixInterface $idx)
     {
@@ -61,13 +74,7 @@ class Deploy implements IdephixAwareInterface
         $target->set('deploy.next_release_dir', $this->getNextReleaseFolder());
         $target->set('deploy.dry_run', $this->dryRun);
 
-        $strategyClass = 'Idephix\\Extension\\Deploy\\Strategy\\'.$target->get('deploy.strategy', 'Copy');
-
-        if (!class_exists($strategyClass)) {
-            throw new \Exception(sprintf('No deploy strategy %s found. Check you configuration.', $strategyClass));
-        }
-
-        $this->strategy = new $strategyClass($this->idx, $target);
+        $this->strategy = $this->strategyFactory->fromTarget($target, $this->idx);
     }
 
     /**
