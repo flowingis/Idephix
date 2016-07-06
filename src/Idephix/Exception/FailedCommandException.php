@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Idephix;
+namespace Idephix\Exception;
 
 class FailedCommandException extends \Exception
 {

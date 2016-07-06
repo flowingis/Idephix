@@ -1,6 +1,7 @@
 <?php
 namespace Idephix;
 
+use Idephix\Exception\FailedCommandException;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Idephix\Test\LibraryMock;

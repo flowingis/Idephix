@@ -2,6 +2,7 @@
 
 namespace Idephix;
 
+use Idephix\Exception\FailedCommandException;
 use Idephix\File\IdxFile;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
