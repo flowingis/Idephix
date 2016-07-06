@@ -21,7 +21,8 @@ class IdephixTestCase extends \PHPUnit_Framework_TestCase
         $sshClient->setParameters($currentTarget->get('ssh_params'));
         $sshClient->setHost(current($currentTarget->get('hosts')));
 
-        $idx = (new InspectableIdephix(Config::fromArray(array('sshClient' => $sshClient)), $output))
+        $idx = new InspectableIdephix(Config::fromArray(array('sshClient' => $sshClient)), $output);
+        $idx = $idx
             ->withCurrentTarget(Context::fromArray($targets[$targetName]), $targetName);
 
         return $idx;
