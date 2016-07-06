@@ -167,7 +167,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     public function testRemote()
     {
         $output = new BufferedOutput($this->output);
-        $sshClient = new SSH\SshClient(new SSH\FakeSsh2Proxy($this, "Remote output from "));
+        $sshClient = new SSH\SshClient(new SSH\FakeSsh2Proxy($this, 'Remote output from '));
         $this->idx = new Idephix(
             Config::fromArray(array('targets' => array('test_target' => array()), 'sshClient' => $sshClient)),
             $output
@@ -179,7 +179,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
 
         $rows = explode("\n", $output->fetch());
         $this->assertCount(3, $rows);
-        $this->assertEquals("Remote: echo foo", $rows[0]);
+        $this->assertEquals('Remote: echo foo', $rows[0]);
         $this->assertEquals('Remote output from echo foo', $rows[1]);
     }
 

@@ -45,20 +45,20 @@ class Slack implements IdephixAwareInterface
             $username = $this->settings['username'];
         }
 
-        $data = "payload=" . json_encode(array(
-                "channel" => $channel,
-                "text" => $message,
-                "icon_url" => $icon_url,
-                "unfurl_links" => true,
-                "username" => $username,
-                "attachments" => $attachments
+        $data = 'payload=' . json_encode(array(
+                'channel' => $channel,
+                'text' => $message,
+                'icon_url' => $icon_url,
+                'unfurl_links' => true,
+                'username' => $username,
+                'attachments' => $attachments
             ));
 
         $url = $this->settings['url'];
         $response = $this->send($data, $url);
 
         if ($response != 'ok') {
-            throw new \Exception("Unable to send the message to Slack. The error returned is: " . $response);
+            throw new \Exception('Unable to send the message to Slack. The error returned is: ' . $response);
         }
 
         $this->idx->local("echo 'Message sent to slack channel'");
@@ -69,7 +69,7 @@ class Slack implements IdephixAwareInterface
     protected function send($data, $url)
     {
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $result = curl_exec($ch);

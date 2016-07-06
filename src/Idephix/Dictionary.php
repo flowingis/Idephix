@@ -48,7 +48,7 @@ abstract class Dictionary implements \ArrayAccess
      */
     public function offsetGet($offset)
     {
-        if(array_key_exists($offset, $this->data)){
+        if (array_key_exists($offset, $this->data)) {
             return $this->resolveElement($this->data[$offset]);
         }
 
@@ -113,7 +113,7 @@ abstract class Dictionary implements \ArrayAccess
 
     public function get($offset, $default = null)
     {
-        if(is_null($this->offsetGet($offset))){
+        if (is_null($this->offsetGet($offset))) {
             return $default;
         }
 
@@ -131,7 +131,7 @@ abstract class Dictionary implements \ArrayAccess
      */
     private function resolveElement($element)
     {
-        if($element instanceof \Closure){
+        if ($element instanceof \Closure) {
             $element = $element();
         }
 
