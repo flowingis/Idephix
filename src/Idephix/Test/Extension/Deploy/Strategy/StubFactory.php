@@ -11,7 +11,7 @@ class StubFactory implements FactoryInterface
 
     public function __construct()
     {
-        $this->map = array('Copy' => StubCopy::class);
+        $this->map = array('Copy' => '\Idephix\Test\Extension\Deploy\Strategy\StubCopy');
     }
 
     public function fromTarget(Context $target, IdephixInterface $idx)
