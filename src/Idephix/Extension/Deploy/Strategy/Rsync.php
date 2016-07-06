@@ -7,7 +7,7 @@ use Idephix\IdephixInterface;
 use Idephix\SSH\SshClient;
 use Symfony\Component\Console\Output\Output;
 
-class Copy implements DeployStrategyInterface
+class Rsync implements DeployStrategyInterface
 {
     protected $idx;
     protected $conf;
