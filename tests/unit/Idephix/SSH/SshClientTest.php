@@ -2,7 +2,7 @@
 namespace Idephix\SSH\Test;
 
 use Idephix\SSH\SshClient;
-use Idephix\SSH\FakeSsh2Proxy;
+use Idephix\Test\SSH\StubProxy;
 
 class SshClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +22,7 @@ class SshClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testConnectNoHost()
     {
-        $sshClient = new SshClient(new FakeSsh2Proxy($this));
+        $sshClient = new SshClient(new StubProxy());
         $sshClient->setParameters($this->params);
         $sshClient->connect();
     }
@@ -33,7 +33,7 @@ class SshClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testConnectionFail()
     {
-        $sshClient = new SshClient(new FakeSsh2Proxy($this));
+        $sshClient = new SshClient(new StubProxy());
         $sshClient->setParameters($this->params);
         $sshClient->setHost('fail_connection');
         $sshClient->connect();
@@ -41,7 +41,7 @@ class SshClientTest extends \PHPUnit_Framework_TestCase
 
     public function testConnect()
     {
-        $sshClient = new SshClient(new FakeSsh2Proxy($this));
+        $sshClient = new SshClient(new StubProxy());
         $sshClient->setParameters($this->params);
         $sshClient->setHost('localhost');
         $sshClient->connect();

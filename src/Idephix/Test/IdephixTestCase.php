@@ -4,7 +4,7 @@ namespace Idephix\Test;
 
 use Idephix\Context;
 use Idephix\SSH\SshClient;
-use Idephix\SSH\FakeSsh2Proxy;
+use Idephix\Test\SSH\StubProxy;
 use Symfony\Component\Console\Output\StreamOutput;
 
 class IdephixTestCase extends \PHPUnit_Framework_TestCase
@@ -16,7 +16,7 @@ class IdephixTestCase extends \PHPUnit_Framework_TestCase
         $this->output = fopen('php://memory', 'r+');
         $output = new StreamOutput($this->output);
         $currentTarget = Context::fromArray($targets[$targetName]);
-        $sshClient = new SshClient(new FakeSsh2Proxy($this));
+        $sshClient = new SshClient(new StubProxy());
         $sshClient->setParameters($currentTarget->get('ssh_params'));
         $sshClient->setHost(current($currentTarget->get('hosts')));
         $sshClient->connect();

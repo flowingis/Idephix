@@ -23,7 +23,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
 
         $this->idx = new Idephix(
             Config::fromArray(
-                array('targets' => array(), 'sshClient' => new SSH\SshClient(new SSH\FakeSsh2Proxy($this)))
+                array('targets' => array(), 'sshClient' => new SSH\SshClient(new Test\SSH\StubProxy()))
             ), $output
         );
     }
@@ -80,7 +80,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $_SERVER['argv'] = $argv;
 
         $sshClient = new SSH\SshClient(
-            new SSH\FakeSsh2Proxy($this)
+            new Test\SSH\StubProxy()
         );
         $output = fopen('php://memory', 'r+');
         $idx = new Idephix(
@@ -167,7 +167,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     public function testRemote()
     {
         $output = new BufferedOutput($this->output);
-        $sshClient = new SSH\SshClient(new SSH\FakeSsh2Proxy($this, 'Remote output from '));
+        $sshClient = new SSH\SshClient(new Test\SSH\StubProxy('Remote output from '));
         $this->idx = new Idephix(
             Config::fromArray(array('targets' => array('test_target' => array()), 'sshClient' => $sshClient)),
             $output
@@ -190,7 +190,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     public function testRemoteException()
     {
         $output = new StreamOutput($this->output);
-        $sshClient = new SSH\SshClient(new SSH\FakeSsh2Proxy($this));
+        $sshClient = new SSH\SshClient(new Test\SSH\StubProxy());
         $this->idx = new Idephix(
             Config::fromArray(array('targets' => array('test_target' => array()), 'sshClient' => $sshClient)),
             $output
