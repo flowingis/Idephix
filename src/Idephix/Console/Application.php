@@ -1,6 +1,6 @@
 <?php
 
-namespace Idephix;
+namespace Idephix\Console;
 
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
