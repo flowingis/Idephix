@@ -71,7 +71,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_allow_to_resolve_callable_elements()
     {
-        $spy = new EnvironmentSpy();
+        $spy = new LazyConfigSpy();
         $context = Config::fromArray(
             array(
                 'foo' => function () use ($spy) {
@@ -87,7 +87,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class EnvironmentSpy
+class LazyConfigSpy
 {
     public $resolved = false;
 }
