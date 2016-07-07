@@ -1,9 +1,8 @@
 <?php
 namespace Idephix\Task;
 
-class Definition
+class Task
 {
-
     public function name()
     {
     }
@@ -12,7 +11,14 @@ class Definition
     {
     }
 
+    /**
+     * @return Task
+     */
     public function parameters()
+    {
+    }
+
+    public function code()
     {
     }
 }

@@ -1,63 +1,65 @@
 <?php
+namespace Idephix\Console;
 
-namespace Idephix;
-
-use Symfony\Component\Console\Command\Command;
+use Idephix\IdephixInterface;
+use Idephix\Task\Task;
+use Idephix\Task\Parameter;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Idephix\Util\DocBlockParser;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Class CommandWrapper
- * @package Idephix
- * @deprecated 
- */
-class CommandWrapper extends Command
+class Command extends SymfonyCommand
 {
     private $idxTask;
-
+    /** @var  IdephixInterface */
     private $idx;
 
-    public function withIdx(IdephixInterface $idx)
-    {
-        $this->idx = $idx;
-
-        return $this;
-    }
-
     /**
-     * @param callable $code
-     * @return $this
+     * @param Task $task
+     * @return Command
      */
-    public function buildFromCode($code)
+    public static function fromTask(Task $task, IdephixInterface $idx)
     {
-        $this->assertCallable($code);
-        $this->idxTask = $code;
+        $command = new static($task->name());
+        $command->idx = $idx;
 
-        $reflector = new \ReflectionFunction($code);
-        $parser = new DocBlockParser($reflector->getDocComment());
-        $this->setDescription($parser->getDescription());
+        $command->setDescription($task->description());
 
-        foreach ($reflector->getParameters() as $parameter) {
-            $description = $parser->getParamDescription($parameter->getName());
-
-            if ($parameter->getName() !== 'idx') {
-                $this->addParameter($parameter, $description);
+        /** @var Parameter $parameter */
+        foreach ($task->parameters() as $parameter) {
+            if (!$parameter->isOptional()) {
+                $command->addArgument($parameter->name(), InputArgument::REQUIRED, $parameter->description());
+                continue;
             }
+
+            if ($parameter->isFlagOption()) {
+                $command->addOption($parameter->name(), null, InputOption::VALUE_NONE, $parameter->description());
+                continue;
+            }
+
+            $command->addArgument(
+                $parameter->name(),
+                InputArgument::OPTIONAL,
+                $parameter->description(),
+                $parameter->defaultValue()
+            );
         }
 
-        return $this;
+        $command->assertCallable($task->code());
+        $command->idxTask = $task->code();
+
+        return $command;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $input = $this->filterByOriginalDefinition(
-            $input,
-            $this->getApplication()->getDefinition()
+        $input = $this->inheritDefinitionFrom(
+            $this->getApplication()->getDefinition(),
+            $input
         );
 
         $idxTask = new \ReflectionFunction($this->idxTask);
@@ -76,9 +78,9 @@ class CommandWrapper extends Command
     /**
      * @param InputInterface $input
      * @param $appDefinition
-     * @return ArrayInput
+     * @return InputInterface
      */
-    public function filterByOriginalDefinition(InputInterface $input, $appDefinition)
+    private function inheritDefinitionFrom(InputDefinition $appDefinition, InputInterface $input)
     {
         $newDefinition = new InputDefinition();
         $newInput = new ArrayInput(array(), $newDefinition);
@@ -110,30 +112,6 @@ class CommandWrapper extends Command
 
     /**
      * @param \ReflectionParameter $parameter
-     * @param string $description
-     */
-    public function addParameter(\ReflectionParameter $parameter, $description)
-    {
-        $name = $parameter->getName();
-
-        if (!$parameter->isOptional()) {
-            $this->addArgument($name, InputArgument::REQUIRED, $description);
-
-            return;
-        }
-
-        if ($this->isFlagOption($parameter)) {
-            $this->addOption($name, null, InputOption::VALUE_NONE, $description);
-
-            return;
-        }
-
-        $default = $parameter->getDefaultValue();
-        $this->addArgument($name, InputArgument::OPTIONAL, $description, $default);
-    }
-
-    /**
-     * @param \ReflectionParameter $parameter
      * @return bool
      */
     private function isFlagOption(\ReflectionParameter $parameter)
@@ -144,7 +122,7 @@ class CommandWrapper extends Command
     /**
      * @param callable $code
      */
-    protected function assertCallable($code)
+    private function assertCallable($code)
     {
         if (!is_callable($code)) {
             throw new \InvalidArgumentException('Code must be a callable');
