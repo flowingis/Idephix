@@ -82,7 +82,6 @@ class Command extends SymfonyCommand
             );
         }
 
-        $command->assertCallable($task->code());
         $command->idxTaskCode = $task->code();
 
         return $command;
