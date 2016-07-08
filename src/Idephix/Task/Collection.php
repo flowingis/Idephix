@@ -1,16 +1,24 @@
 <?php
 namespace Idephix\Task;
 
-abstract class Collection extends \IteratorIterator implements \ArrayAccess
+abstract class Collection implements \Iterator, \OuterIterator, \ArrayAccess
 {
-    public static function ofArray($array)
+    /** @var  \Iterator */
+    private $innerIterator;
+
+    protected function __construct(\Iterator $iterator)
     {
-        return new static(new \ArrayIterator($array));
+        $this->innerIterator = $iterator;
+    }
+
+    public function getInnerIterator()
+    {
+        return $this->innerIterator;
     }
 
     public static function dry()
     {
-        return static::ofArray(array());
+        return new static(new \ArrayIterator(array()));
     }
 
     public function count()
@@ -31,5 +39,30 @@ abstract class Collection extends \IteratorIterator implements \ArrayAccess
     public function offsetUnset($offset)
     {
         $this->getInnerIterator()->offsetUnset($offset);
+    }
+
+    public function current()
+    {
+        return $this->innerIterator->current();
+    }
+
+    public function next()
+    {
+        $this->innerIterator->next();
+    }
+
+    public function key()
+    {
+        return $this->innerIterator->key();
+    }
+
+    public function valid()
+    {
+        return $this->innerIterator->valid();
+    }
+
+    public function rewind()
+    {
+        $this->innerIterator->rewind();
     }
 }

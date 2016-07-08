@@ -5,26 +5,18 @@ class ParameterCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
+     * @expectedException \DomainException
      */
     public function it_should_only_accept_parameter_definition()
     {
-        $collection = ParameterCollection::ofArray(array(new \stdClass()));
-        $this->assertCount(0, $collection);
-
-        try {
-            $collection = ParameterCollection::dry();
-            $collection[] = new \stdClass();
-
-            $this->fail('Should accept only Task object');
-        } catch (\DomainException $e) {
-            $this->assertInstanceOf('\DomainException', $e);
-        }
+        $collection = ParameterCollection::dry();
+        $collection[] = new \stdClass();
     }
 
     /** @test */
     public function it_should_create_from_array()
     {
-        $collection = ParameterCollection::create(
+        $collection = ParameterCollection::createFromArray(
             array(
                 'foo' => array('description' => 'my foo param'),
                 'bar' => array('description' => 'my bar param', 'defaultValue' => 'foobar'),

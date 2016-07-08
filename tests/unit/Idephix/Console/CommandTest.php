@@ -66,7 +66,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $task->name()->willReturn('fooTask');
         $task->description()->willReturn('fooDescription');
         $task->parameters()->willReturn(
-            ParameterCollection::create(
+            ParameterCollection::createFromArray(
                 array(
                     'bar' => array('description' => 'bar-description'),
                     'foo' => array('defaultValue' => 'foo-value', 'description' => 'foo-description'),

@@ -3,7 +3,7 @@ namespace Idephix\Task;
 
 class ParameterCollection extends Collection
 {
-    public static function create($parametersData)
+    public static function createFromArray($parametersData)
     {
         $parameters = array();
         foreach ($parametersData as $name => $data) {
@@ -13,21 +13,7 @@ class ParameterCollection extends Collection
 
         return new static(new \ArrayIterator($parameters));
     }
-
-    public static function ofArray($array)
-    {
-        return new static(
-            new \ArrayIterator(
-                array_filter(
-                    $array,
-                    function ($task) {
-                        return $task instanceof Parameter;
-                    }
-                )
-            )
-        );
-    }
-
+    
     public function offsetSet($offset, $value)
     {
         if (!$value instanceof Parameter) {

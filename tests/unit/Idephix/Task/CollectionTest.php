@@ -13,6 +13,11 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
 class TestCollection extends Collection
 {
+    public static function ofArray($array)
+    {
+        return new static(new \ArrayIterator($array));
+    }
+    
     public function offsetSet($offset, $value)
     {
         $this->getInnerIterator()->offsetSet($offset, $value);

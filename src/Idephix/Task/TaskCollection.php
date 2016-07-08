@@ -11,7 +11,7 @@ use PhpParser\Parser;
 
 class TaskCollection extends Collection
 {
-    public static function ofArray($array)
+    public static function ofTasks($array)
     {
         return new static(
             new \ArrayIterator(
@@ -58,5 +58,4 @@ class TaskCollection extends Collection
 
         $this->getInnerIterator()->offsetSet($offset, $value);
     }
-
 }

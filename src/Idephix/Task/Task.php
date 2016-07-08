@@ -42,7 +42,7 @@ class Task
     public static function dummy()
     {
         $code = function($bar){ echo $bar; };
-        $params = ParameterCollection::create(array('bar'=> array('description' => '')));
+        $params = ParameterCollection::createFromArray(array('bar'=> array('description' => '')));
 
         return new static('foo', 'foo descr', $code, $params);
     }

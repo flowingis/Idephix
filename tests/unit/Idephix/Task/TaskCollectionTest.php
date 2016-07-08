@@ -5,21 +5,12 @@ class TaskCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
+     * @expectedException \DomainException
      */
     public function it_should_only_accept_task_definition()
     {
-        $collection = TaskCollection::ofArray(array(new \stdClass()));
-        $this->assertCount(0, $collection);
-
-        try {
-            $collection = TaskCollection::ofArray(array(Task::dummy()));
-            $collection[] = new \stdClass();
-
-            $this->fail('Should accept only Task object');
-        } catch (\DomainException $e) {
-            $this->assertInstanceOf('\DomainException', $e);
-        }
-
+        $collection = TaskCollection::dry();
+        $collection[] = new \stdClass();
     }
 
     /** @test */
@@ -47,7 +38,7 @@ EOD;
                 function ($bar) {
                     echo $bar;
                 },
-                ParameterCollection::create(
+                ParameterCollection::createFromArray(
                     array('foo' => array('description' => ''), 'bar' => array('description' => ''))
                 )
             ),
@@ -79,7 +70,7 @@ EOD;
                 function ($bar) {
                     echo $bar;
                 },
-                ParameterCollection::create(array('bar' => array('description' => '')))
+                ParameterCollection::createFromArray(array('bar' => array('description' => '')))
             ),
             $task
         );
@@ -109,7 +100,7 @@ EOD;
                 function ($bar) {
                     echo $bar;
                 },
-                ParameterCollection::create(array('bar' => array('description' => '')))
+                ParameterCollection::createFromArray(array('bar' => array('description' => '')))
             ),
             $task
         );
