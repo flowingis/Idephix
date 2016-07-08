@@ -4,6 +4,7 @@ namespace Idephix\Console;
 use Idephix\IdephixInterface;
 use Idephix\Task\Task;
 use Idephix\Task\Parameter;
+use Idephix\Util\DocBlockParser;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,6 +18,38 @@ class Command extends SymfonyCommand
     private $idxTaskCode;
     /** @var  IdephixInterface */
     private $idx;
+
+    /**
+     * Build a command from callable code
+     *
+     * This is maintained only to support legacy idxfile and will soon removed
+     *
+     * @param callable $code
+     * @return $this
+     * @deprecated
+     */
+    public static function buildFromCode($name, $code, IdephixInterface $idx)
+    {
+        $command = new static($name);
+        $command->idx = $idx;
+
+        $command->assertCallable($code);
+        $command->idxTaskCode = $code;
+
+        $reflector = new \ReflectionFunction($code);
+        $parser = new DocBlockParser($reflector->getDocComment());
+        $command->setDescription($parser->getDescription());
+
+        foreach ($reflector->getParameters() as $parameter) {
+            $description = $parser->getParamDescription($parameter->getName());
+
+            if ($parameter->getName() !== 'idx') {
+                $command->addParameter($parameter, $description);
+            }
+        }
+
+        return $command;
+    }
 
     /**
      * @param Task $task
@@ -54,6 +87,31 @@ class Command extends SymfonyCommand
 
         return $command;
     }
+
+    /**
+     * @param \ReflectionParameter $parameter
+     * @param string $description
+     */
+    private function addParameter(\ReflectionParameter $parameter, $description)
+    {
+        $name = $parameter->getName();
+
+        if (!$parameter->isOptional()) {
+            $this->addArgument($name, InputArgument::REQUIRED, $description);
+
+            return;
+        }
+
+        if ($this->isFlagOption($parameter)) {
+            $this->addOption($name, null, InputOption::VALUE_NONE, $description);
+
+            return;
+        }
+
+        $default = $parameter->getDefaultValue();
+        $this->addArgument($name, InputArgument::OPTIONAL, $description, $default);
+    }
+
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
