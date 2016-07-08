@@ -6,8 +6,6 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Idephix\Test\LibraryMock;
 
-include_once(__DIR__ . '/PassTester.php');
-
 class IdephixTest extends \PHPUnit_Framework_TestCase
 {
     /**
