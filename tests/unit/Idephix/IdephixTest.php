@@ -6,7 +6,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Idephix\Test\LibraryMock;
 
-include_once(__DIR__.'/PassTester.php');
+include_once(__DIR__ . '/PassTester.php');
 
 class IdephixTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +14,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      * @var Idephix
      */
     protected $idx;
-    
+
     protected $output;
 
     protected function setUp()
@@ -45,8 +45,11 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function testAdd()
     {
-        $this->idx->add('command_name', function () {
-        });
+        $this->idx->add(
+            'command_name',
+            function () {
+            }
+        );
 
         $this->assertTrue($this->idx->has('command_name'));
     }
@@ -66,8 +69,13 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 array('idx', 'foo', '--env=env'),
-                array('env' => array('hosts' => array('localhost', '1.2.3.4'), 'ssh_params' => array('user' => 'test'))),
-                "Local: echo \"Hello World from localhost\"\nHello World from localhost\n".
+                array(
+                    'env' => array(
+                        'hosts' => array('localhost', '1.2.3.4'),
+                        'ssh_params' => array('user' => 'test')
+                    )
+                ),
+                "Local: echo \"Hello World from localhost\"\nHello World from localhost\n" .
                 "Local: echo \"Hello World from 1.2.3.4\"\nHello World from 1.2.3.4\n"
             ),
         );
@@ -91,9 +99,12 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         );
         $idx->getApplication()->setAutoExit(false);
 
-        $idx->add('foo', function () use ($idx) {
-            $idx->local('echo "Hello World from '.$idx->getCurrentTargetHost().'"');
-        });
+        $idx->add(
+            'foo',
+            function () use ($idx) {
+                $idx->local('echo "Hello World from ' . $idx->getCurrentTargetHost() . '"');
+            }
+        );
 
         $idx->run();
 
@@ -110,9 +121,12 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $idx = new Idephix(Config::dry(), new StreamOutput($output));
         $idx->getApplication()->setAutoExit(false);
 
-        $idx->add('foo', function () use ($idx) {
-            $idx->local('sleep 2', false, 1);
-        });
+        $idx->add(
+            'foo',
+            function () use ($idx) {
+                $idx->local('sleep 2', false, 1);
+            }
+        );
 
         try {
             $idx->run();
@@ -148,18 +162,17 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function testRunTask()
     {
-        $mock = $this->getMock('\\Idephix\\PassTester');
-        $mock->expects($this->exactly(1))
-            ->method('pass')
-            ->with('foo');
+        $spy = new TaskSpy();
 
-        $this->idx->add('command_name', function ($param) use ($mock) {
-            $mock->pass($param);
+        $this->idx->add('command_name', function ($param) use ($spy) {
+            $spy->execute($param);
 
             return 0;
         });
 
         $this->assertEquals(0, $this->idx->runTask('command_name', 'foo'));
+        $this->assertTrue($spy->executed);
+        $this->assertEquals(array('foo'), $spy->lastCallArguments);
     }
 
     /**
@@ -204,5 +217,17 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->idx->local('echo foo');
         rewind($this->output);
         $this->assertRegExp('/echo foo/m', stream_get_contents($this->output));
+    }
+}
+
+class TaskSpy
+{
+    public $executed = false;
+    public $lastCallArguments = array();
+
+    public function execute($myParam)
+    {
+        $this->executed = true;
+        $this->lastCallArguments = func_get_args();
     }
 }

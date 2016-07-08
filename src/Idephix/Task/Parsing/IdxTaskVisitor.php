@@ -1,7 +1,6 @@
 <?php
 namespace Idephix\Task\Parsing;
 
-use Idephix\IdxSetupCollector;
 use Idephix\Task\Parameter;
 use Idephix\Task\ParameterCollection;
 use Idephix\Task\Task;
