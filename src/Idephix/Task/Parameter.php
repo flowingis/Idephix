@@ -7,6 +7,10 @@ class Parameter
     private $description;
     private $defaultValue;
 
+    private function __construct()
+    {
+    }
+
     public static function create($name, $description, $defaultValue = null)
     {
         $param = new static();
