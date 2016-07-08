@@ -3,21 +3,6 @@ namespace Idephix\Task;
 
 class TaskCollectionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @test */
-    public function it_should_accept_task_definition()
-    {
-        $collection = TaskCollection::ofArray(array(Task::dummy()));
-        foreach ($collection as $task) {
-        }
-    }
-
-    /** @test */
-    public function it_should_allow_array_access()
-    {
-        $collection = TaskCollection::ofArray(array(Task::dummy()));
-        $this->assertEquals(Task::dummy(), $collection[0]);
-    }
-
     /**
      * @test
      */
