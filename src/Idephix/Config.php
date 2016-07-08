@@ -7,6 +7,10 @@ class Config extends Dictionary
 {
     public static function parseFile($configFile)
     {
+        if(is_null($configFile)){
+            return static::dry();
+        }
+        
         try {
             new \SplFileObject($configFile);
         } catch (\RuntimeException $e) {

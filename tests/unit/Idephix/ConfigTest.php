@@ -109,6 +109,12 @@ EOD;
         $this->assertEquals(array('foo' => 'bar'), $config['targets']);
     }
 
+    /** @test */
+    public function it_should_create_from_null_file()
+    {
+        $this->assertEquals(Config::dry(), Config::parseFile(null));
+    }
+
     /**
      * @test
      * @expectedException \Idephix\Exception\InvalidConfigurationException

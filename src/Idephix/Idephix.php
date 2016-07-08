@@ -3,8 +3,10 @@
 namespace Idephix;
 
 use Idephix\Console\Application;
+use Idephix\Console\Command;
 use Idephix\Exception\FailedCommandException;
 use Idephix\File\IdxFile;
+use Idephix\Task\TaskCollection;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -71,19 +73,15 @@ class Idephix implements IdephixInterface
         $this->addInitIdxFileCommand();
     }
 
-    public static function fromFile(IdxFile $file)
+    public static function create(TaskCollection $tasks, Config $config)
     {
-        $idx = new self($file->executionContext(), $file->output(), $file->input());
+        $idephix = new static($config);
 
-        foreach ($file->tasks() as $taskName => $taskCode) {
-            $idx->add($taskName, $taskCode);
+        foreach($tasks as $task){
+            $idephix->application->add(Command::fromTask($task, $idephix));
         }
 
-        foreach ($file->libraries() as $name => $library) {
-            $idx->addLibrary($name, $library);
-        }
-
-        return $idx;
+        return $idephix;
     }
 
     public function output()

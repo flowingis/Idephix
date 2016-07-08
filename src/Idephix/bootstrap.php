@@ -3,6 +3,7 @@
 namespace Idephix;
 
 use Idephix\Exception\FailedCommandException;
+use Idephix\Task\TaskCollection;
 use Symfony\Component\Console\Input\ArgvInput;
 use Idephix\File\FunctionBasedIdxFile;
 
@@ -23,7 +24,7 @@ function run()
             if (isLegacyIdxFile($idxFile)) {
                 include $idxFile;
             } else {
-                $idx = Idephix::fromFile(new FunctionBasedIdxFile($idxFile, $configFile));
+                $idx = Idephix::create(TaskCollection::parseFile($idxFile), Config::parseFile($configFile));
                 $idx->run();
             }
             return 0;

@@ -1,6 +1,7 @@
 <?php
 namespace Idephix\Task;
 
+use Idephix\Exception\InvalidIdxFileException;
 use Idephix\Task\Parsing\IdxTaskVisitor;
 use PhpParser\Lexer;
 use PhpParser\Node\Name;
@@ -36,6 +37,17 @@ class TaskCollection extends Collection
         $traverser->traverse($stmts);
 
         return $collection;
+    }
+    
+    public static function parseFile($idxFile)
+    {
+        try {
+            new \SplFileObject($idxFile);
+        } catch (\RuntimeException $e) {
+            throw new InvalidIdxFileException("$idxFile does not exists or is not readable");
+        }
+
+        return static::ofFunctions(file_get_contents($idxFile));
     }
 
     public function offsetSet($offset, $value)
