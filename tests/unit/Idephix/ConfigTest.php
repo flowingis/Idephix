@@ -85,6 +85,63 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $context['foo']);
         $this->assertTrue($spy->resolved);
     }
+
+    /** @test */
+    public function it_should_create_from_file()
+    {
+        if(!ini_get('allow_url_include')){
+            $this->markTestSkipped('allow_url_include must be 1');
+        }
+
+        $configFileContent =<<<'EOD'
+<?php
+
+use \Idephix\SSH\SshClient;
+
+$targets = array('foo' => 'bar');
+return \Idephix\Config::fromArray(array('targets' => $targets, 'sshClient' => new SshClient()));
+
+EOD;
+
+        $configFile = "data://text/plain;base64,".base64_encode($configFileContent);
+
+        $config = Config::parseFile($configFile);
+        $this->assertEquals(array('foo' => 'bar'), $config['targets']);
+    }
+
+    /**
+     * @test
+     * @expectedException \Idephix\Exception\InvalidConfigurationException
+     */
+    public function it_should_throw_exception_for_invalid_config()
+    {
+        if(!ini_get('allow_url_include')){
+            $this->markTestSkipped('allow_url_include must be 1');
+        }
+
+        $configFileContent =<<<'EOD'
+<?php
+
+use \Idephix\SSH\SshClient;
+
+$targets = array('foo' => 'bar');
+return array('targets' => $targets, 'sshClient' => new SshClient());
+
+EOD;
+
+        $configFile = "data://text/plain;base64,".base64_encode($configFileContent);
+        Config::parseFile($configFile);
+    }
+
+    /**
+     * @test
+     * @expectedException \Idephix\Exception\InvalidConfigurationException
+     */
+    public function it_should_throw_exception_for_invalid_file()
+    {
+        $configFile = "/tmp/foo-non-existing-file";
+        Config::parseFile($configFile);
+    }
 }
 
 class LazyConfigSpy
