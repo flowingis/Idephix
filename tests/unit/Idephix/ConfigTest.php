@@ -89,7 +89,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_should_create_from_file()
     {
-        if(!ini_get('allow_url_include')){
+        if (!ini_get('allow_url_include')) {
             $this->markTestSkipped('allow_url_include must be 1');
         }
 
@@ -103,7 +103,7 @@ return \Idephix\Config::fromArray(array('targets' => $targets, 'sshClient' => ne
 
 EOD;
 
-        $configFile = "data://text/plain;base64,".base64_encode($configFileContent);
+        $configFile = 'data://text/plain;base64,'.base64_encode($configFileContent);
 
         $config = Config::parseFile($configFile);
         $this->assertEquals(array('foo' => 'bar'), $config['targets']);
@@ -121,7 +121,7 @@ EOD;
      */
     public function it_should_throw_exception_for_invalid_config()
     {
-        if(!ini_get('allow_url_include')){
+        if (!ini_get('allow_url_include')) {
             $this->markTestSkipped('allow_url_include must be 1');
         }
 
@@ -135,7 +135,7 @@ return array('targets' => $targets, 'sshClient' => new SshClient());
 
 EOD;
 
-        $configFile = "data://text/plain;base64,".base64_encode($configFileContent);
+        $configFile = 'data://text/plain;base64,'.base64_encode($configFileContent);
         Config::parseFile($configFile);
     }
 
@@ -145,7 +145,7 @@ EOD;
      */
     public function it_should_throw_exception_for_invalid_file()
     {
-        $configFile = "/tmp/foo-non-existing-file";
+        $configFile = '/tmp/foo-non-existing-file';
         Config::parseFile($configFile);
     }
 }

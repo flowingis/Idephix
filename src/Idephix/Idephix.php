@@ -77,7 +77,7 @@ class Idephix implements IdephixInterface
     {
         $idephix = new static($config);
 
-        foreach($tasks as $task){
+        foreach ($tasks as $task) {
             $idephix->application->add(Command::fromTask($task, $idephix));
         }
 

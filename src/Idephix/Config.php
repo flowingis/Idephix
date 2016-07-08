@@ -7,7 +7,7 @@ class Config extends Dictionary
 {
     public static function parseFile($configFile)
     {
-        if(is_null($configFile)){
+        if (is_null($configFile)) {
             return static::dry();
         }
         
@@ -20,7 +20,7 @@ class Config extends Dictionary
         /** @var Config $config */
         $config = require_once $configFile;
 
-        if(!$config instanceof Config){
+        if (!$config instanceof Config) {
             throw new InvalidConfigurationException('The config must be an instance of Idephix\Config');
         }
 

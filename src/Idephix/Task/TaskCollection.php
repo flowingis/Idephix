@@ -4,7 +4,6 @@ namespace Idephix\Task;
 use Idephix\Exception\InvalidIdxFileException;
 use Idephix\Task\Parsing\IdxTaskVisitor;
 use PhpParser\Lexer;
-use PhpParser\Node\Name;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\Parser;

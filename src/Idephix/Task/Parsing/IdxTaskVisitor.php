@@ -99,7 +99,7 @@ class IdxTaskVisitor extends NodeVisitorAbstract
      */
     private function getDefaultValue(\ReflectionParameter $parameter)
     {
-        if($parameter->isDefaultValueAvailable()){
+        if ($parameter->isDefaultValueAvailable()) {
             return $parameter->getDefaultValue();
         }
 
