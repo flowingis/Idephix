@@ -114,7 +114,25 @@ class Command extends SymfonyCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $input = $this->inheritDefinitionFrom(
+        $args = $this->buildIdephixTaskArguments($input);
+
+        return call_user_func_array($this->idxTaskCode, $args);
+    }
+
+    /**
+     * Create an array of arguments to call the defined task
+     *
+     * We remove all the arguments and the options defined
+     * for the command and we use the rest for the closure. This
+     * will remove all default args/options defined within command
+     * definition.
+     *
+     * @param InputInterface $input
+     * @return array
+     */
+    protected function buildIdephixTaskArguments(InputInterface $input)
+    {
+        $input = $this->removeApplicationParamsFrom(
             $this->getApplication()->getDefinition(),
             $input
         );
@@ -127,9 +145,9 @@ class Command extends SymfonyCommand
 
         if (!empty($idxArguments) && $idxArguments[0]->getName() == 'idx') {
             array_unshift($args, $this->idx);
+            return $args;
         }
-
-        return call_user_func_array($this->idxTaskCode, $args);
+        return $args;
     }
 
     /**
@@ -137,7 +155,7 @@ class Command extends SymfonyCommand
      * @param $appDefinition
      * @return InputInterface
      */
-    private function inheritDefinitionFrom(InputDefinition $appDefinition, InputInterface $input)
+    private function removeApplicationParamsFrom(InputDefinition $appDefinition, InputInterface $input)
     {
         $newDefinition = new InputDefinition();
         $newInput = new ArrayInput(array(), $newDefinition);
