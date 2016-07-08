@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Command extends SymfonyCommand
 {
-    private $idxTask;
+    private $idxTaskCode;
     /** @var  IdephixInterface */
     private $idx;
 
@@ -50,7 +50,7 @@ class Command extends SymfonyCommand
         }
 
         $command->assertCallable($task->code());
-        $command->idxTask = $task->code();
+        $command->idxTaskCode = $task->code();
 
         return $command;
     }
@@ -62,7 +62,7 @@ class Command extends SymfonyCommand
             $input
         );
 
-        $idxTask = new \ReflectionFunction($this->idxTask);
+        $idxTask = new \ReflectionFunction($this->idxTaskCode);
         $idxArguments = $idxTask->getParameters();
 
         $args = $input->getArguments();
@@ -72,7 +72,7 @@ class Command extends SymfonyCommand
             array_unshift($args, $this->idx);
         }
 
-        return call_user_func_array($this->idxTask, $args);
+        return call_user_func_array($this->idxTaskCode, $args);
     }
 
     /**
