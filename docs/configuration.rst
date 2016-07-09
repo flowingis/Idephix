@@ -66,8 +66,8 @@ and ssh clients:
 
     return \Idephix\Config::fromArray(
         array(
-            'targets' => $targets,
-            'sshClient' => new \Idephix\SSH\SshClient(),
+            \Idephix\Config::TARGETS => $targets,
+            \Idephix\Config::SSHCLIENT => new \Idephix\SSH\SshClient(),
         )
     );
 

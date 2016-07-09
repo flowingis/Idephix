@@ -5,6 +5,9 @@ use Idephix\Exception\InvalidConfigurationException;
 
 class Config extends Dictionary
 {
+    const TARGETS = 'targets';
+    const SSHCLIENT = 'sshClient';
+
     public static function parseFile($configFile)
     {
         if (is_null($configFile)) {
