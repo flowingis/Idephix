@@ -2,13 +2,13 @@
 namespace Idephix\Console;
 
 use Idephix\IdephixInterface;
+use Idephix\Task\IdephixParameter;
+use Idephix\Task\ParameterCollection;
 use Idephix\Task\Task;
-use Idephix\Task\Parameter;
+use Idephix\Task\UserDefinedParameter;
 use Idephix\Util\DocBlockParser;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,6 +18,8 @@ class Command extends SymfonyCommand
     private $idxTaskCode;
     /** @var  IdephixInterface */
     private $idx;
+    /** @var  Task */
+    private $task;
 
     /**
      * Build a command from callable code
@@ -30,25 +32,28 @@ class Command extends SymfonyCommand
      */
     public static function buildFromCode($name, $code, IdephixInterface $idx)
     {
-        $command = new static($name);
-        $command->idx = $idx;
+        if (!is_callable($code)) {
+            throw new \InvalidArgumentException('Code must be a callable');
+        }
 
-        $command->assertCallable($code);
-        $command->idxTaskCode = $code;
+        $parameters = ParameterCollection::dry();
 
         $reflector = new \ReflectionFunction($code);
         $parser = new DocBlockParser($reflector->getDocComment());
-        $command->setDescription($parser->getDescription());
 
         foreach ($reflector->getParameters() as $parameter) {
-            $description = $parser->getParamDescription($parameter->getName());
-
-            if ($parameter->getName() !== 'idx') {
-                $command->addParameter($parameter, $description);
+            if ($parameter->getName() == 'idx') {
+                $parameters[] = IdephixParameter::create();
+                continue;
             }
+
+            $description = $parser->getParamDescription($parameter->getName());
+            $default = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
+            $parameters[] = UserDefinedParameter::create($parameter->getName(), $description, $default);
         }
 
-        return $command;
+        $task = new Task($name, $parser->getDescription(), $code, $parameters);
+        return static::fromTask($task, $idx);
     }
 
     /**
@@ -58,12 +63,13 @@ class Command extends SymfonyCommand
     public static function fromTask(Task $task, IdephixInterface $idx)
     {
         $command = new static($task->name());
+        $command->task = $task;
         $command->idx = $idx;
 
         $command->setDescription($task->description());
 
-        /** @var Parameter $parameter */
-        foreach ($task->parameters() as $parameter) {
+        /** @var UserDefinedParameter $parameter */
+        foreach ($task->userDefinedParameters() as $parameter) {
             if (!$parameter->isOptional()) {
                 $command->addArgument($parameter->name(), InputArgument::REQUIRED, $parameter->description());
                 continue;
@@ -87,36 +93,9 @@ class Command extends SymfonyCommand
         return $command;
     }
 
-    /**
-     * @param \ReflectionParameter $parameter
-     * @param string $description
-     */
-    private function addParameter(\ReflectionParameter $parameter, $description)
-    {
-        $name = $parameter->getName();
-
-        if (!$parameter->isOptional()) {
-            $this->addArgument($name, InputArgument::REQUIRED, $description);
-
-            return;
-        }
-
-        if ($this->isFlagOption($parameter)) {
-            $this->addOption($name, null, InputOption::VALUE_NONE, $description);
-
-            return;
-        }
-
-        $default = $parameter->getDefaultValue();
-        $this->addArgument($name, InputArgument::OPTIONAL, $description, $default);
-    }
-
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $args = $this->buildIdephixTaskArguments($input);
-
-        return call_user_func_array($this->idxTaskCode, $args);
+        return call_user_func_array($this->idxTaskCode, $this->extractArgumentsFrom($input));
     }
 
     /**
@@ -130,77 +109,24 @@ class Command extends SymfonyCommand
      * @param InputInterface $input
      * @return array
      */
-    protected function buildIdephixTaskArguments(InputInterface $input)
+    protected function extractArgumentsFrom(InputInterface $input)
     {
-        $input = $this->removeApplicationParamsFrom(
-            $this->getApplication()->getDefinition(),
-            $input
-        );
+        $args = array();
+        /** @var UserDefinedParameter $parameter */
+        foreach ($this->task->parameters() as $parameter) {
+            if ($parameter instanceof IdephixParameter) {
+                $args[] = $this->idx;
+                continue;
+            }
 
-        $idxTask = new \ReflectionFunction($this->idxTaskCode);
-        $idxArguments = $idxTask->getParameters();
+            if (false === $parameter->defaultValue()) {
+                $args[] = $input->getOption($parameter->name());
+                continue;
+            }
 
-        $args = $input->getArguments();
-        $args += $input->getOptions();
-
-        if (!empty($idxArguments) && $idxArguments[0]->getName() == 'idx') {
-            array_unshift($args, $this->idx);
-            return $args;
+            $args[] = $input->getArgument($parameter->name());
         }
+
         return $args;
-    }
-
-    /**
-     * @param InputInterface $input
-     * @param $appDefinition
-     * @return InputInterface
-     */
-    private function removeApplicationParamsFrom(InputDefinition $appDefinition, InputInterface $input)
-    {
-        $newDefinition = new InputDefinition();
-        $newInput = new ArrayInput(array(), $newDefinition);
-
-        foreach ($input->getArguments() as $name => $value) {
-            if (!$appDefinition->hasArgument($name)) {
-                $newDefinition->addArgument(
-                    $this->getDefinition()->getArgument($name)
-                );
-                if (!empty($value)) {
-                    $newInput->setArgument($name, $value);
-                }
-            }
-        }
-
-        foreach ($input->getOptions() as $name => $value) {
-            if (!$appDefinition->hasOption($name)) {
-                $newDefinition->addOption(
-                    $this->getDefinition()->getOption($name)
-                );
-                if (!empty($value)) {
-                    $newInput->setOption($name, $value);
-                }
-            }
-        }
-
-        return $newInput;
-    }
-
-    /**
-     * @param \ReflectionParameter $parameter
-     * @return bool
-     */
-    private function isFlagOption(\ReflectionParameter $parameter)
-    {
-        return false === $parameter->getDefaultValue();
-    }
-
-    /**
-     * @param callable $code
-     */
-    private function assertCallable($code)
-    {
-        if (!is_callable($code)) {
-            throw new \InvalidArgumentException('Code must be a callable');
-        }
     }
 }

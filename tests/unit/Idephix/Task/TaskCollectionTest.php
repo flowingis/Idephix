@@ -77,7 +77,7 @@ EOD;
     }
 
     /** @test */
-    public function it_should_ignore_idx_param()
+    public function it_should_recognize_idx_param()
     {
         $idxFileContent =<<<'EOD'
 <?php
@@ -93,6 +93,10 @@ EOD;
 
         $task = $collection[0];
 
+        $expectedParams = ParameterCollection::dry();
+        $expectedParams[] = IdephixParameter::create();
+        $expectedParams[] = UserDefinedParameter::create('bar', '');
+
         $this->assertTaskEqual(
             new Task(
                 'foo',
@@ -100,7 +104,7 @@ EOD;
                 function ($bar) {
                     echo $bar;
                 },
-                ParameterCollection::createFromArray(array('bar' => array('description' => '')))
+                $expectedParams
             ),
             $task
         );

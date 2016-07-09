@@ -24,7 +24,7 @@ class ParameterCollectionTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertCount(2, $collection);
-        $this->assertEquals(Parameter::create('foo', 'my foo param'), $collection[0]);
-        $this->assertEquals(Parameter::create('bar', 'my bar param', 'foobar'), $collection[1]);
+        $this->assertEquals(UserDefinedParameter::create('foo', 'my foo param'), $collection[0]);
+        $this->assertEquals(UserDefinedParameter::create('bar', 'my bar param', 'foobar'), $collection[1]);
     }
 }

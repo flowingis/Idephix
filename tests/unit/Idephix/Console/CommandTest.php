@@ -2,7 +2,10 @@
 namespace Idephix\Console;
 
 use Idephix\IdephixInterface;
+use Idephix\Task\IdephixParameter;
 use Idephix\Task\ParameterCollection;
+use Idephix\Task\UserDefinedParameter;
+use Idephix\Task\UserDefinedParameterCollection;
 use Idephix\Test\Console\IdephixCommandTester;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -14,7 +17,9 @@ class CommandTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_build_command()
     {
-        $idephixTaskCode = function (IdephixInterface $idx, $bar, $foo = 'foo-value', $go = false) {
+        $argumentsSpy = new \stdClass();
+        $idephixTaskCode = function (IdephixInterface $idx, $bar, $foo = 'foo-value', $go = false) use ($argumentsSpy) {
+            $argumentsSpy->args = func_get_args();
             $idx->output()->write('task executed');
         };
 
@@ -23,26 +28,28 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = Command::fromTask($task->reveal(), $idx);
 
         $this->assertInstanceOf('\Symfony\Component\Console\Command\Command', $command);
-        $this->assertEquals('fooTask', $command->getName());
-        $this->assertEquals('fooDescription', $command->getDescription());
+        $this->assertEquals('yell', $command->getName());
+        $this->assertEquals('A command that yells at you', $command->getDescription());
 
         $this->assertEquals(2, $command->getDefinition()->getArgumentCount());
         $this->assertEquals(1, count($command->getDefinition()->getOptions()));
 
-        $this->assertEquals('bar-description', $command->getDefinition()->getArgument('bar')->getDescription());
-        $this->assertEquals('foo-description', $command->getDefinition()->getArgument('foo')->getDescription());
-        $this->assertEquals('foo-value', $command->getDefinition()->getArgument('foo')->getDefault());
-        $this->assertEquals('dry run flag', $command->getDefinition()->getOption('go')->getDescription());
-        $this->assertFalse($command->getDefinition()->getOption('go')->getDefault());
+        $this->assertEquals('what you want me to yell', $command->getDefinition()->getArgument('what')->getDescription());
+        $this->assertEquals('The exclamation mark to use', $command->getDefinition()->getArgument('exclamationMark')->getDescription());
+        $this->assertEquals('!', $command->getDefinition()->getArgument('exclamationMark')->getDefault());
+        $this->assertEquals('Do you really want to yell out loud?', $command->getDefinition()->getOption('loud')->getDescription());
+        $this->assertFalse($command->getDefinition()->getOption('loud')->getDefault());
 
         $testApplication = new Application();
         $testApplication->add($command);
-        $command = $testApplication->find('fooTask');
+        $command = $testApplication->find('yell');
 
         $commandTester = new IdephixCommandTester($command, $idx->output());
-        $commandTester->execute(array('command' => $command->getName(), 'bar' => 'foobar'));
+        $commandTester->execute(array('command' => $command->getName(), 'what' => 'Say my name'));
 
+        $expectedArguments = array($idx, 'Say my name', '!', false);
         $this->assertEquals('task executed', $commandTester->getDisplay());
+        $this->assertEquals($expectedArguments, $argumentsSpy->args);
     }
 
     /**
@@ -62,18 +69,17 @@ class CommandTest extends \PHPUnit_Framework_TestCase
      */
     private function createTaskDefinition($idephixTaskCode)
     {
+        $parameters = ParameterCollection::dry();
+        $parameters[] = IdephixParameter::create();
+        $parameters[] = UserDefinedParameter::create('what', 'what you want me to yell');
+        $parameters[] = UserDefinedParameter::create('exclamationMark', 'The exclamation mark to use', '!');
+        $parameters[] = UserDefinedParameter::create('loud', 'Do you really want to yell out loud?', false);
+
         $task = $this->prophesize('\Idephix\Task\Task');
-        $task->name()->willReturn('fooTask');
-        $task->description()->willReturn('fooDescription');
-        $task->parameters()->willReturn(
-            ParameterCollection::createFromArray(
-                array(
-                    'bar' => array('description' => 'bar-description'),
-                    'foo' => array('defaultValue' => 'foo-value', 'description' => 'foo-description'),
-                    'go' => array('description' => 'dry run flag', 'defaultValue' => false)
-                )
-            )
-        );
+        $task->name()->willReturn('yell');
+        $task->description()->willReturn('A command that yells at you');
+        $task->parameters()->willReturn($parameters);
+        $task->userDefinedParameters()->willReturn(new UserDefinedParameterCollection($parameters));
         $task->code()->willReturn($idephixTaskCode);
         return $task;
     }

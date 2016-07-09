@@ -27,11 +27,16 @@ class Task
     }
 
     /**
-     * @return TaskCollection
+     * @return ParameterCollection
      */
     public function parameters()
     {
         return $this->parameters;
+    }
+
+    public function userDefinedParameters()
+    {
+        return new UserDefinedParameterCollection($this->parameters);
     }
 
     public function code()

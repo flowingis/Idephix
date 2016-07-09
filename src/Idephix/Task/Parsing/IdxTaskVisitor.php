@@ -1,7 +1,8 @@
 <?php
 namespace Idephix\Task\Parsing;
 
-use Idephix\Task\Parameter;
+use Idephix\Task\IdephixParameter;
+use Idephix\Task\UserDefinedParameter;
 use Idephix\Task\ParameterCollection;
 use Idephix\Task\Task;
 use Idephix\Task\TaskCollection;
@@ -43,14 +44,17 @@ class IdxTaskVisitor extends NodeVisitorAbstract
             $parameters = ParameterCollection::dry();
 
             foreach ($reflector->getParameters() as $parameter) {
-                if ($parameter->getName() !== 'idx') {
-                    $description = $parser->getParamDescription($parameter->getName());
-                    $parameters[] = Parameter::create(
-                        $parameter->getName(),
-                        $description,
-                        $this->getDefaultValue($parameter)
-                    );
+                if ($parameter->getClass() && $parameter->getClass()->implementsInterface('\Idephix\IdephixInterface')) {
+                    $parameters[] = IdephixParameter::create();
+                    continue;
                 }
+
+                $description = $parser->getParamDescription($parameter->getName());
+                $parameters[] = UserDefinedParameter::create(
+                    $parameter->getName(),
+                    $description,
+                    $this->getDefaultValue($parameter)
+                );
             }
 
             $this->collection[] = new Task(
