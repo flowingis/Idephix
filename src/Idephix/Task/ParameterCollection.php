@@ -17,7 +17,7 @@ class ParameterCollection extends Collection
     public function offsetSet($offset, $value)
     {
         if (!$value instanceof Parameter) {
-            throw new \DomainException('TaskCollection can only accept \Idephix\Task\Parameter object');
+            throw new \DomainException('ParameterCollection can only accept \Idephix\Task\Parameter object');
         }
 
         $this->getInnerIterator()->offsetSet($offset, $value);
