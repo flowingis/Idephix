@@ -1,7 +1,7 @@
 <?php
-namespace Idephix\Task;
+namespace Idephix\Task\Parameter;
 
-interface Parameter
+interface ParameterInterface
 {
     public function isFlagOption();
 

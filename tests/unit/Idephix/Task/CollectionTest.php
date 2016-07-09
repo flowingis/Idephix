@@ -11,7 +11,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class TestCollection extends Collection
+class TestCollection extends CollectionIterator
 {
     public static function ofArray($array)
     {

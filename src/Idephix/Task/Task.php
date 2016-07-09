@@ -1,6 +1,9 @@
 <?php
 namespace Idephix\Task;
 
+use Idephix\Task\Parameter\Collection;
+use Idephix\Task\Parameter\UserDefinedCollection;
+
 class Task
 {
     private $name;
@@ -8,7 +11,7 @@ class Task
     private $parameters;
     private $code;
 
-    public function __construct($name, $description, $code, ParameterCollection $parameters)
+    public function __construct($name, $description, $code, Collection $parameters)
     {
         $this->name = $name;
         $this->description = $description;
@@ -27,7 +30,7 @@ class Task
     }
 
     /**
-     * @return ParameterCollection
+     * @return Collection
      */
     public function parameters()
     {
@@ -36,7 +39,7 @@ class Task
 
     public function userDefinedParameters()
     {
-        return new UserDefinedParameterCollection($this->parameters);
+        return new UserDefinedCollection($this->parameters);
     }
 
     public function code()
@@ -47,7 +50,7 @@ class Task
     public static function dummy()
     {
         $code = function ($bar) { echo $bar; };
-        $params = ParameterCollection::createFromArray(array('bar'=> array('description' => '')));
+        $params = Collection::createFromArray(array('bar'=> array('description' => '')));
 
         return new static('foo', 'foo descr', $code, $params);
     }

@@ -1,7 +1,7 @@
 <?php
-namespace Idephix\Task;
+namespace Idephix\Task\Parameter;
 
-class UserDefinedParameter implements Parameter
+class UserDefined implements ParameterInterface
 {
     private $name;
     private $description;

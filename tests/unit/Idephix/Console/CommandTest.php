@@ -2,10 +2,10 @@
 namespace Idephix\Console;
 
 use Idephix\IdephixInterface;
-use Idephix\Task\IdephixParameter;
-use Idephix\Task\ParameterCollection;
-use Idephix\Task\UserDefinedParameter;
-use Idephix\Task\UserDefinedParameterCollection;
+use Idephix\Task\Parameter\Idephix;
+use Idephix\Task\Parameter\Collection;
+use Idephix\Task\Parameter\UserDefined;
+use Idephix\Task\Parameter\UserDefinedCollection;
 use Idephix\Test\Console\IdephixCommandTester;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -69,17 +69,17 @@ class CommandTest extends \PHPUnit_Framework_TestCase
      */
     private function createTaskDefinition($idephixTaskCode)
     {
-        $parameters = ParameterCollection::dry();
-        $parameters[] = IdephixParameter::create();
-        $parameters[] = UserDefinedParameter::create('what', 'what you want me to yell');
-        $parameters[] = UserDefinedParameter::create('exclamationMark', 'The exclamation mark to use', '!');
-        $parameters[] = UserDefinedParameter::create('loud', 'Do you really want to yell out loud?', false);
+        $parameters = Collection::dry();
+        $parameters[] = Idephix::create();
+        $parameters[] = UserDefined::create('what', 'what you want me to yell');
+        $parameters[] = UserDefined::create('exclamationMark', 'The exclamation mark to use', '!');
+        $parameters[] = UserDefined::create('loud', 'Do you really want to yell out loud?', false);
 
         $task = $this->prophesize('\Idephix\Task\Task');
         $task->name()->willReturn('yell');
         $task->description()->willReturn('A command that yells at you');
         $task->parameters()->willReturn($parameters);
-        $task->userDefinedParameters()->willReturn(new UserDefinedParameterCollection($parameters));
+        $task->userDefinedParameters()->willReturn(new UserDefinedCollection($parameters));
         $task->code()->willReturn($idephixTaskCode);
         return $task;
     }

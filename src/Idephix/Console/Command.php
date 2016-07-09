@@ -2,10 +2,10 @@
 namespace Idephix\Console;
 
 use Idephix\IdephixInterface;
-use Idephix\Task\IdephixParameter;
-use Idephix\Task\ParameterCollection;
+use Idephix\Task\Parameter\Idephix;
+use Idephix\Task\Parameter\Collection;
 use Idephix\Task\Task;
-use Idephix\Task\UserDefinedParameter;
+use Idephix\Task\Parameter\UserDefined;
 use Idephix\Util\DocBlockParser;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -36,20 +36,20 @@ class Command extends SymfonyCommand
             throw new \InvalidArgumentException('Code must be a callable');
         }
 
-        $parameters = ParameterCollection::dry();
+        $parameters = Collection::dry();
 
         $reflector = new \ReflectionFunction($code);
         $parser = new DocBlockParser($reflector->getDocComment());
 
         foreach ($reflector->getParameters() as $parameter) {
             if ($parameter->getName() == 'idx') {
-                $parameters[] = IdephixParameter::create();
+                $parameters[] = Idephix::create();
                 continue;
             }
 
             $description = $parser->getParamDescription($parameter->getName());
             $default = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
-            $parameters[] = UserDefinedParameter::create($parameter->getName(), $description, $default);
+            $parameters[] = UserDefined::create($parameter->getName(), $description, $default);
         }
 
         $task = new Task($name, $parser->getDescription(), $code, $parameters);
@@ -68,7 +68,7 @@ class Command extends SymfonyCommand
 
         $command->setDescription($task->description());
 
-        /** @var UserDefinedParameter $parameter */
+        /** @var UserDefined $parameter */
         foreach ($task->userDefinedParameters() as $parameter) {
             if (!$parameter->isOptional()) {
                 $command->addArgument($parameter->name(), InputArgument::REQUIRED, $parameter->description());
@@ -112,9 +112,9 @@ class Command extends SymfonyCommand
     protected function extractArgumentsFrom(InputInterface $input)
     {
         $args = array();
-        /** @var UserDefinedParameter $parameter */
+        /** @var \Idephix\Task\Parameter\UserDefined $parameter */
         foreach ($this->task->parameters() as $parameter) {
-            if ($parameter instanceof IdephixParameter) {
+            if ($parameter instanceof Idephix) {
                 $args[] = $this->idx;
                 continue;
             }

@@ -8,7 +8,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\Parser;
 
-class TaskCollection extends Collection
+class TaskCollection extends CollectionIterator
 {
     public static function ofTasks($array)
     {

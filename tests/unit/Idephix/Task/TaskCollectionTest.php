@@ -1,6 +1,10 @@
 <?php
 namespace Idephix\Task;
 
+use Idephix\Task\Parameter\Idephix;
+use Idephix\Task\Parameter\Collection;
+use Idephix\Task\Parameter\UserDefined;
+
 class TaskCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -38,7 +42,7 @@ EOD;
                 function ($bar) {
                     echo $bar;
                 },
-                ParameterCollection::createFromArray(
+                Collection::createFromArray(
                     array('foo' => array('description' => ''), 'bar' => array('description' => ''))
                 )
             ),
@@ -70,7 +74,7 @@ EOD;
                 function ($bar) {
                     echo $bar;
                 },
-                ParameterCollection::createFromArray(array('bar' => array('description' => '')))
+                Collection::createFromArray(array('bar' => array('description' => '')))
             ),
             $task
         );
@@ -93,9 +97,9 @@ EOD;
 
         $task = $collection[0];
 
-        $expectedParams = ParameterCollection::dry();
-        $expectedParams[] = IdephixParameter::create();
-        $expectedParams[] = UserDefinedParameter::create('bar', '');
+        $expectedParams = Collection::dry();
+        $expectedParams[] = Idephix::create();
+        $expectedParams[] = UserDefined::create('bar', '');
 
         $this->assertTaskEqual(
             new Task(

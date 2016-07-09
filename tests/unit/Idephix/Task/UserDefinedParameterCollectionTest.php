@@ -1,6 +1,11 @@
 <?php
 namespace Idephix\Task;
 
+use Idephix\Task\Parameter\Idephix;
+use Idephix\Task\Parameter\Collection;
+use Idephix\Task\Parameter\UserDefined;
+use Idephix\Task\Parameter\UserDefinedCollection;
+
 class UserDefinedParameterCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -8,16 +13,16 @@ class UserDefinedParameterCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_return_only_user_defined_parameters()
     {
-        $parameters = ParameterCollection::dry();
-        $parameters[] = UserDefinedParameter::create('foo', 'my foo parameter');
-        $parameters[] = IdephixParameter::create();
-        $parameters[] = UserDefinedParameter::create('bar', 'my bar paramter');
+        $parameters = Collection::dry();
+        $parameters[] = UserDefined::create('foo', 'my foo parameter');
+        $parameters[] = Idephix::create();
+        $parameters[] = UserDefined::create('bar', 'my bar paramter');
 
-        $filtered = new UserDefinedParameterCollection($parameters);
+        $filtered = new UserDefinedCollection($parameters);
 
         $count = 0;
         foreach ($filtered as $parameter) {
-            $this->assertInstanceOf('\Idephix\Task\UserDefinedParameter', $parameter);
+            $this->assertInstanceOf('\Idephix\Task\Parameter\UserDefined', $parameter);
             $count++;
         }
 

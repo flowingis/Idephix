@@ -1,7 +1,7 @@
 <?php
 namespace Idephix\Task;
 
-abstract class Collection implements \Iterator, \OuterIterator, \ArrayAccess
+abstract class CollectionIterator implements \Iterator, \OuterIterator, \ArrayAccess
 {
     /** @var  \Iterator */
     private $innerIterator;

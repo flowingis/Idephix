@@ -1,7 +1,7 @@
 <?php
-namespace Idephix\Task;
+namespace Idephix\Task\Parameter;
 
-class IdephixParameter implements Parameter
+class Idephix implements ParameterInterface
 {
     private $name;
 

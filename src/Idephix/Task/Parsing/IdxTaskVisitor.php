@@ -1,9 +1,9 @@
 <?php
 namespace Idephix\Task\Parsing;
 
-use Idephix\Task\IdephixParameter;
-use Idephix\Task\UserDefinedParameter;
-use Idephix\Task\ParameterCollection;
+use Idephix\Task\Parameter\Idephix;
+use Idephix\Task\Parameter\UserDefined;
+use Idephix\Task\Parameter\Collection;
 use Idephix\Task\Task;
 use Idephix\Task\TaskCollection;
 use Idephix\Util\DocBlockParser;
@@ -41,16 +41,16 @@ class IdxTaskVisitor extends NodeVisitorAbstract
             $reflector = new \ReflectionFunction($code);
             $parser = new DocBlockParser($reflector->getDocComment());
 
-            $parameters = ParameterCollection::dry();
+            $parameters = Collection::dry();
 
             foreach ($reflector->getParameters() as $parameter) {
                 if ($parameter->getClass() && $parameter->getClass()->implementsInterface('\Idephix\IdephixInterface')) {
-                    $parameters[] = IdephixParameter::create();
+                    $parameters[] = Idephix::create();
                     continue;
                 }
 
                 $description = $parser->getParamDescription($parameter->getName());
-                $parameters[] = UserDefinedParameter::create(
+                $parameters[] = UserDefined::create(
                     $parameter->getName(),
                     $description,
                     $this->getDefaultValue($parameter)
