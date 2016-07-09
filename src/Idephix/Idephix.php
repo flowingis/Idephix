@@ -49,7 +49,7 @@ class Idephix implements IdephixInterface
             self::RELEASE_DATE
             );
 
-        $this->targets = $config['targets'];
+        $this->targets = $config->targets();
         $sshClient = $config['sshClient'];
 
         if (null === $sshClient) {

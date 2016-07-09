@@ -29,4 +29,9 @@ class Config extends Dictionary
 
         return $config;
     }
+
+    public function targets()
+    {
+        return $this[self::TARGETS];
+    }
 }
