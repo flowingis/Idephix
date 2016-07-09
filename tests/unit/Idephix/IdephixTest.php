@@ -2,6 +2,7 @@
 namespace Idephix;
 
 use Idephix\Exception\FailedCommandException;
+use Idephix\Task\TaskCollection;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Idephix\Test\LibraryMock;
@@ -137,6 +138,21 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('ProcessTimedOutException', stream_get_contents($output));
     }
 
+    /** @test */
+    public function it_should_retrieve_libraries_from_config()
+    {
+        $lib = new LibraryMock($this);
+        $idx = new Idephix(
+            Config::fromArray(
+                array(
+                    Config::LIBRARIES => array('deploy' => $lib)
+                )
+            )
+        );
+
+        $this->assertEquals(42, $idx->test(42));
+    }
+    
     /**
      */
     public function testAddLibrary()

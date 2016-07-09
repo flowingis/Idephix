@@ -71,6 +71,10 @@ class Idephix implements IdephixInterface
         $this->input = $input;
         $this->addSelfUpdateCommand();
         $this->addInitIdxFileCommand();
+        
+        foreach($config->libraries() as $name => $library){
+            $this->addLibrary($name, $library);
+        }
     }
 
     public static function create(TaskCollection $tasks, Config $config)
