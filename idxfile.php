@@ -41,7 +41,7 @@ function deployPhar(\Idephix\IdephixInterface $idx)
 
     $idx->output()->writeln("committing new phar");
     $idx->local('cp -f idephix.phar ~/docs');
-    $idx->local('cp -f .git/refs/heads/master ~/docs/version');
+    $idx->local('git rev-parse HEAD > ~/docs/version');
     $idx->local('cd ~/docs && git status');
 
     $idx->local('cd ~/docs && git add -A .');
