@@ -11,33 +11,35 @@ function deployPhar(\Idephix\IdephixInterface $idx)
         exit(-1);
     }
 
-    $new_version = $idx->local('cat .git/refs/heads/master');
-    $commit_msg = trim($idx->local('git log -1 --pretty=%B'));
-
-    if (false === strpos($commit_msg, '[release]')) {
-        $idx->output()->writeln("skipping, commit msg was '$commit_msg'");
+    try{
+        $idx->local('git describe --exact-match --tags');
+    }catch (\Exception $e){
+        $commit_msg = trim($idx->local('git log -1 --pretty=%B'));
+        $idx->output()->writeln("skipping, commit '$commit_msg' is not tagged");
         exit(0);
     }
 
     $current_version = file_get_contents(
         'https://raw.githubusercontent.com/ideatosrl/getidephix.com/gh-pages/version'
     );
+    $new_version = $idx->local('cat .git/refs/heads/master');
 
     if ($new_version == $current_version) {
         $idx->output()->writeln("version $new_version already deployed");
         exit(0);
     }
 
+    $idx->output()->writeln("setting up ssh key");
     $idx->local('mkdir -p ~/.ssh');
     $idx->local('chmod 600 ~/.ssh/id_rsa');
 
-    // clone doc repo
+    $idx->output()->writeln("cloning getidephix website");
     $idx->local('rm -rf ~/docs');
     $idx->local('cd ~ && git clone --branch gh-pages git@github.com:ideatosrl/getidephix.com.git docs');
     $idx->local('cd ~/docs && git config user.name "ideatobot"');
     $idx->local('cd ~/docs && git config user.email "info@ideato.it"');
 
-    // copy new phar & commit
+    $idx->output()->writeln("committing new phar");
     $idx->local('cp -f idephix.phar ~/docs');
     $idx->local('cp -f .git/refs/heads/master ~/docs/version');
     $idx->local('cd ~/docs && git status');
