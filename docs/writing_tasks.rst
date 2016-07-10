@@ -30,7 +30,7 @@ And you can execute it with:
     $ bin/idx myNewTask
     I am a brand new task
 
-Piece of cake isn't it?
+Easy right?
 
 Adding task arguments
 ---------------------
