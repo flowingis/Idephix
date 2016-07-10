@@ -22,7 +22,7 @@ function deployPhar(\Idephix\IdephixInterface $idx)
     $current_version = file_get_contents(
         'https://raw.githubusercontent.com/ideatosrl/getidephix.com/gh-pages/version'
     );
-    $new_version = $idx->local('cat .git/refs/heads/master');
+    $new_version = $idx->local('git rev-parse HEAD');
 
     if ($new_version == $current_version) {
         $idx->output()->writeln("version $new_version already deployed");
