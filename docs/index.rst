@@ -20,6 +20,7 @@ Contents:
    Getting Started <getting_started>
    Configuration <configuration>
    Writing tasks <writing_tasks>
+   Migrating your idxfile <migrating_idx_file>
 
 Requirements
 ============
