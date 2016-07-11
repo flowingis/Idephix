@@ -1,7 +1,7 @@
 .. _idx_config:
 
 Configuration
-*************
+=============
 
 All Idephix configurations are defined within the ``idxrc.php`` file.
 By default Idephix will look for a file named ``idxrc.php`` in the root
@@ -12,8 +12,17 @@ you need to specify id by using ``-c`` option with Idephix CLI.
 The file **must** return an instace of ``\Idephix\Config``, which lets you
 configure the targets and the preferred ssh client.
 
-This example of ``idxrc.php`` file will give you and idea of how define targets
-and ssh clients:
+Idephix uses 3 main configuration elements:
+
+- targets
+- sshClient
+- extensions
+
+None of them are mandatory, you'll need targets and sshClient only to execute remote
+tasks and extensions only if you want to register some extension.
+
+This example of ``idxrc.php`` file will give you and idea of how define targets, ssh clients
+and extensions:
 
 .. code-block:: php
 
@@ -68,6 +77,9 @@ and ssh clients:
         array(
             \Idephix\Config::TARGETS => $targets,
             \Idephix\Config::SSHCLIENT => new \Idephix\SSH\SshClient(),
+            \Idephix\Config::EXTENSIONS => array(
+                'deploy' => new \Idephix\Extension\Deploy\Deploy(),
+            ),
         )
     );
 
