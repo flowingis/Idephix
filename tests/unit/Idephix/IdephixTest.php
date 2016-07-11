@@ -5,7 +5,7 @@ use Idephix\Exception\FailedCommandException;
 use Idephix\Task\TaskCollection;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
-use Idephix\Test\LibraryMock;
+use Idephix\Test\ExtensionMock;
 
 class IdephixTest extends \PHPUnit_Framework_TestCase
 {
@@ -141,11 +141,11 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_should_retrieve_libraries_from_config()
     {
-        $lib = new LibraryMock($this);
+        $lib = new ExtensionMock($this);
         $idx = new Idephix(
             Config::fromArray(
                 array(
-                    Config::LIBRARIES => array('deploy' => $lib)
+                    Config::EXTENSIONS => array('deploy' => $lib)
                 )
             )
         );
@@ -155,21 +155,21 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     
     /**
      */
-    public function testAddLibrary()
+    public function addExtension()
     {
-        $lib = new LibraryMock($this);
-        $this->idx->addLibrary('name', $lib);
+        $extension = new ExtensionMock($this);
+        $this->idx->addExtension('name', $extension);
         $this->assertEquals(42, $this->idx->name()->test(42));
         $this->assertEquals(42, $this->idx->test(42));
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The library must be an object
+     * @expectedExceptionMessage The extension must be an object
      */
-    public function testAddLibraryNonObject()
+    public function testAddNonObjectExtension()
     {
-        $this->idx->addLibrary('name', 123);
+        $this->idx->addExtension('name', 123);
     }
 
     /**

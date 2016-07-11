@@ -7,7 +7,7 @@ class Config extends Dictionary
 {
     const TARGETS = 'targets';
     const SSHCLIENT = 'sshClient';
-    const LIBRARIES = 'libraries';
+    const EXTENSIONS = 'extensions';
 
     public static function parseFile($configFile)
     {
@@ -36,8 +36,8 @@ class Config extends Dictionary
         return $this[self::TARGETS];
     }
 
-    public function libraries()
+    public function extensions()
     {
-        return $this->get(self::LIBRARIES, array());
+        return $this->get(self::EXTENSIONS, array());
     }
 }

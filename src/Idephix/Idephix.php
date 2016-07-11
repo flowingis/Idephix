@@ -27,7 +27,7 @@ class Idephix implements IdephixInterface
     const RELEASE_DATE = '@release_date@';
 
     private $application;
-    private $library = array();
+    private $extensions = array();
     private $input;
     private $output;
     private $sshClient;
@@ -72,8 +72,8 @@ class Idephix implements IdephixInterface
         $this->addSelfUpdateCommand();
         $this->addInitIdxFileCommand();
         
-        foreach($config->libraries() as $name => $library){
-            $this->addLibrary($name, $library);
+        foreach($config->extensions() as $name => $extension){
+            $this->addExtension($name, $extension);
         }
     }
 
@@ -100,13 +100,13 @@ class Idephix implements IdephixInterface
 
     public function __call($name, $arguments = array())
     {
-        if (isset($this->library[$name])) {
-            return $this->library[$name];
+        if (isset($this->extensions[$name])) {
+            return $this->extensions[$name];
         }
 
-        foreach ($this->library as $libName => $library) {
-            if (is_callable(array($library, $name))) {
-                return call_user_func_array(array($library, $name), $arguments);
+        foreach ($this->extensions as $libName => $extension) {
+            if (is_callable(array($extension, $name))) {
+                return call_user_func_array(array($extension, $name), $arguments);
             }
         }
 
@@ -234,17 +234,27 @@ class Idephix implements IdephixInterface
     /**
      * @inheritdoc
      */
-    public function addLibrary($name, $library)
+    public function addExtension($name, $extension)
     {
-        if (!is_object($library)) {
-            throw new \InvalidArgumentException('The library must be an object');
+        if (!is_object($extension)) {
+            throw new \InvalidArgumentException('The extension must be an object');
         }
 
-        if ($library instanceof IdephixAwareInterface) {
-            $library->setIdephix($this);
+        if ($extension instanceof IdephixAwareInterface) {
+            $extension->setIdephix($this);
         }
 
-        $this->library[$name] = $library;
+        $this->extensions[$name] = $extension;
+    }
+
+    /**
+     * @param $name
+     * @param $extension
+     * @deprecated should use addExtension instead
+     */
+    public function addLibrary($name, $extension)
+    {
+        $this->addExtension($name, $extension);
     }
 
     /**
@@ -277,7 +287,7 @@ class Idephix implements IdephixInterface
     public function addSelfUpdateCommand()
     {
         if ('phar:' === substr(__FILE__, 0, 5)) {
-            $this->addLibrary('selfUpdate', new SelfUpdate());
+            $this->addExtension('selfUpdate', new SelfUpdate());
             $idx = $this;
             $this
                 ->add(
@@ -294,7 +304,7 @@ class Idephix implements IdephixInterface
 
     public function addInitIdxFileCommand()
     {
-        $this->addLibrary('initIdxFile', new InitIdxFile());
+        $this->addExtension('initIdxFile', new InitIdxFile());
         $idx = $this;
         $this
             ->add(

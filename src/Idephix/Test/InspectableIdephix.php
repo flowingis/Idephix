@@ -93,12 +93,12 @@ class InspectableIdephix implements IdephixInterface
 
     /**
      * @param string $name
-     * @param object $library
+     * @param object $extension
      * @return void
      */
-    public function addLibrary($name, $library)
+    public function addExtension($name, $extension)
     {
-        // TODO: Implement addLibrary() method.
+        // TODO: Implement addExtension() method.
     }
 
     /**

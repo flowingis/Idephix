@@ -5,7 +5,7 @@ namespace Idephix\Test;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\IdephixInterface;
 
-class LibraryMock implements IdephixAwareInterface
+class ExtensionMock implements IdephixAwareInterface
 {
     protected $tester;
 
