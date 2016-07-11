@@ -5,7 +5,6 @@ namespace Idephix;
 use Idephix\Console\Application;
 use Idephix\Console\Command;
 use Idephix\Exception\FailedCommandException;
-use Idephix\File\IdxFile;
 use Idephix\Task\TaskCollection;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -72,7 +71,7 @@ class Idephix implements IdephixInterface
         $this->addSelfUpdateCommand();
         $this->addInitIdxFileCommand();
         
-        foreach($config->extensions() as $name => $extension){
+        foreach ($config->extensions() as $name => $extension) {
             $this->addExtension($name, $extension);
         }
     }
