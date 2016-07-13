@@ -12,7 +12,7 @@ interface IdephixInterface
      * @param OutputInterface $output
      * @param InputInterface $input
      */
-    public function __construct(Config $config, OutputInterface $output = null, InputInterface $input = null);
+    public function __construct($config, OutputInterface $output = null, InputInterface $input = null);
 
     /**
      * Add a Command to the application.

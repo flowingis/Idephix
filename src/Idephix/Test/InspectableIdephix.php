@@ -22,7 +22,7 @@ class InspectableIdephix implements IdephixInterface
      * @param OutputInterface $output
      * @param InputInterface $input
      */
-    public function __construct(Config $config, OutputInterface $output = null, InputInterface $input = null)
+    public function __construct($config, OutputInterface $output = null, InputInterface $input = null)
     {
         $this->sshClient = $config->get('sshClient', null);
         $this->input = $input;

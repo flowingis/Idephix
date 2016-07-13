@@ -4,6 +4,7 @@ namespace Idephix;
 
 use Idephix\Console\Application;
 use Idephix\Console\Command;
+use Idephix\Exception\DeprecatedException;
 use Idephix\Exception\FailedCommandException;
 use Idephix\Task\TaskCollection;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,10 +39,15 @@ class Idephix implements IdephixInterface
     protected $invokerClassName;
 
     public function __construct(
-        Config $config,
+        $config,
         OutputInterface $output = null,
         InputInterface $input = null)
     {
+
+        if(!$config instanceof Config){
+            throw new DeprecatedException("You're using an old idxfile format, consider updating. http://idephix.readthedocs.io/en/latest/migrating_idx_file.html");
+        }
+
         $this->application = new Application(
             'Idephix',
             self::VERSION,
