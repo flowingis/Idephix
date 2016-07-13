@@ -12,7 +12,7 @@ function deployPhar(\Idephix\IdephixInterface $idx)
     }
 
     try{
-        $newTag = $idx->local('git describe --exact-match --tags');
+        $newTag = trim($idx->local('git describe --exact-match --tags'));
     }catch (\Exception $e){
         $commit_msg = trim($idx->local('git log -1 --pretty=%B'));
         $idx->output()->writeln("skipping, commit '$commit_msg' is not tagged");
