@@ -12,20 +12,20 @@ function deployPhar(\Idephix\IdephixInterface $idx)
     }
 
     try{
-        $idx->local('git describe --exact-match --tags');
+        $newTag = $idx->local('git describe --exact-match --tags');
     }catch (\Exception $e){
         $commit_msg = trim($idx->local('git log -1 --pretty=%B'));
         $idx->output()->writeln("skipping, commit '$commit_msg' is not tagged");
         exit(0);
     }
 
-    $current_version = file_get_contents(
+    $currentHash = file_get_contents(
         'https://raw.githubusercontent.com/ideatosrl/getidephix.com/gh-pages/version'
     );
-    $new_version = $idx->local('git rev-parse HEAD');
+    $newVersion = $idx->local('git rev-parse HEAD');
 
-    if ($new_version == $current_version) {
-        $idx->output()->writeln("version $new_version already deployed");
+    if ($newVersion == $currentHash) {
+        $idx->output()->writeln("version $newVersion already deployed");
         exit(0);
     }
 
@@ -41,11 +41,13 @@ function deployPhar(\Idephix\IdephixInterface $idx)
 
     $idx->output()->writeln("committing new phar");
     $idx->local('cp -f idephix.phar ~/docs');
+    $idx->local('mkdir -p ~/docs/archive');
+    $idx->local("cp -f idephix.phar ~/docs/archive/idephix-{$newTag}.phar");
     $idx->local('git rev-parse HEAD > ~/docs/version');
     $idx->local('cd ~/docs && git status');
 
     $idx->local('cd ~/docs && git add -A .');
-    $idx->local("cd ~/docs && git commit -m 'deploy phar version $new_version'");
+    $idx->local("cd ~/docs && git commit -m 'deploy phar version $newTag $newVersion'");
     $idx->local('cd ~/docs && git push -q origin gh-pages');
 };
 
