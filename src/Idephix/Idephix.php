@@ -43,8 +43,7 @@ class Idephix implements IdephixInterface
         OutputInterface $output = null,
         InputInterface $input = null)
     {
-
-        if(!$config instanceof Config){
+        if (!$config instanceof Config) {
             throw new DeprecatedException("You're using an old idxfile format, consider updating. http://idephix.readthedocs.io/en/latest/migrating_idx_file.html");
         }
 
