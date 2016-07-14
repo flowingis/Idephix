@@ -11,9 +11,9 @@ function deployPhar(\Idephix\IdephixInterface $idx)
         exit(-1);
     }
 
-    try{
+    try {
         $newTag = trim($idx->local('git describe --exact-match --tags'));
-    }catch (\Exception $e){
+    } catch (\Exception $e) {
         $commit_msg = trim($idx->local('git log -1 --pretty=%B'));
         $idx->output()->writeln("skipping, commit '$commit_msg' is not tagged");
         exit(0);
@@ -29,17 +29,17 @@ function deployPhar(\Idephix\IdephixInterface $idx)
         exit(0);
     }
 
-    $idx->output()->writeln("setting up ssh key");
+    $idx->output()->writeln('setting up ssh key');
     $idx->local('mkdir -p ~/.ssh');
     $idx->local('chmod 600 ~/.ssh/id_rsa');
 
-    $idx->output()->writeln("cloning getidephix website");
+    $idx->output()->writeln('cloning getidephix website');
     $idx->local('rm -rf ~/docs');
     $idx->local('cd ~ && git clone --branch gh-pages git@github.com:ideatosrl/getidephix.com.git docs');
     $idx->local('cd ~/docs && git config user.name "ideatobot"');
     $idx->local('cd ~/docs && git config user.email "info@ideato.it"');
 
-    $idx->output()->writeln("committing new phar");
+    $idx->output()->writeln('committing new phar');
     $idx->local('cp -f idephix.phar ~/docs');
     $idx->local('mkdir -p ~/docs/archive');
     $idx->local("cp -f idephix.phar ~/docs/archive/idephix-{$newTag}.phar");
@@ -94,7 +94,10 @@ function build(\Idephix\IdephixInterface $idx)
 
 function fixCs(\Idephix\IdephixInterface $idx)
 {
-    $idx->local('bin/php-cs-fixer fix');
+    try {
+        $idx->local('bin/php-cs-fixer fix');
+    } catch (\Exception $e) {
+    }
 };
 
 function buildDoc(\Idephix\IdephixInterface $idx, $open = false)
