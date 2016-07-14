@@ -5,7 +5,7 @@ use Idephix\Exception\FailedCommandException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
-use Idephix\Test\ExtensionMock;
+use Idephix\Test\DummyExtension;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 
 class IdephixTest extends \PHPUnit_Framework_TestCase
@@ -151,7 +151,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_should_retrieve_libraries_from_config()
     {
-        $lib = new ExtensionMock($this);
+        $lib = new DummyExtension($this);
         $idx = new Idephix(
             Config::fromArray(
                 array(
@@ -167,7 +167,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function addExtension()
     {
-        $extension = new ExtensionMock($this);
+        $extension = new DummyExtension($this);
         $this->idx->addExtension('name', $extension);
         $this->assertEquals(42, $this->idx->name()->test(42));
         $this->assertEquals(42, $this->idx->test(42));
