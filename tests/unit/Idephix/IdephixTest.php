@@ -164,13 +164,35 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
+     * @test
      */
-    public function addExtension()
+    public function it_should_allow_to_use_extension()
     {
         $extension = new DummyExtension($this);
         $this->idx->addExtension('name', $extension);
         $this->assertEquals(42, $this->idx->name()->test(42));
         $this->assertEquals(42, $this->idx->test(42));
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_allow_to_override_extension_method()
+    {
+        $extension = new DummyExtension($this);
+        $this->idx->addExtension('myExtension', $extension);
+        $this->idx->add('test', function ($what) { return $what * 2;});
+        $this->assertEquals(84, $this->idx->test(42));
+        $this->assertEquals(42, $this->idx->myExtension()->test(42));
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_allow_to_invoke_tasks()
+    {
+        $this->idx->add('test', function ($what) { return $what * 2;});
+        $this->assertEquals(84, $this->idx->test(42));
     }
 
     /**

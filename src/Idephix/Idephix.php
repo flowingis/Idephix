@@ -104,6 +104,10 @@ class Idephix implements IdephixInterface
 
     public function __call($name, $arguments = array())
     {
+        if ($this->has($name)) {
+            return call_user_func_array(array($this, 'runTask'), array_merge(array($name), $arguments));
+        }
+
         if (isset($this->extensions[$name])) {
             return $this->extensions[$name];
         }
@@ -276,6 +280,7 @@ class Idephix implements IdephixInterface
      * @param string $name the name of the task you want to call
      * @param (...)  arbitrary number of parameter matching the target task interface
      * @return integer
+     * @deprecated should call directly tasks as Idephix methods 
      */
     public function runTask($name)
     {
