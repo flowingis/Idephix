@@ -2,6 +2,8 @@
 namespace Idephix;
 
 use Idephix\Exception\FailedCommandException;
+use Idephix\Task\Parameter;
+use Idephix\Task\Task;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -51,8 +53,9 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
      */
-    public function testAdd()
+    public function it_should_add_closure()
     {
         $this->idx->add(
             'command_name',
@@ -63,6 +66,26 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->idx->has('command_name'));
     }
 
+    /**
+     * @test
+     */
+    public function it_should_add_task()
+    {
+        $task = new Task('command_name', 'foo command name', function () {}, Parameter\Collection::dry());
+        $this->idx->add($task);
+
+        $this->assertTrue($this->idx->has('command_name'));
+    }
+
+    /**
+     * @test
+     * @expectedException \Idephix\Exception\InvalidTaskException
+     */
+    public function it_should_throw_exception_for_missing_code()
+    {
+        $this->idx->add('command_name');
+    }
+    
     public function getArgvAndTargets()
     {
         return array(

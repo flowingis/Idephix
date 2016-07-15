@@ -6,6 +6,8 @@ use Idephix\Console\Application;
 use Idephix\Console\Command;
 use Idephix\Exception\DeprecatedException;
 use Idephix\Exception\FailedCommandException;
+use Idephix\Exception\InvalidTaskException;
+use Idephix\Task\Task;
 use Idephix\Task\TaskCollection;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -141,10 +143,19 @@ class Idephix implements IdephixInterface
     /**
      * @inheritdoc
      */
-    public function add($name, $code)
+    public function add($task, $code = null)
     {
-        $this->application->add(Command::buildFromCode($name, $code, $this));
-        return $this;
+        if ($task instanceof Task) {
+            $this->application->add(Command::fromTask($task, $this));
+            return $this;
+        }
+
+        if (is_string($task) && is_callable($code)) {
+            $this->application->add(Command::buildFromCode($task, $code, $this));
+            return $this;
+        }
+
+        throw new InvalidTaskException('A task must be an instance of Idephix\Task or Callable');
     }
 
     /**
