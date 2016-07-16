@@ -71,10 +71,15 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_add_task()
     {
-        $task = new Task('command_name', 'foo command name', function () {}, Parameter\Collection::dry());
+        $task = new Task('fooCommand', 'A dummy command', function () {}, Parameter\Collection::dry());
         $this->idx->add($task);
 
-        $this->assertTrue($this->idx->has('command_name'));
+        $this->assertTrue($this->idx->has('fooCommand'));
+
+        $registeredCommands = $this->idx->getApplication()->all();
+        $this->assertArrayHasKey('fooCommand', $registeredCommands);
+        $this->assertInstanceOf('\Idephix\Console\Command', $registeredCommands['fooCommand']);
+        $this->assertEquals('fooCommand', $registeredCommands['fooCommand']->getName());
     }
 
     /**
