@@ -2,13 +2,15 @@
 
 namespace Idephix\Extension\Project;
 
+use Idephix\Extension;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
+use Idephix\Task\TaskCollection;
 
 /**
  * Provide a basic rsync interface based on current idx target parameters
  */
-class Project implements IdephixAwareInterface
+class Project implements IdephixAwareInterface, Extension
 {
     /**
      * @var \Idephix\IdephixInterface
@@ -18,6 +20,17 @@ class Project implements IdephixAwareInterface
     public function setIdephix(IdephixInterface $idx)
     {
         $this->idx = $idx;
+    }
+
+    /** @return TaskCollection */
+    public function tasks()
+    {
+        return TaskCollection::dry();
+    }
+
+    public function name()
+    {
+        return 'project';
     }
 
     public function rsyncProject($remoteDir, $localDir = null, $exclude = null, $extraOpts = null)

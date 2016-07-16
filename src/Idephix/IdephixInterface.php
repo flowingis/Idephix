@@ -45,11 +45,10 @@ interface IdephixInterface
     public function run();
 
     /**
-     * @param string $name
-     * @param object $extension
-     * @return void
+     * @param Extension $extension
+     * @return
      */
-    public function addExtension($name, $extension);
+    public function addExtension(Extension $extension);
 
     /**
      * @param $name

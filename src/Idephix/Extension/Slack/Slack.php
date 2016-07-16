@@ -2,15 +2,17 @@
 
 namespace Idephix\Extension\Slack;
 
+use Idephix\Extension;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
+use Idephix\Task\TaskCollection;
 
 /**
  * Description of Slack wrapper
  *
  * @author dymissy
  */
-class Slack implements IdephixAwareInterface
+class Slack implements IdephixAwareInterface, Extension
 {
     /**
      * @var \Idephix\IdephixInterface
@@ -29,6 +31,17 @@ class Slack implements IdephixAwareInterface
         );
 
         $this->settings = array_merge($defaults, $args);
+    }
+
+    /** @return TaskCollection */
+    public function tasks()
+    {
+        return TaskCollection::dry();
+    }
+
+    public function name()
+    {
+        return 'slack';
     }
 
     public function sendToSlack($message, $attachments = array(), $channel = '', $icon_url = '', $username = '')

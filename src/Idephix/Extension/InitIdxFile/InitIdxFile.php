@@ -2,10 +2,14 @@
 
 namespace Idephix\Extension\InitIdxFile;
 
+use Idephix\Extension;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\IdephixInterface;
+use Idephix\Task\Parameter\Collection;
+use Idephix\Task\Task;
+use Idephix\Task\TaskCollection;
 
-class InitIdxFile implements IdephixAwareInterface
+class InitIdxFile implements IdephixAwareInterface, Extension
 {
     private $idx;
 
@@ -14,6 +18,20 @@ class InitIdxFile implements IdephixAwareInterface
     public function __construct($baseDir = '.')
     {
         $this->baseDir = $baseDir;
+    }
+
+
+    /** @return TaskCollection */
+    public function tasks()
+    {
+        return TaskCollection::ofTasks(array(
+            new Task('initFile', 'Init idx configurations and tasks file', array($this, 'initFile'), Collection::dry()),
+        ));
+    }
+
+    public function name()
+    {
+        return 'initIdxFile';
     }
 
     public function setIdephix(IdephixInterface $idx)

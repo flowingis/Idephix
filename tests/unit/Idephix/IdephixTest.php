@@ -177,13 +177,13 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function it_should_retrieve_libraries_from_config()
+    public function it_should_register_extensions_from_config()
     {
-        $lib = new DummyExtension($this);
+        $extension = new DummyExtension($this, 'deploy');
         $idx = new Idephix(
             Config::fromArray(
                 array(
-                    Config::EXTENSIONS => array('deploy' => $lib)
+                    Config::EXTENSIONS => array($extension)
                 )
             )
         );
@@ -196,9 +196,8 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_allow_to_use_extension()
     {
-        $extension = new DummyExtension($this);
-        $this->idx->addExtension('name', $extension);
-        $this->assertEquals(42, $this->idx->name()->test(42));
+        $extension = new DummyExtension($this, 'deploy');
+        $this->idx->addExtension($extension);
         $this->assertEquals(42, $this->idx->test(42));
     }
 
@@ -207,11 +206,25 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_allow_to_override_extension_method()
     {
-        $extension = new DummyExtension($this);
-        $this->idx->addExtension('myExtension', $extension);
+        $extension = new DummyExtension($this, 'myExtension');
+        $this->idx->addExtension($extension);
         $this->idx->add('test', function ($what) { return $what * 2;});
         $this->assertEquals(84, $this->idx->test(42));
-        $this->assertEquals(42, $this->idx->myExtension()->test(42));
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_add_task_from_extesions()
+    {
+        $extension = new DummyExtension($this, 'deploy');
+        $this->idx->addExtension($extension);
+
+        $registeredCommands = $this->idx->getApplication()->all();
+        $this->assertArrayHasKey('update', $registeredCommands);
+        $this->assertInstanceOf('\Idephix\Console\Command', $registeredCommands['update']);
+        $this->assertEquals('update', $registeredCommands['update']->getName());
+        $this->assertEquals(42, $this->idx->update(42));
     }
 
     /**
@@ -221,15 +234,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     {
         $this->idx->add('test', function ($what) { return $what * 2;});
         $this->assertEquals(84, $this->idx->test(42));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The extension must be an object
-     */
-    public function testAddNonObjectExtension()
-    {
-        $this->idx->addExtension('name', 123);
     }
 
     /**

@@ -2,17 +2,39 @@
 
 namespace Idephix\Extension\SelfUpdate;
 
+use Idephix\Extension;
+use Idephix\Task\Parameter;
 use Idephix\Idephix;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
+use Idephix\Task\Task;
+use Idephix\Task\TaskCollection;
 
-class SelfUpdate implements IdephixAwareInterface
+class SelfUpdate implements IdephixAwareInterface, Extension
 {
     private $idx;
 
     public function setIdephix(IdephixInterface $idx)
     {
         $this->idx = $idx;
+    }
+
+    /** @return TaskCollection */
+    public function tasks()
+    {
+        return TaskCollection::ofTasks(array(
+            new Task(
+                'selfupdate',
+                'Update Idephix to the latest version',
+                array($this, 'update'),
+                Parameter\Collection::dry()
+            )
+        ));
+    }
+
+    public function name()
+    {
+        return 'selfUpdate';
     }
 
     /**

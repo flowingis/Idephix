@@ -78,8 +78,8 @@ class Idephix implements IdephixInterface
         $this->addSelfUpdateCommand();
         $this->addInitIdxFileCommand();
         
-        foreach ($config->extensions() as $name => $extension) {
-            $this->addExtension($name, $extension);
+        foreach ($config->extensions() as $extension) {
+            $this->addExtension($extension);
         }
     }
 
@@ -108,10 +108,6 @@ class Idephix implements IdephixInterface
     {
         if ($this->has($name)) {
             return call_user_func_array(array($this, 'runTask'), array_merge(array($name), $arguments));
-        }
-
-        if (isset($this->extensions[$name])) {
-            return $this->extensions[$name];
         }
 
         foreach ($this->extensions as $libName => $extension) {
@@ -253,17 +249,19 @@ class Idephix implements IdephixInterface
     /**
      * @inheritdoc
      */
-    public function addExtension($name, $extension)
+    public function addExtension(Extension $extension)
     {
-        if (!is_object($extension)) {
-            throw new \InvalidArgumentException('The extension must be an object');
-        }
-
         if ($extension instanceof IdephixAwareInterface) {
             $extension->setIdephix($this);
         }
 
-        $this->extensions[$name] = $extension;
+        $this->extensions[$extension->name()] = $extension;
+
+        foreach ($extension->tasks() as $task) {
+            if (!$this->has($task->name())) {
+                $this->application->add(Command::fromTask($task, $this));
+            }
+        }
     }
 
     /**
@@ -307,35 +305,13 @@ class Idephix implements IdephixInterface
     public function addSelfUpdateCommand()
     {
         if ('phar:' === substr(__FILE__, 0, 5)) {
-            $this->addExtension('selfUpdate', new SelfUpdate());
-            $idx = $this;
-            $this
-                ->add(
-                    'selfupdate',
-                    /**
-                     * Donwload and update Idephix
-                     */
-                    function () use ($idx) {
-                        $idx->selfUpdate()->update();
-                    }
-                );
+            $this->addExtension(new SelfUpdate());
         }
     }
 
     public function addInitIdxFileCommand()
     {
-        $this->addExtension('initIdxFile', new InitIdxFile());
-        $idx = $this;
-        $this
-            ->add(
-                'init-idx-file',
-                /**
-                 * Create an example idxfile.php
-                 */
-                function () use ($idx) {
-                    $idx->initIdxFile()->initFile();
-                }
-            );
+        $this->addExtension(new InitIdxFile());
     }
 
     /**

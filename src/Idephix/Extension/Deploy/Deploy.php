@@ -3,18 +3,20 @@
 namespace Idephix\Extension\Deploy;
 
 use Idephix\Context;
+use Idephix\Extension;
 use Idephix\Extension\Deploy\Strategy\Factory;
 use Idephix\Extension\Deploy\Strategy\FactoryInterface;
 use Idephix\Idephix;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
+use Idephix\Task\TaskCollection;
 
 /**
  * Basic Deploy class
  *
  * @author kea
  */
-class Deploy implements IdephixAwareInterface
+class Deploy implements IdephixAwareInterface, Extension
 {
     /**
      * @var Idephix
@@ -38,6 +40,17 @@ class Deploy implements IdephixAwareInterface
         $this->strategyFactory = $strategyFactory;
     }
 
+    /** @return TaskCollection */
+    public function tasks()
+    {
+        return TaskCollection::dry();
+    }
+
+    public function name()
+    {
+        return 'deploy';
+    }
+
     public static function create()
     {
         return new static(new Factory);
@@ -48,7 +61,7 @@ class Deploy implements IdephixAwareInterface
         $this->sshClient = $idx->sshClient();
         $this->idx = $idx;
     }
-
+    
     public function setUpEnvironment()
     {
         if (null === $this->idx->getCurrentTargetName()) {
