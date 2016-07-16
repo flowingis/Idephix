@@ -32,7 +32,18 @@ And you can execute it with:
     $ bin/idx myNewTask
     I am a brand new task
 
-Easy right?
+You can even execute a task within another task:
+
+.. code-block:: php
+
+    function anotherTask()
+    {
+    }
+
+    function myNewTask(\Idephix\IdephixInterface $idx)
+    {
+        $idx->anotherTask();
+    }
 
 Adding task arguments
 ---------------------
