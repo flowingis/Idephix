@@ -9,7 +9,7 @@ use Idephix\Exception\FailedCommandException;
 use Idephix\Exception\InvalidTaskException;
 use Idephix\Exception\MissingMethodException;
 use Idephix\Extension\MethodCollection;
-use Idephix\Task\Task;
+use Idephix\Task\CallableTask;
 use Idephix\Task\TaskCollection;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -143,7 +143,7 @@ class Idephix implements IdephixInterface
      */
     public function add($task, $code = null)
     {
-        if ($task instanceof Task) {
+        if ($task instanceof CallableTask) {
             $this->application->add(Command::fromTask($task, $this));
             return $this;
         }

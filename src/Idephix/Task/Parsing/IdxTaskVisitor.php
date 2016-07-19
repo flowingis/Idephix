@@ -4,7 +4,7 @@ namespace Idephix\Task\Parsing;
 use Idephix\Task\Parameter\Idephix;
 use Idephix\Task\Parameter\UserDefined;
 use Idephix\Task\Parameter\Collection;
-use Idephix\Task\Task;
+use Idephix\Task\CallableTask;
 use Idephix\Task\TaskCollection;
 use Idephix\Util\DocBlockParser;
 use PhpParser\Node;
@@ -57,7 +57,7 @@ class IdxTaskVisitor extends NodeVisitorAbstract
                 );
             }
 
-            $this->collection[] = new Task(
+            $this->collection[] = new CallableTask(
                 $this->cleanupTaskName($node), $parser->getDescription(), $code, $parameters
             );
         }

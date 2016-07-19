@@ -7,7 +7,7 @@ use Idephix\Task\Parameter;
 use Idephix\Idephix;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
-use Idephix\Task\Task;
+use Idephix\Task\CallableTask;
 use Idephix\Task\TaskCollection;
 
 class SelfUpdate implements IdephixAwareInterface, Extension
@@ -23,7 +23,7 @@ class SelfUpdate implements IdephixAwareInterface, Extension
     public function tasks()
     {
         return TaskCollection::ofTasks(array(
-            new Task(
+            new CallableTask(
                 'selfupdate',
                 'Update Idephix to the latest version',
                 array($this, 'update'),

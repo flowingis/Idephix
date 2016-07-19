@@ -6,7 +6,7 @@ use Idephix\Extension;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\IdephixInterface;
 use Idephix\Task\Parameter\Collection;
-use Idephix\Task\Task;
+use Idephix\Task\CallableTask;
 use Idephix\Task\TaskCollection;
 
 class InitIdxFile implements IdephixAwareInterface, Extension
@@ -25,7 +25,7 @@ class InitIdxFile implements IdephixAwareInterface, Extension
     public function tasks()
     {
         return TaskCollection::ofTasks(array(
-            new Task('initFile', 'Init idx configurations and tasks file', array($this, 'initFile'), Collection::dry()),
+            new CallableTask('initFile', 'Init idx configurations and tasks file', array($this, 'initFile'), Collection::dry()),
         ));
     }
 

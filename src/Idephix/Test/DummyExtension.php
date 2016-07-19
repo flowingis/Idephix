@@ -6,7 +6,7 @@ use Idephix\Extension;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\IdephixInterface;
 use Idephix\Task\Parameter\Collection;
-use Idephix\Task\Task;
+use Idephix\Task\CallableTask;
 use Idephix\Task\TaskCollection;
 
 class DummyExtension implements IdephixAwareInterface, Extension
@@ -58,7 +58,7 @@ class DummyExtension implements IdephixAwareInterface, Extension
     public function tasks()
     {
         $collection = TaskCollection::dry();
-        $collection[] = new Task(
+        $collection[] = new CallableTask(
             'update', 'An exposed task by DummyExtension',
             array($this, 'update'),
             Collection::createFromArray(array('return' => array('description' => 'what do you want back')))

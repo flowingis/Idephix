@@ -17,7 +17,7 @@ class TaskCollection extends CollectionIterator
                 array_filter(
                     $array,
                     function ($task) {
-                        return $task instanceof Task;
+                        return $task instanceof CallableTask;
                     }
                 )
             )
@@ -51,7 +51,7 @@ class TaskCollection extends CollectionIterator
 
     public function offsetSet($offset, $value)
     {
-        if (!$value instanceof Task) {
+        if (!$value instanceof CallableTask) {
             throw new \DomainException('TaskCollection can only accept \Idephix\Task\Task object');
         }
 

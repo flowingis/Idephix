@@ -3,7 +3,7 @@ namespace Idephix;
 
 use Idephix\Exception\FailedCommandException;
 use Idephix\Task\Parameter;
-use Idephix\Task\Task;
+use Idephix\Task\CallableTask;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -70,7 +70,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_add_task()
     {
-        $task = new Task('fooCommand', 'A dummy command', function () {}, Parameter\Collection::dry());
+        $task = new CallableTask('fooCommand', 'A dummy command', function () {}, Parameter\Collection::dry());
         $this->idx->add($task);
 
         $this->assertTrue($this->idx->has('fooCommand'));

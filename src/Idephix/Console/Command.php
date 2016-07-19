@@ -4,8 +4,9 @@ namespace Idephix\Console;
 use Idephix\IdephixInterface;
 use Idephix\Task\Parameter\Idephix;
 use Idephix\Task\Parameter\Collection;
-use Idephix\Task\Task;
+use Idephix\Task\CallableTask;
 use Idephix\Task\Parameter\UserDefined;
+use Idephix\Task\Task;
 use Idephix\Util\DocBlockParser;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -52,7 +53,7 @@ class Command extends SymfonyCommand
             $parameters[] = UserDefined::create($parameter->getName(), $description, $default);
         }
 
-        $task = new Task($name, $parser->getDescription(), $code, $parameters);
+        $task = new CallableTask($name, $parser->getDescription(), $code, $parameters);
         return static::fromTask($task, $idx);
     }
 

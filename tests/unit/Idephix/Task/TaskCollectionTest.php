@@ -36,7 +36,7 @@ EOD;
         $task = $collection[0];
 
         $this->assertTaskEqual(
-            new Task(
+            new CallableTask(
                 'foo',
                 'This is foo description',
                 function ($bar) {
@@ -68,7 +68,7 @@ EOD;
         $task = $collection[0];
 
         $this->assertTaskEqual(
-            new Task(
+            new CallableTask(
                 'echo',
                 '',
                 function ($bar) {
@@ -102,7 +102,7 @@ EOD;
         $expectedParams[] = UserDefined::create('bar', '');
 
         $this->assertTaskEqual(
-            new Task(
+            new CallableTask(
                 'foo',
                 '',
                 function ($bar) {
