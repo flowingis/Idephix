@@ -7,6 +7,8 @@ use Idephix\Console\Command;
 use Idephix\Exception\DeprecatedException;
 use Idephix\Exception\FailedCommandException;
 use Idephix\Exception\InvalidTaskException;
+use Idephix\Exception\MissingMethodException;
+use Idephix\Extension\MethodCollection;
 use Idephix\Task\Task;
 use Idephix\Task\TaskCollection;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,7 +31,7 @@ class Idephix implements IdephixInterface
     const RELEASE_DATE = '@release_date@';
 
     private $application;
-    private $extensions = array();
+    private $extensionsMethods;
     private $input;
     private $output;
     private $sshClient;
@@ -48,6 +50,8 @@ class Idephix implements IdephixInterface
         if (!$config instanceof Config) {
             throw new DeprecatedException("You're using an old idxfile format, consider updating. http://idephix.readthedocs.io/en/latest/migrating_idx_file.html");
         }
+
+        $this->extensionsMethods = MethodCollection::dry();
 
         $this->application = new Application(
             'Idephix',
@@ -110,13 +114,11 @@ class Idephix implements IdephixInterface
             return call_user_func_array(array($this, 'runTask'), array_merge(array($name), $arguments));
         }
 
-        foreach ($this->extensions as $libName => $extension) {
-            if (is_callable(array($extension, $name))) {
-                return call_user_func_array(array($extension, $name), $arguments);
-            }
+        try {
+            return $this->extensionsMethods->execute($name, $arguments);
+        } catch (MissingMethodException $e) {
+            throw new \BadMethodCallException('Call to undefined method: "' . $name . '"');
         }
-
-        throw new \BadMethodCallException('Call to undefined method: "'.$name.'"');
     }
 
     public function __get($name)
@@ -255,7 +257,7 @@ class Idephix implements IdephixInterface
             $extension->setIdephix($this);
         }
 
-        $this->extensions[$extension->name()] = $extension;
+        $this->extensionsMethods = $this->extensionsMethods->merge($extension->methods());
 
         foreach ($extension->tasks() as $task) {
             if (!$this->has($task->name())) {

@@ -44,6 +44,16 @@ class DummyExtension implements IdephixAwareInterface, Extension
         return $return;
     }
 
+    public function name()
+    {
+        return $this->name;
+    }
+
+    public function unregisteredMethod($return)
+    {
+        return $return;
+    }
+
     /** @return TaskCollection */
     public function tasks()
     {
@@ -57,8 +67,13 @@ class DummyExtension implements IdephixAwareInterface, Extension
         return $collection;
     }
 
-    public function name()
+    /** @return array of callable */
+    public function methods()
     {
-        return $this->name;
+        return Extension\MethodCollection::ofCallables(
+            array(
+                new Extension\CallableMethod('test', array($this, 'test'))
+            )
+        );
     }
 }

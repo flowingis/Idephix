@@ -3,6 +3,7 @@
 namespace Idephix\Extension\Project;
 
 use Idephix\Extension;
+use Idephix\Extension\MethodCollection;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Task\TaskCollection;
@@ -66,5 +67,11 @@ class Project implements IdephixAwareInterface, Extension
         $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e '$sshCmd' $localDir $user@$host:$remoteDir";
 
         return $this->idx->local($cmd);
+    }
+
+    /** @return MethodCollection */
+    public function methods()
+    {
+        return MethodCollection::dry();
     }
 }

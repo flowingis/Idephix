@@ -73,4 +73,9 @@ class SelfUpdate implements IdephixAwareInterface, Extension
             $this->idx->output->writeln('<info>You are using the latest idephix version.</info>');
         }
     }
+
+    public function methods()
+    {
+        return Extension\MethodCollection::dry();
+    }
 }

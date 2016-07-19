@@ -153,4 +153,10 @@ DEFAULT;
 
         $this->idx->output->writeln("{$filename} file created.");
     }
+
+    /** @return array of callable */
+    public function methods()
+    {
+        return Extension\MethodCollection::dry();
+    }
 }

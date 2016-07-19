@@ -7,7 +7,6 @@ use Idephix\Task\Task;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
-use Idephix\Test\DummyExtension;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 
 class IdephixTest extends \PHPUnit_Framework_TestCase
@@ -174,57 +173,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         rewind($output);
 
         $this->assertContains('ProcessTimedOutException', stream_get_contents($output));
-    }
-
-    /** @test */
-    public function it_should_register_extensions_from_config()
-    {
-        $extension = new DummyExtension($this, 'deploy');
-        $idx = new Idephix(
-            Config::fromArray(
-                array(
-                    Config::EXTENSIONS => array($extension)
-                )
-            )
-        );
-
-        $this->assertEquals(42, $idx->test(42));
-    }
-    
-    /**
-     * @test
-     */
-    public function it_should_allow_to_use_extension()
-    {
-        $extension = new DummyExtension($this, 'deploy');
-        $this->idx->addExtension($extension);
-        $this->assertEquals(42, $this->idx->test(42));
-    }
-
-    /**
-     * @test
-     */
-    public function it_should_allow_to_override_extension_method()
-    {
-        $extension = new DummyExtension($this, 'myExtension');
-        $this->idx->addExtension($extension);
-        $this->idx->add('test', function ($what) { return $what * 2;});
-        $this->assertEquals(84, $this->idx->test(42));
-    }
-
-    /**
-     * @test
-     */
-    public function it_should_add_task_from_extesions()
-    {
-        $extension = new DummyExtension($this, 'deploy');
-        $this->idx->addExtension($extension);
-
-        $registeredCommands = $this->idx->getApplication()->all();
-        $this->assertArrayHasKey('update', $registeredCommands);
-        $this->assertInstanceOf('\Idephix\Console\Command', $registeredCommands['update']);
-        $this->assertEquals('update', $registeredCommands['update']->getName());
-        $this->assertEquals(42, $this->idx->update(42));
     }
 
     /**
