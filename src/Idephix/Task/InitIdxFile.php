@@ -1,18 +1,14 @@
 <?php
+namespace Idephix\Task;
 
-namespace Idephix\Extension\InitIdxFile;
-
-use Idephix\Extension;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\IdephixInterface;
 use Idephix\Task\Parameter\Collection;
-use Idephix\Task\CallableTask;
-use Idephix\Task\TaskCollection;
+use Idephix\Task\Parameter\UserDefinedCollection;
 
-class InitIdxFile implements IdephixAwareInterface, Extension
+class InitIdxFile implements Task, IdephixAwareInterface
 {
     private $idx;
-
     private $baseDir;
 
     public function __construct($baseDir = '.')
@@ -20,23 +16,29 @@ class InitIdxFile implements IdephixAwareInterface, Extension
         $this->baseDir = $baseDir;
     }
 
-
-    /** @return TaskCollection */
-    public function tasks()
-    {
-        return TaskCollection::ofTasks(array(
-            new CallableTask('initFile', 'Init idx configurations and tasks file', array($this, 'initFile'), Collection::dry()),
-        ));
-    }
-
     public function name()
     {
-        return 'initIdxFile';
+        return 'initFile';
     }
 
-    public function setIdephix(IdephixInterface $idx)
+    public function description()
     {
-        $this->idx = $idx;
+        return 'Init idx configurations and tasks file';
+    }
+
+    public function parameters()
+    {
+        return Collection::dry();
+    }
+
+    public function userDefinedParameters()
+    {
+        return new UserDefinedCollection($this->parameters());
+    }
+
+    public function code()
+    {
+        return array($this, 'initFile');
     }
 
     /**
@@ -154,9 +156,12 @@ DEFAULT;
         $this->idx->output->writeln("{$filename} file created.");
     }
 
-    /** @return array of callable */
-    public function methods()
+    /**
+     * @param IdephixInterface $idx
+     * @return void
+     */
+    public function setIdephix(IdephixInterface $idx)
     {
-        return Extension\MethodCollection::dry();
+        $this->idx = $idx;
     }
 }

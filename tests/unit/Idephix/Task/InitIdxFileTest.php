@@ -1,9 +1,7 @@
 <?php
-namespace Idephix\Extension\Deploy;
+namespace Idephix\Task;
 
 use Idephix\Test\IdephixTestCase;
-use Idephix\Extension\InitIdxFile\InitIdxFile;
-use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamFile;
 use org\bovigo\vfs\vfsStreamWrapper;
