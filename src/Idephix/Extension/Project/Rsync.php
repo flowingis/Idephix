@@ -11,7 +11,7 @@ use Idephix\Task\TaskCollection;
 /**
  * Provide a basic rsync interface based on current idx target parameters
  */
-class Project implements IdephixAwareInterface, Extension
+class Rsync implements IdephixAwareInterface, Extension
 {
     /**
      * @var \Idephix\IdephixInterface
@@ -23,15 +23,25 @@ class Project implements IdephixAwareInterface, Extension
         $this->idx = $idx;
     }
 
+    public function name()
+    {
+        return 'rsync';
+    }
+
+    /** @return MethodCollection */
+    public function methods()
+    {
+        return MethodCollection::ofCallables(
+            array(
+                new Extension\CallableMethod('rsyncProject', array($this, 'rsyncProject'))
+            )
+        );
+    }
+
     /** @return TaskCollection */
     public function tasks()
     {
         return TaskCollection::dry();
-    }
-
-    public function name()
-    {
-        return 'project';
     }
 
     public function rsyncProject($remoteDir, $localDir = null, $exclude = null, $extraOpts = null)
@@ -67,11 +77,5 @@ class Project implements IdephixAwareInterface, Extension
         $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e '$sshCmd' $localDir $user@$host:$remoteDir";
 
         return $this->idx->local($cmd);
-    }
-
-    /** @return MethodCollection */
-    public function methods()
-    {
-        return MethodCollection::dry();
     }
 }

@@ -18,7 +18,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
              ->method('getCurrentTargetHost')
              ->will($this->returnValue('banana.com'));
 
-        $this->project = new Project();
+        $this->project = new Rsync();
         $this->project->setIdephix($this->idx);
     }
 
