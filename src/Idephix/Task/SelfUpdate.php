@@ -1,16 +1,14 @@
 <?php
 
-namespace Idephix\Extension\SelfUpdate;
+namespace Idephix\Task\SelfUpdate;
 
-use Idephix\Extension;
 use Idephix\Task\Parameter;
 use Idephix\Idephix;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
-use Idephix\Task\CallableTask;
-use Idephix\Task\TaskCollection;
+use Idephix\Task\Task;
 
-class SelfUpdate implements IdephixAwareInterface, Extension
+class SelfUpdate implements IdephixAwareInterface, Task
 {
     private $idx;
 
@@ -19,22 +17,29 @@ class SelfUpdate implements IdephixAwareInterface, Extension
         $this->idx = $idx;
     }
 
-    /** @return TaskCollection */
-    public function tasks()
-    {
-        return TaskCollection::ofTasks(array(
-            new CallableTask(
-                'selfupdate',
-                'Update Idephix to the latest version',
-                array($this, 'update'),
-                Parameter\Collection::dry()
-            )
-        ));
-    }
-
     public function name()
     {
-        return 'selfUpdate';
+        return 'selfupdate';
+    }
+
+    public function description()
+    {
+        return 'Update Idephix to the latest version';
+    }
+
+    public function code()
+    {
+        return array($this, 'update');
+    }
+
+    public function parameters()
+    {
+        return Parameter\Collection::dry();
+    }
+
+    public function userDefinedParameters()
+    {
+        return new Parameter\UserDefinedCollection($this->parameters());
     }
 
     /**
@@ -72,10 +77,5 @@ class SelfUpdate implements IdephixAwareInterface, Extension
         } else {
             $this->idx->output->writeln('<info>You are using the latest idephix version.</info>');
         }
-    }
-
-    public function methods()
-    {
-        return Extension\MethodCollection::dry();
     }
 }

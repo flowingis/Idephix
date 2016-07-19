@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Idephix\SSH\SshClient;
 use Idephix\Extension\IdephixAwareInterface;
-use Idephix\Extension\SelfUpdate\SelfUpdate;
+use Idephix\Task\SelfUpdate\SelfUpdate;
 use Idephix\Task\InitIdxFile;
 
 /**
@@ -307,7 +307,7 @@ class Idephix implements IdephixInterface
     public function addSelfUpdateCommand()
     {
         if ('phar:' === substr(__FILE__, 0, 5)) {
-            $this->addExtension(new SelfUpdate());
+            $this->add(new SelfUpdate());
         }
     }
 
