@@ -1,6 +1,8 @@
 Idephix - Automation and Deploy tool
 ====================================
 
+[![Join the chat at https://gitter.im/ideatosrl/Idephix](https://badges.gitter.im/ideatosrl/Idephix.svg)](https://gitter.im/ideatosrl/Idephix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Idephix is a PHP tool for building automated scripts
 
 [![Build Status](https://travis-ci.org/ideatosrl/Idephix.svg)](https://travis-ci.org/ideatosrl/Idephix)
