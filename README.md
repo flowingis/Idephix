@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/ideatosrl/Idephix.png?label=ready&title=Ready)](https://waffle.io/ideatosrl/Idephix)
 Idephix - Automation and Deploy tool
 ====================================
 
