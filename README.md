@@ -1,4 +1,4 @@
-[![Stories in Ready](https://badge.waffle.io/ideatosrl/Idephix.png?label=backlog&title=Get%20Involved)](https://badge.waffle.io/ideatosrl/Idephix.png?label=backlog&title=Get%20Involved)
+[![Stories in Ready](https://badge.waffle.io/ideatosrl/Idephix.png?label=backlog&title=Get%20Involved)](https://waffle.io/ideatosrl/Idephix)
 [![Gitter](https://badges.gitter.im/ideatosrl/Idephix.svg)](https://gitter.im/ideatosrl/Idephix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Build Status](https://travis-ci.org/ideatosrl/Idephix.svg)](https://travis-ci.org/ideatosrl/Idephix)
 [![Code Climate](https://codeclimate.com/github/ideatosrl/Idephix/badges/gpa.svg)](https://codeclimate.com/github/ideatosrl/Idephix)
