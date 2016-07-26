@@ -313,7 +313,7 @@ class Idephix implements IdephixInterface
 
     public function addInitIdxFileCommand()
     {
-        $this->add(new InitIdxFile());
+        $this->add(InitIdxFile::fromDeployRecipe());
     }
 
     /**

@@ -10,10 +10,23 @@ class InitIdxFile implements Task, IdephixAwareInterface
 {
     private $idx;
     private $baseDir;
+    private $idxFileTemplate;
+    private $idxRcTemplate;
 
-    public function __construct($baseDir = '.')
+    public function __construct($writeTo = '.', $idxFileTemplate, $idxRcTemplate)
     {
-        $this->baseDir = $baseDir;
+        $this->baseDir = $writeTo;
+        $this->idxFileTemplate = new \SplFileObject($idxFileTemplate);
+        $this->idxRcTemplate = new \SplFileObject($idxRcTemplate);
+    }
+
+    public static function fromDeployRecipe($writeTo = '.')
+    {
+        return new static(
+            $writeTo,
+            __DIR__ . '/../Cookbook/Deploy/idxfile.php',
+            __DIR__ . '/../Cookbook/Deploy/idxrc.php'
+        );
     }
 
     public function name()
@@ -52,89 +65,13 @@ class InitIdxFile implements Task, IdephixAwareInterface
 
     private function initIdxRc()
     {
-        $data = <<<'DEFAULT'
-<?php
-
-$targets = array(
-    'prod' => array(
-        'hosts' => array('127.0.0.1'),
-        'ssh_params' => $sshParams,
-        'deploy' => array(
-            'local_base_dir' => $localBaseDir,
-            'remote_base_dir' => "/var/www/myfantasticserver/",
-            // 'rsync_exclude_file' => 'rsync_exclude.txt'
-            // 'rsync_include_file' => 'rsync_include.txt'
-            // 'migrations' => true
-            // 'strategy' => 'Copy'
-        ),
-    ),
-);
-return \Idephix\Config::fromArray(
-    array(
-        'targets' => $targets, 
-        'sshClient' => new \Idephix\SSH\SshClient(new \Idephix\SSH\CLISshProxy())
-    )
-);
-DEFAULT;
-
+        $data = $this->idxRcTemplate->fread($this->idxRcTemplate->getSize());
         $this->writeFile('idxrc.php', $data);
     }
 
     private function initIdxFile()
     {
-        $data = <<<'DEFAULT'
-<?php
-
-function sf2Deploy($idx, $go = false)
-{
-    if (!$go) {
-        echo "\nDry Run...\n";
-    }
-    $deploy = new \Idephix\Extension\Deploy\Deploy();
-    $deploy->setIdephix($idx);
-
-    $deploy->deploySF2Copy($go);
-}
-
-/**
- * Build your Symfony project after you have downloaded it for the first time
- */
-function buildFromscratch($idx)
-{
-    if (!file_exists(__DIR__ . "/composer.phar")) {
-        $idx->output->writeln("Downloading composer.phar ...");
-        $idx->local("curl -sS https://getcomposer.org/installer | php");
-    }
-
-    $idx->local("php composer.phar install");
-    $idx->local("./app/console doctrine:schema:update --force");
-    $idx->runTask('asset:install');
-    $idx->local("./app/console cache:clear --env=dev");
-    $idx->local("./app/console cache:clear --env=test");
-    $idx->runTask('test:run');
-}
-
-/**
- * Symfony2 installing assets and running assetic command
- */
-function assetInstall($idx)
-{
-    $idx->local("app/console assets:install web");
-    $idx->local("app/console assetic:dump");
-}
-/**
- * run phpunit tests
- */
-function testRun($idx)
-{
-    $phpunit = new \Idephix\Extension\PHPUnit\PHPUnit();
-    $phpunit->setIdephix($idx);
-
-    $phpunit->runPhpUnit('-c app/');
-}
-
-DEFAULT;
-
+        $data = $this->idxFileTemplate->fread($this->idxFileTemplate->getSize());
         $this->writeFile('idxfile.php', $data);
     }
 
