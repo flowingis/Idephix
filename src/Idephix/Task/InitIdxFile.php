@@ -20,6 +20,10 @@ class InitIdxFile implements Task, IdephixAwareInterface
         $this->idxRcTemplate = new \SplFileObject($idxRcTemplate);
     }
 
+    /**
+     * @param string $writeTo
+     * @return static
+     */
     public static function fromDeployRecipe($writeTo = '.')
     {
         return new static(

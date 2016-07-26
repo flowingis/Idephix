@@ -307,13 +307,17 @@ class Idephix implements IdephixInterface
     public function addSelfUpdateCommand()
     {
         if ('phar:' === substr(__FILE__, 0, 5)) {
-            $this->add(new SelfUpdate());
+            $selfUpdate = new SelfUpdate();
+            $selfUpdate->setIdephix($this);
+            $this->add($selfUpdate);
         }
     }
 
     public function addInitIdxFileCommand()
     {
-        $this->add(InitIdxFile::fromDeployRecipe());
+        $init = InitIdxFile::fromDeployRecipe();
+        $init->setIdephix($this);
+        $this->add($init);
     }
 
     /**
