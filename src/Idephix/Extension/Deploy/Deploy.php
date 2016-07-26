@@ -6,7 +6,7 @@ use Idephix\Context;
 use Idephix\Extension;
 use Idephix\Extension\Deploy\Strategy\Factory;
 use Idephix\Extension\Deploy\Strategy\FactoryInterface;
-use Idephix\Extension\MethodCollection;
+use Idephix\Extension\HelperCollection;
 use Idephix\Idephix;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
@@ -411,7 +411,7 @@ class Deploy implements IdephixAwareInterface, Extension
         return !is_null($releaseFolderNameFormat);
     }
 
-    /** @return MethodCollection */
+    /** @return HelperCollection */
     public function methods()
     {
         // TODO: Implement methods() method.

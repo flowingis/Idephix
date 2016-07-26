@@ -6,8 +6,8 @@ class MethodCollectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_should_be_constructed_from_methods()
     {
-        $method = $this->prophesize('\Idephix\Extension\Method')->reveal();
-        $collection = MethodCollection::ofCallables(array($method));
+        $method = $this->prophesize('\Idephix\Extension\Helper')->reveal();
+        $collection = HelperCollection::ofCallables(array($method));
 
         $this->assertEquals(1, $collection->count());
     }
@@ -15,14 +15,14 @@ class MethodCollectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_should_be_merged()
     {
-        $fooMethod = $this->prophesize('\Idephix\Extension\Method');
+        $fooMethod = $this->prophesize('\Idephix\Extension\Helper');
         $fooMethod->name()->willReturn('foo');
 
-        $barMethod = $this->prophesize('\Idephix\Extension\Method');
+        $barMethod = $this->prophesize('\Idephix\Extension\Helper');
         $barMethod->name()->willReturn('bar');
 
-        $collection = MethodCollection::ofCallables(array($fooMethod->reveal()));
-        $otherCollection = MethodCollection::ofCallables(array($barMethod->reveal()));
+        $collection = HelperCollection::ofCallables(array($fooMethod->reveal()));
+        $otherCollection = HelperCollection::ofCallables(array($barMethod->reveal()));
 
         $this->assertEquals(1, $collection->count());
         $this->assertEquals(1, $otherCollection->count());
@@ -34,9 +34,9 @@ class MethodCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_execute_by_name()
     {
-        $collection = MethodCollection::ofCallables(array(
-            $foo = new StubMethod('foo'),
-            $bar = new StubMethod('bar'),
+        $collection = HelperCollection::ofCallables(array(
+            $foo = new StubHelper('foo'),
+            $bar = new StubHelper('bar'),
         ));
 
         $collection->execute('foo', array('arg1', 'arg2'));
@@ -52,11 +52,11 @@ class MethodCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_throw_exception_for_method_not_found()
     {
-        MethodCollection::dry()->execute('foo');
+        HelperCollection::dry()->execute('foo');
     }
 }
 
-class StubMethod implements Method
+class StubHelper implements Helper
 {
     public $invoked = false;
     public $args;

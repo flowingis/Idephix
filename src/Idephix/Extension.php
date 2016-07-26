@@ -3,7 +3,7 @@
 
 namespace Idephix;
 
-use Idephix\Extension\MethodCollection;
+use Idephix\Extension\HelperCollection;
 use Idephix\Task\TaskCollection;
 
 interface Extension
@@ -11,7 +11,7 @@ interface Extension
     /** @return TaskCollection */
     public function tasks();
 
-    /** @return MethodCollection */
+    /** @return HelperCollection */
     public function methods();
 
     public function name();

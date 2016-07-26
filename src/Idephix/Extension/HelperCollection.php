@@ -4,7 +4,7 @@ namespace Idephix\Extension;
 use Idephix\Exception\MissingMethodException;
 use Idephix\Task\CollectionIterator;
 
-class MethodCollection extends CollectionIterator
+class HelperCollection extends CollectionIterator
 {
     public static function ofCallables($array)
     {
@@ -13,7 +13,7 @@ class MethodCollection extends CollectionIterator
                 array_filter(
                     $array,
                     function ($method) {
-                        return $method instanceof Method;
+                        return $method instanceof Helper;
                     }
                 )
             )
@@ -22,14 +22,14 @@ class MethodCollection extends CollectionIterator
 
     public function offsetSet($offset, $value)
     {
-        if (!$value instanceof Method) {
+        if (!$value instanceof Helper) {
             throw new \DomainException('MethodCollection can only accept \Idephix\Extension\Method instances');
         }
 
         $this->getInnerIterator()->offsetSet($offset, $value);
     }
 
-    public function merge(MethodCollection $collection)
+    public function merge(HelperCollection $collection)
     {
         return new static(
             new \ArrayIterator(

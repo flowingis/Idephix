@@ -8,7 +8,7 @@ use Idephix\Exception\DeprecatedException;
 use Idephix\Exception\FailedCommandException;
 use Idephix\Exception\InvalidTaskException;
 use Idephix\Exception\MissingMethodException;
-use Idephix\Extension\MethodCollection;
+use Idephix\Extension\HelperCollection;
 use Idephix\Task\Task;
 use Idephix\Task\TaskCollection;
 use Symfony\Component\Console\Input\InputInterface;
@@ -51,7 +51,7 @@ class Idephix implements IdephixInterface
             throw new DeprecatedException("You're using an old idxfile format, consider updating. http://idephix.readthedocs.io/en/latest/migrating_idx_file.html");
         }
 
-        $this->extensionsMethods = MethodCollection::dry();
+        $this->extensionsMethods = HelperCollection::dry();
 
         $this->application = new Application(
             'Idephix',
