@@ -33,6 +33,17 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("rsync -rlDcz --force --delete --progress  -e 'ssh' ./from kea@banana.com:/a/remote/", $result);
     }
 
+    public function testRysncWithoutUser()
+    {
+        $this->idx->expects($this->exactly(1))
+            ->method('getCurrentTarget')
+            ->will($this->returnValue(Context::fromArray(array('ssh_params' => array()))));
+
+        $result = $this->project->rsyncProject('/a/remote', './from');
+
+        $this->assertEquals("rsync -rlDcz --force --delete --progress  -e 'ssh' ./from banana.com:/a/remote/", $result);
+    }
+
     public function testRsyncProjectWithCustomPort()
     {
         $this->idx->expects($this->exactly(1))

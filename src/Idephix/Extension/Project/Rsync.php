@@ -56,8 +56,7 @@ class Rsync implements IdephixAwareInterface, Extension
             throw new \InvalidArgumentException('Target not provided. Please provide a valid target.');
         }
 
-        $user = $target->get('ssh_params.user');
-        $host = $this->idx->getCurrentTargetHost();
+
         $port = $target->get('ssh_params.port');
 
         if (file_exists($exclude)) {
@@ -74,8 +73,24 @@ class Rsync implements IdephixAwareInterface, Extension
             $sshCmd .= ' -p ' . $port;
         }
 
-        $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e '$sshCmd' $localDir $user@$host:$remoteDir";
+        $remoteConnection = $this->connectionString($this->idx->getCurrentTargetHost(), $target->get('ssh_params.user'));
+
+        $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e '$sshCmd' $localDir $remoteConnection:$remoteDir";
 
         return $this->idx->local($cmd);
+    }
+
+    /**
+     * @param $host
+     * @param null $user
+     * @return string
+     */
+    private function connectionString($host, $user = null)
+    {
+        $remoteConnection = '';
+        $remoteConnection .= is_null($user) ? '' : "$user@";
+        $remoteConnection .= $host;
+
+        return $remoteConnection;
     }
 }
