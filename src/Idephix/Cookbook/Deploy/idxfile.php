@@ -7,7 +7,6 @@ function deploy(Idephix\IdephixInterface $idx, $go = false)
     $sharedFiles = $config->get('deploy.shared_files', array());
 
     $sharedFolders = $config->get('deploy.shared_folders', array());
-    $sshHost = $idx->getCurrentTargetHost();
     $remoteBaseDir = $config->get('deploy.remote_base_dir');
     $rsyncExclude = $config->get('deploy.rsync_exclude');
     $repository = $config->get('deploy.repository');
@@ -27,7 +26,6 @@ function deploy(Idephix\IdephixInterface $idx, $go = false)
         composer install --no-dev --prefer-dist --no-progress --optimize-autoloader --no-interaction
     "
     );
-
 
     $idx->remote(
         "mkdir -p {$remoteBaseDir}/releases && \\
@@ -54,6 +52,7 @@ function deploy(Idephix\IdephixInterface $idx, $go = false)
     $idx->rsyncProject($nextRelease, $localArtifact . '/', $rsyncExclude, $dryRun);
 
     foreach (array_merge($sharedFiles, $sharedFolders) as $item) {
+        $idx->remote("rm -r $nextRelease/$item");
         $idx->remote("ln -nfs $remoteBaseDir/shared/$item $nextRelease/$item");
     }
 
