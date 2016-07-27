@@ -3,14 +3,14 @@
 function deploy(Idephix\IdephixInterface $idx, $go = false)
 {
     /** @var \Idephix\Context $target */
-    $config = $idx->getCurrentTarget();
-    $sharedFiles = $config->get('deploy.shared_files', array());
+    $target = $idx->getCurrentTarget();
+    $sharedFiles = $target->get('deploy.shared_files', array());
 
-    $sharedFolders = $config->get('deploy.shared_folders', array());
-    $remoteBaseDir = $config->get('deploy.remote_base_dir');
-    $rsyncExclude = $config->get('deploy.rsync_exclude');
-    $repository = $config->get('deploy.repository');
-    $deployBranch = $config->get('deploy.branch');
+    $sharedFolders = $target->get('deploy.shared_folders', array());
+    $remoteBaseDir = $target->get('deploy.remote_base_dir');
+    $rsyncExclude = $target->get('deploy.rsync_exclude');
+    $repository = $target->get('deploy.repository');
+    $deployBranch = $target->get('deploy.branch');
 
     $nextRelease = "$remoteBaseDir/releases/" . time();
     $linkedRelease = "$remoteBaseDir/current";
