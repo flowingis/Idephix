@@ -16,8 +16,8 @@ class InitIdxFile implements Task, IdephixAwareInterface
     public function __construct($writeTo = '.', $idxFileTemplate, $idxRcTemplate)
     {
         $this->baseDir = $writeTo;
-        $this->idxFileTemplate = new \SplFileObject($idxFileTemplate);
-        $this->idxRcTemplate = new \SplFileObject($idxRcTemplate);
+        $this->idxFileTemplate = $idxFileTemplate;
+        $this->idxRcTemplate = $idxRcTemplate;
     }
 
     /**
@@ -69,13 +69,13 @@ class InitIdxFile implements Task, IdephixAwareInterface
 
     private function initIdxRc()
     {
-        $data = $this->idxRcTemplate->fread($this->idxRcTemplate->getSize());
+        $data = file_get_contents($this->idxRcTemplate);
         $this->writeFile('idxrc.php', $data);
     }
 
     private function initIdxFile()
     {
-        $data = $this->idxFileTemplate->fread($this->idxFileTemplate->getSize());
+        $data = file_get_contents($this->idxFileTemplate);
         $this->writeFile('idxfile.php', $data);
     }
 
