@@ -7,12 +7,12 @@ $targets = array(
             'user' => 'ideato'
         ),
         'deploy' => array(
-            'repository' => 'file:///Users/ftassi/workspace/testidx',
-            'shared_files' => array('parameters.yml'),
-            'shared_folders' => array('cache', 'log'),
+            'repository' => './',
+            'branch' => 'origin/master',
+            'shared_files' => array('app/config/parameters.yml'),
+            'shared_folders' => array('app/cache', 'app/logs'),
             'remote_base_dir' => '/var/www/testidx',
             'rsync_exclude' => './rsync_exclude.txt',
-            'rsync_include' => './rsync_include.txt',
         )
     ),
 );
@@ -20,6 +20,9 @@ $targets = array(
 return \Idephix\Config::fromArray(
     array(
         \Idephix\Config::TARGETS => $targets,
-        \Idephix\Config::SSHCLIENT => array(new \Idephix\SSH\SshClient(new \Idephix\SSH\CLISshProxy())),
+        \Idephix\Config::SSHCLIENT => new \Idephix\SSH\SshClient(new \Idephix\SSH\CLISshProxy()),
+        \Idephix\Config::EXTENSIONS => array(
+            'rsync' => new \Idephix\Extension\Project\Rsync(),
+        ),
     )
 );
