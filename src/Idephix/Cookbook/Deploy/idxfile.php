@@ -2,22 +2,32 @@
 
 function deploy(Idephix\IdephixInterface $idx, $go = false)
 {
-    $dryRun = !$go;
-    
-    /** @var \Idephix\Context $target */
-    $target = $idx->getCurrentTarget();
-    $sharedFiles = $target->get('deploy.shared_files', array());
-
-    $sharedFolders = $target->get('deploy.shared_folders', array());
-    $remoteBaseDir = $target->get('deploy.remote_base_dir');
-    $rsyncExclude = $target->get('deploy.rsync_exclude');
-    $repository = $target->get('deploy.repository');
-    $deployBranch = $target->get('deploy.branch');
-
+    /** @var \Idephix\Context $config */
+    $config = $idx->getCurrentTarget();
+    $sharedFiles = $config->get('deploy.shared_files', array());
+    $sharedFolders = $config->get('deploy.shared_folders', array());
+    $remoteBaseDir = $config->get('deploy.remote_base_dir');
+    $rsyncExclude = $config->get('deploy.rsync_exclude');
+    $repository = $config->get('deploy.repository');
+    $deployBranch = $config->get('deploy.branch');
     $nextRelease = "$remoteBaseDir/releases/" . time();
     $linkedRelease = "$remoteBaseDir/current";
     $localArtifact = '.deploy';
+    $idx->prepareArtifact($idx, $localArtifact, $repository, $deployBranch);
+    $idx->prepareSharedFilesAndFolders($idx, $remoteBaseDir, $sharedFolders, $sharedFiles);
+    try {
+        $idx->remote("cd $remoteBaseDir && cp -pPR `readlink {$linkedRelease}` $nextRelease");
+    } catch (\Exception $e) {
+        $idx->output()->writeln('<info>First deploy, sending the whole project</info>');
+    }
+    $dryRun = $go ? '' : '--dry-run';
+    $idx->rsyncProject($nextRelease, $localArtifact . '/', $rsyncExclude, $dryRun);
+    $idx->linkSharedFilesAndFolders($idx, $sharedFiles, $sharedFolders, $nextRelease, $remoteBaseDir);
+    $idx->switchToNextRelease($idx, $remoteBaseDir, $nextRelease);
+}
 
+function prepareArtifact(Idephix\IdephixInterface $idx, $localArtifact, $repository, $deployBranch)
+{
     $idx->local(
         "
         rm -Rf {$localArtifact} && \\
@@ -26,44 +36,37 @@ function deploy(Idephix\IdephixInterface $idx, $go = false)
         git fetch && \\
         git checkout --force {$deployBranch} && \\
         composer install --no-dev --prefer-dist --no-progress --optimize-autoloader --no-interaction
-    ",
-        $dryRun
+    "
     );
+}
 
+function prepareSharedFilesAndFolders(Idephix\IdephixInterface $idx, $remoteBaseDir, $sharedFolders, $sharedFiles)
+{
     $idx->remote(
         "mkdir -p {$remoteBaseDir}/releases && \\
-         mkdir -p {$remoteBaseDir}/shared",
-        $dryRun
+         mkdir -p {$remoteBaseDir}/shared"
     );
-
     foreach ($sharedFolders as $folder) {
-        $idx->remote("mkdir -p {$remoteBaseDir}/shared/{$folder}", $dryRun);
+        $idx->remote("mkdir -p {$remoteBaseDir}/shared/{$folder}");
     }
-
     foreach ($sharedFiles as $file) {
         $sharedFile = "{$remoteBaseDir}/shared/{$file}";
-        $idx->remote("mkdir -p `dirname '{$sharedFile}'` && touch \"$sharedFile\"", $dryRun);
+        $idx->remote("mkdir -p `dirname '{$sharedFile}'` && touch \"$sharedFile\"");
     }
-
-    try {
-        $idx->remote("cd $remoteBaseDir && cp -pPR `readlink {$linkedRelease}` $nextRelease", $dryRun);
-    } catch (\Exception $e) {
-        $idx->output()->writeln('<info>First deploy, sending the whole project</info>');
-    }
-
-    $extraOptions = $dryRun ? '--dry-run' : '';
-
-    $idx->rsyncProject($nextRelease, $localArtifact . '/', $rsyncExclude, $extraOptions);
-
+}
+function linkSharedFilesAndFolders(Idephix\IdephixInterface $idx, $sharedFiles, $sharedFolders, $nextRelease, $remoteBaseDir)
+{
     foreach (array_merge($sharedFiles, $sharedFolders) as $item) {
-        $idx->remote("rm -r $nextRelease/$item", $dryRun);
-        $idx->remote("ln -nfs $remoteBaseDir/shared/$item $nextRelease/$item", $dryRun);
+        $idx->remote("rm -r $nextRelease/$item");
+        $idx->remote("ln -nfs $remoteBaseDir/shared/$item $nextRelease/$item");
     }
+}
 
+function switchToNextRelease(Idephix\IdephixInterface $idx, $remoteBaseDir, $nextRelease)
+{
     $idx->remote(
         "
         cd $remoteBaseDir && \\
-        ln -nfs $nextRelease current",
-        $dryRun
+        ln -nfs $nextRelease current"
     );
 }
