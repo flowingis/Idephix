@@ -2,7 +2,10 @@
 namespace Idephix\Task;
 
 use Idephix\Task\Parameter\Collection;
+use Idephix\Task\Parameter\Idephix;
+use Idephix\Task\Parameter\UserDefined;
 use Idephix\Task\Parameter\UserDefinedCollection;
+use Idephix\Util\DocBlockParser;
 
 class CallableTask implements Task
 {
@@ -17,6 +20,30 @@ class CallableTask implements Task
         $this->description = $description;
         $this->parameters = $parameters;
         $this->code = $code;
+    }
+
+    /**
+     * @return static
+     */
+    public static function buildFromClosure($name, \Closure $code)
+    {
+        $parameters = Collection::dry();
+
+        $reflector = new \ReflectionFunction($code);
+        $parser = new DocBlockParser($reflector->getDocComment());
+
+        foreach ($reflector->getParameters() as $parameter) {
+            if ($parameter->getClass() && $parameter->getClass()->implementsInterface('\Idephix\IdephixInterface')) {
+                $parameters[] = Idephix::create();
+                continue;
+            }
+
+            $description = $parser->getParamDescription($parameter->getName());
+            $default = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
+            $parameters[] = UserDefined::create($parameter->getName(), $description, $default);
+        }
+
+        return new CallableTask(str_replace('_', '', $name), $parser->getDescription(), $code, $parameters);
     }
 
     public function name()

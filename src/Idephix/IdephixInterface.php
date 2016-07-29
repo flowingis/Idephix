@@ -19,10 +19,10 @@ interface IdephixInterface
      * The "--go" parameters should be defined as "$go = false".
      *
      * @param string $name
-     * @param callable $code
-     * @return \Idephix\IdephixInterface
+     * @param \Closure $code
+     * @return IdephixInterface
      */
-    public function add($name, $code);
+    public function add($name, \Closure $code = null);
 
     public function output();
 

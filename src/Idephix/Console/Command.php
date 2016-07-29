@@ -3,11 +3,8 @@ namespace Idephix\Console;
 
 use Idephix\IdephixInterface;
 use Idephix\Task\Parameter\Idephix;
-use Idephix\Task\Parameter\Collection;
-use Idephix\Task\CallableTask;
 use Idephix\Task\Parameter\UserDefined;
 use Idephix\Task\Task;
-use Idephix\Util\DocBlockParser;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,41 +18,6 @@ class Command extends SymfonyCommand
     private $idx;
     /** @var  Task */
     private $task;
-
-    /**
-     * Build a command from callable code
-     *
-     * This is maintained only to support legacy idxfile and will soon removed
-     *
-     * @param callable $code
-     * @return $this
-     * @deprecated
-     */
-    public static function buildFromCode($name, $code, IdephixInterface $idx)
-    {
-        if (!is_callable($code)) {
-            throw new \InvalidArgumentException('Code must be a callable');
-        }
-
-        $parameters = Collection::dry();
-
-        $reflector = new \ReflectionFunction($code);
-        $parser = new DocBlockParser($reflector->getDocComment());
-
-        foreach ($reflector->getParameters() as $parameter) {
-            if ($parameter->getName() == 'idx') {
-                $parameters[] = Idephix::create();
-                continue;
-            }
-
-            $description = $parser->getParamDescription($parameter->getName());
-            $default = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
-            $parameters[] = UserDefined::create($parameter->getName(), $description, $default);
-        }
-
-        $task = new CallableTask($name, $parser->getDescription(), $code, $parameters);
-        return static::fromTask($task, $idx);
-    }
 
     /**
      * @param Task $task

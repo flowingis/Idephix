@@ -1,10 +1,6 @@
 <?php
 namespace Idephix\Task;
 
-use Idephix\Task\Parameter\Idephix;
-use Idephix\Task\Parameter\Collection;
-use Idephix\Task\Parameter\UserDefined;
-
 class TaskCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -32,22 +28,7 @@ EOD;
 
         $collection = TaskCollection::ofFunctions($idxFileContent);
         $this->assertCount(1, $collection);
-
-        $task = $collection[0];
-
-        $this->assertTaskEqual(
-            new CallableTask(
-                'foo',
-                'This is foo description',
-                function ($bar) {
-                    echo $bar;
-                },
-                Collection::createFromArray(
-                    array('foo' => array('description' => ''), 'bar' => array('description' => ''))
-                )
-            ),
-            $task
-        );
+        $this->assertInstanceOf('\Idephix\Task\CallableTask', $collection[0]);
     }
 
     /**
@@ -66,64 +47,7 @@ EOD;
         $this->assertCount(1, $collection);
 
         $task = $collection[0];
-
-        $this->assertTaskEqual(
-            new CallableTask(
-                'echo',
-                '',
-                function ($bar) {
-                    echo $bar;
-                },
-                Collection::createFromArray(array('bar' => array('description' => '')))
-            ),
-            $task
-        );
-    }
-
-    /** @test */
-    public function it_should_recognize_idx_param()
-    {
-        $idxFileContent =<<<'EOD'
-<?php
-
-use Idephix\Idephix as Idx;
-
-function foo(Idx $idx, $bar){echo 'bar';};
-
-EOD;
-
-        $collection = TaskCollection::ofFunctions($idxFileContent);
-        $this->assertCount(1, $collection);
-
-        $task = $collection[0];
-
-        $expectedParams = Collection::dry();
-        $expectedParams[] = Idephix::create();
-        $expectedParams[] = UserDefined::create('bar', '');
-
-        $this->assertTaskEqual(
-            new CallableTask(
-                'foo',
-                '',
-                function ($bar) {
-                    echo $bar;
-                },
-                $expectedParams
-            ),
-            $task
-        );
-    }
-
-    /**
-     * @param $actual
-     */
-    private function assertTaskEqual(Task $expected, Task $actual)
-    {
-        $this->assertEquals(
-            $expected,
-            $actual
-        );
-
-        $this->assertEquals(iterator_to_array($expected->parameters()), iterator_to_array($actual->parameters()));
+        $this->assertInstanceOf('\Idephix\Task\CallableTask', $task);
+        $this->assertEquals('echo', $task->name());
     }
 }

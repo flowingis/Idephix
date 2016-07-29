@@ -57,12 +57,12 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     public function it_should_add_closure()
     {
         $this->idx->add(
-            'command_name',
+            'commandName',
             function () {
             }
         );
 
-        $this->assertTrue($this->idx->has('command_name'));
+        $this->assertTrue($this->idx->has('commandName'));
     }
 
     /**
