@@ -13,8 +13,8 @@ function deploy(Idephix\IdephixInterface $idx, $go = false)
     $nextRelease = "$remoteBaseDir/releases/" . time();
     $linkedRelease = "$remoteBaseDir/current";
     $localArtifact = '.deploy';
-    $idx->prepareArtifact($idx, $localArtifact, $repository, $deployBranch);
-    $idx->prepareSharedFilesAndFolders($idx, $remoteBaseDir, $sharedFolders, $sharedFiles);
+    $idx->prepareArtifact($localArtifact, $repository, $deployBranch);
+    $idx->prepareSharedFilesAndFolders($remoteBaseDir, $sharedFolders, $sharedFiles);
     try {
         $idx->remote("cd $remoteBaseDir && cp -pPR `readlink {$linkedRelease}` $nextRelease");
     } catch (\Exception $e) {
@@ -22,8 +22,8 @@ function deploy(Idephix\IdephixInterface $idx, $go = false)
     }
     $dryRun = $go ? '' : '--dry-run';
     $idx->rsyncProject($nextRelease, $localArtifact . '/', $rsyncExclude, $dryRun);
-    $idx->linkSharedFilesAndFolders($idx, $sharedFiles, $sharedFolders, $nextRelease, $remoteBaseDir);
-    $idx->switchToNextRelease($idx, $remoteBaseDir, $nextRelease);
+    $idx->linkSharedFilesAndFolders($sharedFiles, $sharedFolders, $nextRelease, $remoteBaseDir);
+    $idx->switchToNextRelease($remoteBaseDir, $nextRelease);
 }
 
 function prepareArtifact(Idephix\IdephixInterface $idx, $localArtifact, $repository, $deployBranch)
