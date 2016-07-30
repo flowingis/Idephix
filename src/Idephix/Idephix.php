@@ -4,6 +4,7 @@ namespace Idephix;
 
 use Idephix\Console\Application;
 use Idephix\Console\Command;
+use Idephix\Console\InputFactory;
 use Idephix\Exception\DeprecatedException;
 use Idephix\Exception\FailedCommandException;
 use Idephix\Exception\InvalidTaskException;
@@ -32,6 +33,9 @@ class Idephix implements IdephixInterface
     const RELEASE_DATE = '@release_date@';
 
     private $application;
+    /** @var  TaskCollection */
+    private $tasks;
+
     private $extensionsMethods;
     private $input;
     private $output;
@@ -48,11 +52,12 @@ class Idephix implements IdephixInterface
         OutputInterface $output = null,
         InputInterface $input = null)
     {
+        $this->tasks = TaskCollection::dry();
+        $this->extensionsMethods = HelperCollection::dry();
+
         if (!$config instanceof Config) {
             throw new DeprecatedException("You're using an old idxfile format, consider updating. http://idephix.readthedocs.io/en/latest/migrating_idx_file.html");
         }
-
-        $this->extensionsMethods = HelperCollection::dry();
 
         $this->application = new Application(
             'Idephix',
@@ -93,7 +98,7 @@ class Idephix implements IdephixInterface
         $idephix = new static($config);
 
         foreach ($tasks as $task) {
-            $idephix->application->add(Command::fromTask($task, $idephix));
+            $idephix->add($task);
         }
 
         return $idephix;
@@ -149,6 +154,7 @@ class Idephix implements IdephixInterface
         }
 
         if ($task instanceof Task) {
+            $this->tasks[] = $task;
             $this->application->add(Command::fromTask($task, $this));
             return $this;
         }
@@ -261,7 +267,7 @@ class Idephix implements IdephixInterface
 
         foreach ($extension->tasks() as $task) {
             if (!$this->has($task->name())) {
-                $this->application->add(Command::fromTask($task, $this));
+                $this->add($task);
             }
         }
     }
@@ -282,7 +288,7 @@ class Idephix implements IdephixInterface
      */
     public function has($name)
     {
-        return $this->application->has($name);
+        return $this->tasks->has($name) && $this->application->has($name);
     }
 
     /**
@@ -299,9 +305,12 @@ class Idephix implements IdephixInterface
             throw new \InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));
         }
 
-        $arguments = new ArgvInput(array_merge(array('exec_placeholder'), func_get_args()));
+        $inputFactory = new InputFactory();
 
-        return $this->application->get($name)->run($arguments, $this->output);
+        return $this->application->get($name)->run(
+            $inputFactory->buildFromUserArgsForTask(func_get_args(), $this->tasks->get($name)),
+            $this->output
+        );
     }
 
     public function addSelfUpdateCommand()

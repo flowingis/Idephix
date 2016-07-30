@@ -1,6 +1,8 @@
 <?php
 namespace Idephix\Task;
 
+use Idephix\Task\Parameter\Collection;
+
 class TaskCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -49,5 +51,50 @@ EOD;
         $task = $collection[0];
         $this->assertInstanceOf('\Idephix\Task\CallableTask', $task);
         $this->assertEquals('echo', $task->name());
+    }
+
+    /** @test */
+    public function it_should_know_if_has_a_task()
+    {
+        $collection = TaskCollection::ofTasks(array(new DummyTask()));
+
+        $this->assertFalse($collection->has('missingCommand'));
+        $this->assertTrue($collection->has('dummy'));
+    }
+}
+
+
+class DummyTask implements Task
+{
+
+    public function name()
+    {
+        return 'dummy';
+    }
+
+    public function description()
+    {
+        // TODO: Implement description() method.
+    }
+
+    /**
+     * @return Collection
+     */
+    public function parameters()
+    {
+        // TODO: Implement parameters() method.
+    }
+
+    public function userDefinedParameters()
+    {
+        // TODO: Implement userDefinedParameters() method.
+    }
+
+    /**
+     * @return callable
+     */
+    public function code()
+    {
+        // TODO: Implement code() method.
     }
 }

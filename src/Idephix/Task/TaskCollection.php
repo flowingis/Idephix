@@ -17,7 +17,7 @@ class TaskCollection extends CollectionIterator
                 array_filter(
                     $array,
                     function ($task) {
-                        return $task instanceof CallableTask;
+                        return $task instanceof Task;
                     }
                 )
             )
@@ -51,10 +51,32 @@ class TaskCollection extends CollectionIterator
 
     public function offsetSet($offset, $value)
     {
-        if (!$value instanceof CallableTask) {
+        if (!$value instanceof Task) {
             throw new \DomainException('TaskCollection can only accept \Idephix\Task\Task object');
         }
 
         $this->getInnerIterator()->offsetSet($offset, $value);
+    }
+
+    public function has($taskName)
+    {
+        foreach ($this->getInnerIterator() as $task) {
+            if ($taskName === $task->name()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function get($taskName)
+    {
+        foreach ($this->getInnerIterator() as $task) {
+            if ($taskName === $task->name()) {
+                return $task;
+            }
+        }
+
+        throw new \RuntimeException('Non existing task ' . $taskName);
     }
 }

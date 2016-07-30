@@ -180,11 +180,19 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_allow_to_invoke_tasks()
     {
-        $this->idx->add('test', function (IdephixInterface $idx, $what) {return $what * 2;});
-        $this->assertEquals(84, $this->idx->runTask('test', 42));
-        $this->assertEquals(84, $this->idx->test(42));
+        $this->idx->add(
+            'test',
+            function (IdephixInterface $idx, $what, $go = false) {
+                if ($go) {
+                    return $what * 2;
+                }
+                return 0;
+            }
+        );
+        $this->assertEquals(84, $this->idx->test(42, true));
+        $this->assertEquals(84, $this->idx->runTask('test', 42, true));
     }
-    
+
     /**
      * Exception: Remote function need a valid environment. Specify --env parameter.
      */
