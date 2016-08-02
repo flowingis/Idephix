@@ -2,10 +2,11 @@
 namespace Idephix;
 
 use Idephix\Exception\FailedCommandException;
+use Idephix\Task\Parameter;
+use Idephix\Task\CallableTask;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
-use Idephix\Test\DummyExtension;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 
 class IdephixTest extends \PHPUnit_Framework_TestCase
@@ -51,18 +52,44 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
      */
-    public function testAdd()
+    public function it_should_add_closure()
     {
         $this->idx->add(
-            'command_name',
+            'commandName',
             function () {
             }
         );
 
-        $this->assertTrue($this->idx->has('command_name'));
+        $this->assertTrue($this->idx->has('commandName'));
     }
 
+    /**
+     * @test
+     */
+    public function it_should_add_task()
+    {
+        $task = new CallableTask('fooCommand', 'A dummy command', function () {}, Parameter\Collection::dry());
+        $this->idx->add($task);
+
+        $this->assertTrue($this->idx->has('fooCommand'));
+
+        $registeredCommands = $this->idx->getApplication()->all();
+        $this->assertArrayHasKey('fooCommand', $registeredCommands);
+        $this->assertInstanceOf('\Idephix\Console\Command', $registeredCommands['fooCommand']);
+        $this->assertEquals('fooCommand', $registeredCommands['fooCommand']->getName());
+    }
+
+    /**
+     * @test
+     * @expectedException \Idephix\Exception\InvalidTaskException
+     */
+    public function it_should_throw_exception_for_missing_code()
+    {
+        $this->idx->add('command_name');
+    }
+    
     public function getArgvAndTargets()
     {
         return array(
@@ -148,77 +175,22 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('ProcessTimedOutException', stream_get_contents($output));
     }
 
-    /** @test */
-    public function it_should_retrieve_libraries_from_config()
-    {
-        $lib = new DummyExtension($this);
-        $idx = new Idephix(
-            Config::fromArray(
-                array(
-                    Config::EXTENSIONS => array('deploy' => $lib)
-                )
-            )
-        );
-
-        $this->assertEquals(42, $idx->test(42));
-    }
-    
-    /**
-     * @test
-     */
-    public function it_should_allow_to_use_extension()
-    {
-        $extension = new DummyExtension($this);
-        $this->idx->addExtension('name', $extension);
-        $this->assertEquals(42, $this->idx->name()->test(42));
-        $this->assertEquals(42, $this->idx->test(42));
-    }
-
-    /**
-     * @test
-     */
-    public function it_should_allow_to_override_extension_method()
-    {
-        $extension = new DummyExtension($this);
-        $this->idx->addExtension('myExtension', $extension);
-        $this->idx->add('test', function ($what) { return $what * 2;});
-        $this->assertEquals(84, $this->idx->test(42));
-        $this->assertEquals(42, $this->idx->myExtension()->test(42));
-    }
-
     /**
      * @test
      */
     public function it_should_allow_to_invoke_tasks()
     {
-        $this->idx->add('test', function ($what) { return $what * 2;});
-        $this->assertEquals(84, $this->idx->test(42));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The extension must be an object
-     */
-    public function testAddNonObjectExtension()
-    {
-        $this->idx->addExtension('name', 123);
-    }
-
-    /**
-     */
-    public function testRunTask()
-    {
-        $spy = new TaskSpy();
-
-        $this->idx->add('command_name', function ($param) use ($spy) {
-            $spy->execute($param);
-
-            return 0;
-        });
-
-        $this->assertEquals(0, $this->idx->runTask('command_name', 'foo'));
-        $this->assertTrue($spy->executed);
-        $this->assertEquals(array('foo'), $spy->lastCallArguments);
+        $this->idx->add(
+            'test',
+            function (IdephixInterface $idx, $what, $go = false) {
+                if ($go) {
+                    return $what * 2;
+                }
+                return 0;
+            }
+        );
+        $this->assertEquals(84, $this->idx->test(42, true));
+        $this->assertEquals(84, $this->idx->runTask('test', 42, true));
     }
 
     /**

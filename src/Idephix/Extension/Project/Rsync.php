@@ -2,13 +2,16 @@
 
 namespace Idephix\Extension\Project;
 
+use Idephix\Extension;
+use Idephix\Extension\MethodCollection;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
+use Idephix\Task\TaskCollection;
 
 /**
  * Provide a basic rsync interface based on current idx target parameters
  */
-class Project implements IdephixAwareInterface
+class Rsync implements IdephixAwareInterface, Extension
 {
     /**
      * @var \Idephix\IdephixInterface
@@ -18,6 +21,27 @@ class Project implements IdephixAwareInterface
     public function setIdephix(IdephixInterface $idx)
     {
         $this->idx = $idx;
+    }
+
+    public function name()
+    {
+        return 'rsync';
+    }
+
+    /** @return MethodCollection */
+    public function methods()
+    {
+        return MethodCollection::ofCallables(
+            array(
+                new Extension\CallableMethod('rsyncProject', array($this, 'rsyncProject'))
+            )
+        );
+    }
+
+    /** @return TaskCollection */
+    public function tasks()
+    {
+        return TaskCollection::dry();
     }
 
     public function rsyncProject($remoteDir, $localDir = null, $exclude = null, $extraOpts = null)
@@ -32,8 +56,7 @@ class Project implements IdephixAwareInterface
             throw new \InvalidArgumentException('Target not provided. Please provide a valid target.');
         }
 
-        $user = $target->get('ssh_params.user');
-        $host = $this->idx->getCurrentTargetHost();
+
         $port = $target->get('ssh_params.port');
 
         if (file_exists($exclude)) {
@@ -50,8 +73,24 @@ class Project implements IdephixAwareInterface
             $sshCmd .= ' -p ' . $port;
         }
 
-        $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e '$sshCmd' $localDir $user@$host:$remoteDir";
+        $remoteConnection = $this->connectionString($this->idx->getCurrentTargetHost(), $target->get('ssh_params.user'));
+
+        $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e '$sshCmd' $localDir $remoteConnection:$remoteDir";
 
         return $this->idx->local($cmd);
+    }
+
+    /**
+     * @param $host
+     * @param null $user
+     * @return string
+     */
+    private function connectionString($host, $user = null)
+    {
+        $remoteConnection = '';
+        $remoteConnection .= is_null($user) ? '' : "$user@";
+        $remoteConnection .= $host;
+
+        return $remoteConnection;
     }
 }

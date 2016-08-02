@@ -1,9 +1,7 @@
 <?php
 namespace Idephix\Task;
 
-use Idephix\Task\Parameter\Idephix;
 use Idephix\Task\Parameter\Collection;
-use Idephix\Task\Parameter\UserDefined;
 
 class TaskCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,22 +30,7 @@ EOD;
 
         $collection = TaskCollection::ofFunctions($idxFileContent);
         $this->assertCount(1, $collection);
-
-        $task = $collection[0];
-
-        $this->assertTaskEqual(
-            new Task(
-                'foo',
-                'This is foo description',
-                function ($bar) {
-                    echo $bar;
-                },
-                Collection::createFromArray(
-                    array('foo' => array('description' => ''), 'bar' => array('description' => ''))
-                )
-            ),
-            $task
-        );
+        $this->assertInstanceOf('\Idephix\Task\CallableTask', $collection[0]);
     }
 
     /**
@@ -66,64 +49,52 @@ EOD;
         $this->assertCount(1, $collection);
 
         $task = $collection[0];
-
-        $this->assertTaskEqual(
-            new Task(
-                'echo',
-                '',
-                function ($bar) {
-                    echo $bar;
-                },
-                Collection::createFromArray(array('bar' => array('description' => '')))
-            ),
-            $task
-        );
+        $this->assertInstanceOf('\Idephix\Task\CallableTask', $task);
+        $this->assertEquals('echo', $task->name());
     }
 
     /** @test */
-    public function it_should_recognize_idx_param()
+    public function it_should_know_if_has_a_task()
     {
-        $idxFileContent =<<<'EOD'
-<?php
+        $collection = TaskCollection::ofTasks(array(new DummyTask()));
 
-use Idephix\Idephix as Idx;
+        $this->assertFalse($collection->has('missingCommand'));
+        $this->assertTrue($collection->has('dummy'));
+    }
+}
 
-function foo(Idx $idx, $bar){echo 'bar';};
 
-EOD;
+class DummyTask implements Task
+{
 
-        $collection = TaskCollection::ofFunctions($idxFileContent);
-        $this->assertCount(1, $collection);
+    public function name()
+    {
+        return 'dummy';
+    }
 
-        $task = $collection[0];
-
-        $expectedParams = Collection::dry();
-        $expectedParams[] = Idephix::create();
-        $expectedParams[] = UserDefined::create('bar', '');
-
-        $this->assertTaskEqual(
-            new Task(
-                'foo',
-                '',
-                function ($bar) {
-                    echo $bar;
-                },
-                $expectedParams
-            ),
-            $task
-        );
+    public function description()
+    {
+        // TODO: Implement description() method.
     }
 
     /**
-     * @param $actual
+     * @return Collection
      */
-    private function assertTaskEqual(Task $expected, Task $actual)
+    public function parameters()
     {
-        $this->assertEquals(
-            $expected,
-            $actual
-        );
+        // TODO: Implement parameters() method.
+    }
 
-        $this->assertEquals(iterator_to_array($expected->parameters()), iterator_to_array($actual->parameters()));
+    public function userDefinedParameters()
+    {
+        // TODO: Implement userDefinedParameters() method.
+    }
+
+    /**
+     * @return callable
+     */
+    public function code()
+    {
+        // TODO: Implement code() method.
     }
 }

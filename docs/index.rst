@@ -20,6 +20,7 @@ Contents:
    Getting Started <getting_started>
    Configuration <configuration>
    Writing tasks <writing_tasks>
+   Extending Idephix <writing_extensions>
    Migrating your idxfile <migrating_idx_file>
 
 Requirements

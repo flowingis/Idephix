@@ -75,7 +75,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $parameters[] = UserDefined::create('exclamationMark', 'The exclamation mark to use', '!');
         $parameters[] = UserDefined::create('loud', 'Do you really want to yell out loud?', false);
 
-        $task = $this->prophesize('\Idephix\Task\Task');
+        $task = $this->prophesize('\Idephix\Task\CallableTask');
         $task->name()->willReturn('yell');
         $task->description()->willReturn('A command that yells at you');
         $task->parameters()->willReturn($parameters);

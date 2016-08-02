@@ -3,6 +3,7 @@ namespace Idephix\Test;
 
 use Idephix\Config;
 use Idephix\Context;
+use Idephix\Extension;
 use Idephix\IdephixInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -43,10 +44,10 @@ class InspectableIdephix implements IdephixInterface
      * The "--go" parameters should be defined as "$go = false".
      *
      * @param string $name
-     * @param callable $code
-     * @return \Idephix\IdephixInterface
+     * @param \Closure $code
+     * @return IdephixInterface
      */
-    public function add($name, $code)
+    public function add($name, \Closure $code = null)
     {
     }
 
@@ -92,11 +93,9 @@ class InspectableIdephix implements IdephixInterface
     }
 
     /**
-     * @param string $name
-     * @param object $extension
-     * @return void
+     * @param Extension $extension
      */
-    public function addExtension($name, $extension)
+    public function addExtension(Extension $extension)
     {
         // TODO: Implement addExtension() method.
     }

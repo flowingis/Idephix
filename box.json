@@ -3,7 +3,7 @@
   "chmod": "0755",
   "compactors": [
     "Herrera\\Box\\Compactor\\Json",
-    "Herrera\\Box\\Compactor\\Php"
+    "Idephix\\Phar\\Compactor\\Php"
   ],
   "directories": [
     "src/Idephix"

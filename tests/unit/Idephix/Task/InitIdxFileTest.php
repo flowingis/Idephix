@@ -1,10 +1,8 @@
 <?php
-namespace Idephix\Extension\Deploy;
+namespace Idephix\Task;
 
 use Idephix\Test\IdephixTestCase;
-use Idephix\Extension\InitIdxFile\InitIdxFile;
 use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamFile;
 use org\bovigo\vfs\vfsStreamWrapper;
 
@@ -13,9 +11,14 @@ class InitIdxFileTest extends IdephixTestCase
     public function setUp()
     {
         @include_once 'vfsStream/vfsStream.php';
+        $structure = array(
+            'Deploy' => array(
+                'idxfile.php' => 'function foo(){ echo "bar"};',
+                'idxrc.php' => 'return \Idephix\Config::dry();',
+            )
+        );
 
-        vfsStreamWrapper::register();
-        vfsStreamWrapper::setRoot(new vfsStreamDirectory('root'));
+        vfsStream::setup('root', null, $structure);
     }
 
     public function testInitIdxFile()
@@ -25,11 +28,15 @@ class InitIdxFileTest extends IdephixTestCase
         $idx->output->expects($this->exactly(4))
             ->method('writeln');
 
-        $initIdxFile = new InitIdxFile('vfs://root');
+        $initIdxFile = new InitIdxFile('vfs://root', 'vfs://root/Deploy/idxfile.php', 'vfs://root/Deploy/idxrc.php');
         $initIdxFile->setIdephix($idx);
         $initIdxFile->initFile();
 
         $this->assertTrue(file_exists('vfs://root/idxfile.php'));
+        $this->assertTrue(file_exists('vfs://root/idxrc.php'));
+
+        $this->assertEquals('function foo(){ echo "bar"};', file_get_contents('vfs://root/idxfile.php'));
+        $this->assertEquals('return \Idephix\Config::dry();', file_get_contents('vfs://root/idxrc.php'));
     }
 
     public function testInitWithExistingIdxFile()
@@ -43,7 +50,7 @@ class InitIdxFileTest extends IdephixTestCase
             ->with('<error>An idxfile.php already exists, generation skipped.</error>')
             ;
 
-        $initIdxFile = new InitIdxFile('vfs://root');
+        $initIdxFile = new InitIdxFile('vfs://root', 'vfs://root/Deploy/idxfile.php', 'vfs://root/Deploy/idxrc.php');
         $initIdxFile->setIdephix($idx);
         $initIdxFile->initFile();
     }

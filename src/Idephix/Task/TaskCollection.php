@@ -57,4 +57,26 @@ class TaskCollection extends CollectionIterator
 
         $this->getInnerIterator()->offsetSet($offset, $value);
     }
+
+    public function has($taskName)
+    {
+        foreach ($this->getInnerIterator() as $task) {
+            if ($taskName === $task->name()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function get($taskName)
+    {
+        foreach ($this->getInnerIterator() as $task) {
+            if ($taskName === $task->name()) {
+                return $task;
+            }
+        }
+
+        throw new \RuntimeException('Non existing task ' . $taskName);
+    }
 }

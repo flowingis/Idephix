@@ -4,8 +4,14 @@ namespace Idephix;
 
 use Idephix\Console\Application;
 use Idephix\Console\Command;
+use Idephix\Console\InputFactory;
 use Idephix\Exception\DeprecatedException;
 use Idephix\Exception\FailedCommandException;
+use Idephix\Exception\InvalidTaskException;
+use Idephix\Exception\MissingMethodException;
+use Idephix\Extension\MethodCollection;
+use Idephix\Task\CallableTask;
+use Idephix\Task\Task;
 use Idephix\Task\TaskCollection;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -13,8 +19,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Idephix\SSH\SshClient;
 use Idephix\Extension\IdephixAwareInterface;
-use Idephix\Extension\SelfUpdate\SelfUpdate;
-use Idephix\Extension\InitIdxFile\InitIdxFile;
+use Idephix\Task\SelfUpdate\SelfUpdate;
+use Idephix\Task\InitIdxFile;
 
 /**
  * Class Idephix
@@ -27,7 +33,10 @@ class Idephix implements IdephixInterface
     const RELEASE_DATE = '@release_date@';
 
     private $application;
-    private $extensions = array();
+    /** @var  TaskCollection */
+    private $tasks;
+
+    private $extensionsMethods;
     private $input;
     private $output;
     private $sshClient;
@@ -43,6 +52,9 @@ class Idephix implements IdephixInterface
         OutputInterface $output = null,
         InputInterface $input = null)
     {
+        $this->tasks = TaskCollection::dry();
+        $this->extensionsMethods = MethodCollection::dry();
+
         if (!$config instanceof Config) {
             throw new DeprecatedException("You're using an old idxfile format, consider updating. http://idephix.readthedocs.io/en/latest/migrating_idx_file.html");
         }
@@ -76,8 +88,8 @@ class Idephix implements IdephixInterface
         $this->addSelfUpdateCommand();
         $this->addInitIdxFileCommand();
         
-        foreach ($config->extensions() as $name => $extension) {
-            $this->addExtension($name, $extension);
+        foreach ($config->extensions() as $extension) {
+            $this->addExtension($extension);
         }
     }
 
@@ -86,7 +98,7 @@ class Idephix implements IdephixInterface
         $idephix = new static($config);
 
         foreach ($tasks as $task) {
-            $idephix->application->add(Command::fromTask($task, $idephix));
+            $idephix->add($task);
         }
 
         return $idephix;
@@ -108,17 +120,11 @@ class Idephix implements IdephixInterface
             return call_user_func_array(array($this, 'runTask'), array_merge(array($name), $arguments));
         }
 
-        if (isset($this->extensions[$name])) {
-            return $this->extensions[$name];
+        try {
+            return $this->extensionsMethods->execute($name, $arguments);
+        } catch (MissingMethodException $e) {
+            throw new \BadMethodCallException('Call to undefined method: "' . $name . '"');
         }
-
-        foreach ($this->extensions as $libName => $extension) {
-            if (is_callable(array($extension, $name))) {
-                return call_user_func_array(array($extension, $name), $arguments);
-            }
-        }
-
-        throw new \BadMethodCallException('Call to undefined method: "'.$name.'"');
     }
 
     public function __get($name)
@@ -141,10 +147,19 @@ class Idephix implements IdephixInterface
     /**
      * @inheritdoc
      */
-    public function add($name, $code)
+    public function add($task, \Closure $code = null)
     {
-        $this->application->add(Command::buildFromCode($name, $code, $this));
-        return $this;
+        if (is_string($task) && is_callable($code)) {
+            $task = CallableTask::buildFromClosure($task, $code);
+        }
+
+        if ($task instanceof Task) {
+            $this->tasks[] = $task;
+            $this->application->add(Command::fromTask($task, $this));
+            return $this;
+        }
+
+        throw new InvalidTaskException('A task must be an instance of Idephix\Task or Callable');
     }
 
     /**
@@ -242,17 +257,19 @@ class Idephix implements IdephixInterface
     /**
      * @inheritdoc
      */
-    public function addExtension($name, $extension)
+    public function addExtension(Extension $extension)
     {
-        if (!is_object($extension)) {
-            throw new \InvalidArgumentException('The extension must be an object');
-        }
-
         if ($extension instanceof IdephixAwareInterface) {
             $extension->setIdephix($this);
         }
 
-        $this->extensions[$name] = $extension;
+        $this->extensionsMethods = $this->extensionsMethods->merge($extension->methods());
+
+        foreach ($extension->tasks() as $task) {
+            if (!$this->has($task->name())) {
+                $this->add($task);
+            }
+        }
     }
 
     /**
@@ -271,7 +288,7 @@ class Idephix implements IdephixInterface
      */
     public function has($name)
     {
-        return $this->application->has($name);
+        return $this->tasks->has($name) && $this->application->has($name);
     }
 
     /**
@@ -288,43 +305,28 @@ class Idephix implements IdephixInterface
             throw new \InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));
         }
 
-        $arguments = new ArgvInput(array_merge(array('exec_placeholder'), func_get_args()));
+        $inputFactory = new InputFactory();
 
-        return $this->application->get($name)->run($arguments, $this->output);
+        return $this->application->get($name)->run(
+            $inputFactory->buildFromUserArgsForTask(func_get_args(), $this->tasks->get($name)),
+            $this->output
+        );
     }
 
     public function addSelfUpdateCommand()
     {
         if ('phar:' === substr(__FILE__, 0, 5)) {
-            $this->addExtension('selfUpdate', new SelfUpdate());
-            $idx = $this;
-            $this
-                ->add(
-                    'selfupdate',
-                    /**
-                     * Donwload and update Idephix
-                     */
-                    function () use ($idx) {
-                        $idx->selfUpdate()->update();
-                    }
-                );
+            $selfUpdate = new SelfUpdate();
+            $selfUpdate->setIdephix($this);
+            $this->add($selfUpdate);
         }
     }
 
     public function addInitIdxFileCommand()
     {
-        $this->addExtension('initIdxFile', new InitIdxFile());
-        $idx = $this;
-        $this
-            ->add(
-                'init-idx-file',
-                /**
-                 * Create an example idxfile.php
-                 */
-                function () use ($idx) {
-                    $idx->initIdxFile()->initFile();
-                }
-            );
+        $init = InitIdxFile::fromDeployRecipe();
+        $init->setIdephix($this);
+        $this->add($init);
     }
 
     /**
