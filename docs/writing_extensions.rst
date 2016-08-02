@@ -5,7 +5,15 @@ Extensions are meant to wrap reusable code into a class that you can wire to you
 yourself writing the same task over and over again you may want to put it into an Extension so you can easily reuse it
 in every projects.
 
-An Extension are identified by a name, and are capable of:
+.. hint::
+
+    Extensions should be used wisely, for most cases a bunch of tasks that you copy and paste across projects is
+    the best solution. We in the first place dropped the Deploy solution to a standard recipe that we include in
+    out idxfile for each project. This ease the readability and the hackability of the procedure. An Extension will
+    allow you to define reusable code, but it will hide it a little bit, so take this in consideration before
+    implementing one
+
+An Extension is identified by a name, and is capable of:
 
 - registering new Tasks, so they will be directly available from CLI
 - registering methods that will be hooked into the Idephix instance so you can use them within other tasks
