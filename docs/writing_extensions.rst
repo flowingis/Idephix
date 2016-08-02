@@ -35,7 +35,7 @@ Only method registered by `::methods()` will be plugged into Idephix and will be
     class DummyExtension implements Extension
     {
 
-        public function doStuff($foo)
+        public function doStuff(IdephixInterface $idx, $foo, $go=false)
         {
             //do some stuff
         }
@@ -57,10 +57,10 @@ Only method registered by `::methods()` will be plugged into Idephix and will be
 
     //your idxfile.php
 
-    function deploy(IdephixInterface $idx)
+    function deploy(IdephixInterface $idx, $go = false)
     {
         //your deploy business logic here
-        $idx->doStuff($foo)
+        $idx->doStuff($foo, $go)
     }
 
 
