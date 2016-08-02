@@ -8,36 +8,36 @@ in every projects.
 An Extension are identified by a name, and are capable of:
 
 - registering new Tasks, so they will be directly available from CLI
-- registering methods that will be hooked into the Idephix instance so you can use them within other tasks
+- registering helpers that will be hooked into the Idephix instance so you can use them within other tasks
 
 Writing Extensions
 ------------------
 
 An Extension is simply a class implementing `\Idephix\Extension` interface. This will require you do define a name
-and, TasksCollection and a MethodCollection. If your extension don't need to register new tasks or methods, you can
-simply return an empty collection (`\Idephix\Task\TaskCollection::dry()` or `\Idephix\Extension\MethodCollection::dry()`).
+and, TasksCollection and a HelperCollection. If your extension don't need to register new tasks or methods, you can
+simply return an empty collection (`\Idephix\Task\TaskCollection::dry()` or `\Idephix\Extension\HelperCollection::dry()`).
 
 If you need an instance of the current `\Idephix\IdephixInterface` within your extension, simply implement also
 the `\Idephix\Extension\IdephixAwareInterface` and you'll get one at runtime.
 
-Only method registered by `::methods()` will be plugged into Idephix and will be available for other tasks to use:
+Only method registered by `\Idephix\Extension::helpers()` will be plugged into Idephix and will be available for other tasks to use:
 
 .. code-block:: php
 
     class DummyExtension implements Extension
     {
 
-        public function doStuff($foo)
+        public function doStuff(\Idephix\IdephixInterface $idx, $foo, $go = false)
         {
             //do some stuff
         }
 
         /** @return array of callable */
-        public function methods()
+        public function helpers()
         {
-            return Extension\MethodCollection::ofCallables(
+            return Extension\HelperCollection::ofCallables(
                 array(
-                    new Extension\CallableMethod('doStuff', array($this, 'doStuff'))
+                    new Extension\CallableHelper('doStuff', array($this, 'doStuff'))
                 )
             );
         }
@@ -49,10 +49,10 @@ Only method registered by `::methods()` will be plugged into Idephix and will be
 
     //your idxfile.php
 
-    function deploy(IdephixInterface $idx)
+    function deploy(IdephixInterface $idx, $go = false)
     {
         //your deploy business logic here
-        $idx->doStuff($foo)
+        $idx->doStuff($foo, $go)
     }
 
 
@@ -84,7 +84,7 @@ And the you'll also get to execute it directly from cli:
 
 .. code-block:: bash
 
-    $ idx doStuff bar
+    $ idx doStuff bar --go
 
 
 ``Check out our `available extensions <https://github.com/ideatosrl/Idephix/tree/master/src/Idephix/Extension>`_
