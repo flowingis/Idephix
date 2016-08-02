@@ -23,7 +23,7 @@ class HelperCollection extends CollectionIterator
     public function offsetSet($offset, $value)
     {
         if (!$value instanceof Helper) {
-            throw new \DomainException('MethodCollection can only accept \Idephix\Extension\Method instances');
+            throw new \DomainException('HelperCollection can only accept \Idephix\Extension\Helper instances');
         }
 
         $this->getInnerIterator()->offsetSet($offset, $value);

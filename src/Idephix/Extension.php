@@ -12,7 +12,7 @@ interface Extension
     public function tasks();
 
     /** @return HelperCollection */
-    public function methods();
+    public function helpers();
 
     public function name();
 }

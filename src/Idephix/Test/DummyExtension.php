@@ -68,7 +68,7 @@ class DummyExtension implements IdephixAwareInterface, Extension
     }
 
     /** @return array of callable */
-    public function methods()
+    public function helpers()
     {
         return Extension\HelperCollection::ofCallables(
             array(

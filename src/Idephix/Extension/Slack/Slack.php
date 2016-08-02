@@ -98,7 +98,7 @@ class Slack implements IdephixAwareInterface, Extension
     }
 
     /** @return HelperCollection */
-    public function methods()
+    public function helpers()
     {
         return HelperCollection::dry();
     }
