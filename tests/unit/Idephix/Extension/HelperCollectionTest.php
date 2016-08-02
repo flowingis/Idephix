@@ -1,7 +1,7 @@
 <?php
 namespace Idephix\Extension;
 
-class MethodCollectionTest extends \PHPUnit_Framework_TestCase
+class HelperCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function it_should_be_constructed_from_methods()
