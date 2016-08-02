@@ -1,13 +1,13 @@
 <?php
 namespace Idephix\Extension;
 
-class HelperCollectionTest extends \PHPUnit_Framework_TestCase
+class MethodCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function it_should_be_constructed_from_methods()
     {
-        $method = $this->prophesize('\Idephix\Extension\Helper')->reveal();
-        $collection = HelperCollection::ofCallables(array($method));
+        $method = $this->prophesize('\Idephix\Extension\Method')->reveal();
+        $collection = MethodCollection::ofCallables(array($method));
 
         $this->assertEquals(1, $collection->count());
     }
@@ -15,14 +15,14 @@ class HelperCollectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_should_be_merged()
     {
-        $fooMethod = $this->prophesize('\Idephix\Extension\Helper');
+        $fooMethod = $this->prophesize('\Idephix\Extension\Method');
         $fooMethod->name()->willReturn('foo');
 
-        $barMethod = $this->prophesize('\Idephix\Extension\Helper');
+        $barMethod = $this->prophesize('\Idephix\Extension\Method');
         $barMethod->name()->willReturn('bar');
 
-        $collection = HelperCollection::ofCallables(array($fooMethod->reveal()));
-        $otherCollection = HelperCollection::ofCallables(array($barMethod->reveal()));
+        $collection = MethodCollection::ofCallables(array($fooMethod->reveal()));
+        $otherCollection = MethodCollection::ofCallables(array($barMethod->reveal()));
 
         $this->assertEquals(1, $collection->count());
         $this->assertEquals(1, $otherCollection->count());
@@ -34,9 +34,9 @@ class HelperCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_execute_by_name()
     {
-        $collection = HelperCollection::ofCallables(array(
-            $foo = new StubHelper('foo'),
-            $bar = new StubHelper('bar'),
+        $collection = MethodCollection::ofCallables(array(
+            $foo = new StubMethod('foo'),
+            $bar = new StubMethod('bar'),
         ));
 
         $collection->execute('foo', array('arg1', 'arg2'));
@@ -52,11 +52,11 @@ class HelperCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_throw_exception_for_method_not_found()
     {
-        HelperCollection::dry()->execute('foo');
+        MethodCollection::dry()->execute('foo');
     }
 }
 
-class StubHelper implements Helper
+class StubMethod implements Method
 {
     public $invoked = false;
     public $args;

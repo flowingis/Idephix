@@ -1,7 +1,7 @@
 <?php
 namespace Idephix\Extension;
 
-interface Helper
+interface Method
 {
     public function name();
     public function __invoke();

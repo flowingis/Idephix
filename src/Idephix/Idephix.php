@@ -9,7 +9,7 @@ use Idephix\Exception\DeprecatedException;
 use Idephix\Exception\FailedCommandException;
 use Idephix\Exception\InvalidTaskException;
 use Idephix\Exception\MissingMethodException;
-use Idephix\Extension\HelperCollection;
+use Idephix\Extension\MethodCollection;
 use Idephix\Task\CallableTask;
 use Idephix\Task\Task;
 use Idephix\Task\TaskCollection;
@@ -36,7 +36,7 @@ class Idephix implements IdephixInterface
     /** @var  TaskCollection */
     private $tasks;
 
-    private $extensionsHelpers;
+    private $extensionsMethods;
     private $input;
     private $output;
     private $sshClient;
@@ -53,7 +53,7 @@ class Idephix implements IdephixInterface
         InputInterface $input = null)
     {
         $this->tasks = TaskCollection::dry();
-        $this->extensionsHelpers = HelperCollection::dry();
+        $this->extensionsMethods = MethodCollection::dry();
 
         if (!$config instanceof Config) {
             throw new DeprecatedException("You're using an old idxfile format, consider updating. http://idephix.readthedocs.io/en/latest/migrating_idx_file.html");
@@ -121,7 +121,7 @@ class Idephix implements IdephixInterface
         }
 
         try {
-            return $this->extensionsHelpers->execute($name, $arguments);
+            return $this->extensionsMethods->execute($name, $arguments);
         } catch (MissingMethodException $e) {
             throw new \BadMethodCallException('Call to undefined method: "' . $name . '"');
         }
@@ -263,7 +263,7 @@ class Idephix implements IdephixInterface
             $extension->setIdephix($this);
         }
 
-        $this->extensionsHelpers = $this->extensionsHelpers->merge($extension->helpers());
+        $this->extensionsMethods = $this->extensionsMethods->merge($extension->methods());
 
         foreach ($extension->tasks() as $task) {
             if (!$this->has($task->name())) {

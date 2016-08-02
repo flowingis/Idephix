@@ -3,7 +3,7 @@
 namespace Idephix\Extension\Project;
 
 use Idephix\Extension;
-use Idephix\Extension\HelperCollection;
+use Idephix\Extension\MethodCollection;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Task\TaskCollection;
@@ -28,12 +28,12 @@ class Rsync implements IdephixAwareInterface, Extension
         return 'rsync';
     }
 
-    /** @return HelperCollection */
-    public function helpers()
+    /** @return MethodCollection */
+    public function methods()
     {
-        return HelperCollection::ofCallables(
+        return MethodCollection::ofCallables(
             array(
-                new Extension\CallableHelper('rsyncProject', array($this, 'rsyncProject'))
+                new Extension\CallableMethod('rsyncProject', array($this, 'rsyncProject'))
             )
         );
     }

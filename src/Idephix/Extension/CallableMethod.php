@@ -1,7 +1,7 @@
 <?php
 namespace Idephix\Extension;
 
-class CallableHelper implements Helper
+class CallableMethod implements Method
 {
     private $name;
     private $callable;

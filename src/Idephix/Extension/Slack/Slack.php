@@ -3,7 +3,7 @@
 namespace Idephix\Extension\Slack;
 
 use Idephix\Extension;
-use Idephix\Extension\HelperCollection;
+use Idephix\Extension\MethodCollection;
 use Idephix\IdephixInterface;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Task\TaskCollection;
@@ -97,9 +97,9 @@ class Slack implements IdephixAwareInterface, Extension
         $this->idx = $idx;
     }
 
-    /** @return HelperCollection */
-    public function helpers()
+    /** @return MethodCollection */
+    public function methods()
     {
-        return HelperCollection::dry();
+        return MethodCollection::dry();
     }
 }

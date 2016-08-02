@@ -73,12 +73,4 @@ class CallableTask implements Task
     {
         return $this->code;
     }
-
-    public static function dummy()
-    {
-        $code = function ($bar) { echo $bar; };
-        $params = Collection::createFromArray(array('bar'=> array('description' => '')));
-
-        return new static('foo', 'foo descr', $code, $params);
-    }
 }
