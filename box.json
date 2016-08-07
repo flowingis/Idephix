@@ -24,7 +24,7 @@
       "in": "vendor"
     }
   ],
-  "git-commit": "package_version",
+  "git-tag": "package_version",
   "git-version": "git-version",
   "datetime": "release_date",
   "main": "bin\/idx",
