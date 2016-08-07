@@ -19,13 +19,12 @@ function deployPhar(\Idephix\IdephixInterface $idx)
         exit(0);
     }
 
-    $currentHash = file_get_contents(
+    $currentTag = file_get_contents(
         'https://raw.githubusercontent.com/ideatosrl/getidephix.com/gh-pages/version'
     );
-    $newVersion = $idx->local('git rev-parse HEAD');
 
-    if ($newVersion == $currentHash) {
-        $idx->output()->writeln("version $newVersion already deployed");
+    if ($newTag == $currentTag) {
+        $idx->output()->writeln("version $newTag already deployed");
         exit(0);
     }
 
@@ -43,11 +42,11 @@ function deployPhar(\Idephix\IdephixInterface $idx)
     $idx->local('cp -f idephix.phar ~/docs');
     $idx->local('mkdir -p ~/docs/archive');
     $idx->local("cp -f idephix.phar ~/docs/archive/idephix-{$newTag}.phar");
-    $idx->local('git rev-parse HEAD > ~/docs/version');
+    $idx->local("echo $newTag > ~/docs/version");
     $idx->local('cd ~/docs && git status');
 
     $idx->local('cd ~/docs && git add -A .');
-    $idx->local("cd ~/docs && git commit -m 'deploy phar version $newTag $newVersion'");
+    $idx->local("cd ~/docs && git commit -m 'deploy phar version $newTag'");
     $idx->local('cd ~/docs && git push -q origin gh-pages');
 };
 
