@@ -102,6 +102,7 @@ function fixCs(\Idephix\IdephixInterface $idx)
 
 function buildDoc(\Idephix\IdephixInterface $idx, $open = false)
 {
+    $idx->local('cp -r src/Idephix/Cookbook docs/');
     $idx->local('make  -C ./docs html');
 
     if ($open) {
