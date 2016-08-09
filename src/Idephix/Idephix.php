@@ -181,7 +181,8 @@ class Idephix implements Builder, TaskExecutor
                 array_merge(
                     array('hosts' => array()),
                     $this->targets[$env]
-                )
+                ),
+                $this
             );
             $this->currentTargetName = $env;
         }
