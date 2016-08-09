@@ -1,7 +1,7 @@
 <?php
 namespace Idephix;
 
-class Context implements \ArrayAccess
+class Context implements \ArrayAccess, TaskExecutor
 {
     private $idx;
     private $data = array();
@@ -103,5 +103,87 @@ class Context implements \ArrayAccess
         }
 
         return $element;
+    }
+
+    /**
+     * @param $name
+     * @return integer 0 success, 1 fail
+     */
+    public function runTask($name)
+    {
+        return $this->idx->runTask($name);
+    }
+
+    /**
+     * Execute remote command.
+     *
+     * @param string $cmd command
+     * @param boolean $dryRun
+     * @return void
+     */
+    public function remote($cmd, $dryRun = false)
+    {
+        $this->idx->remote($cmd, $dryRun);
+    }
+
+    /**
+     * Execute local command.
+     *
+     * @param string $cmd Command
+     * @param boolean $dryRun
+     * @param integer $timeout
+     *
+     * @return string the command output
+     */
+    public function local($cmd, $dryRun = false, $timeout = 60)
+    {
+        $this->idx->local($cmd, $dryRun, $timeout);
+    }
+
+    public function output()
+    {
+        return $this->idx->output();
+    }
+
+    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
+    {
+        $this->idx->write($messages, $newline, $type);
+    }
+
+    public function writeln($messages, $type = self::OUTPUT_NORMAL)
+    {
+        $this->idx->writeln($messages, $type);
+    }
+
+    public function sshClient()
+    {
+        return $this->idx->sshClient();
+    }
+
+    /**
+     * @return null|Context
+     * @deprecated
+     */
+    public function getCurrentTarget()
+    {
+        return $this->idx->getCurrentTarget();
+    }
+
+    /**
+     * @return mixed
+     * @deprecated
+     */
+    public function getCurrentTargetHost()
+    {
+        return $this->idx->getCurrentTargetHost();
+    }
+
+    /**
+     * @return mixed
+     * @deprecated
+     */
+    public function getCurrentTargetName()
+    {
+        return $this->idx->getCurrentTargetName();
     }
 }
