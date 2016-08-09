@@ -182,7 +182,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     {
         $this->idx->add(
             'test',
-            function (IdephixInterface $idx, $what, $go = false) {
+            function (TaskExecutor $idx, $what, $go = false) {
                 if ($go) {
                     return $what * 2;
                 }

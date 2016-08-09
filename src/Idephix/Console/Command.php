@@ -1,10 +1,10 @@
 <?php
 namespace Idephix\Console;
 
-use Idephix\IdephixInterface;
 use Idephix\Task\Parameter\Idephix;
 use Idephix\Task\Parameter\UserDefined;
 use Idephix\Task\Task;
+use Idephix\TaskExecutor;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,16 +14,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Command extends SymfonyCommand
 {
     private $idxTaskCode;
-    /** @var  IdephixInterface */
+    /** @var  Builder */
     private $idx;
     /** @var  Task */
     private $task;
 
     /**
      * @param Task $task
+     * @param TaskExecutor $idx
      * @return Command
      */
-    public static function fromTask(Task $task, IdephixInterface $idx)
+    public static function fromTask(Task $task, TaskExecutor $idx)
     {
         $command = new static($task->name());
         $command->task = $task;

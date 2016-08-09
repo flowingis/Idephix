@@ -1,7 +1,7 @@
 <?php
 namespace Idephix\Console;
 
-use Idephix\IdephixInterface;
+use Idephix\TaskExecutor;
 use Idephix\Task\Parameter\Idephix;
 use Idephix\Task\Parameter\Collection;
 use Idephix\Task\Parameter\UserDefined;
@@ -18,7 +18,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     public function it_should_build_command()
     {
         $argumentsSpy = new \stdClass();
-        $idephixTaskCode = function (IdephixInterface $idx, $bar, $foo = 'foo-value', $go = false) use ($argumentsSpy) {
+        $idephixTaskCode = function (TaskExecutor $idx, $bar, $foo = 'foo-value', $go = false) use ($argumentsSpy) {
             $argumentsSpy->args = func_get_args();
             $idx->output()->write('task executed');
         };
@@ -57,7 +57,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
      */
     private function mockIdephix()
     {
-        $idx = $this->prophesize('\Idephix\IdephixInterface');
+        $idx = $this->prophesize('\Idephix\TaskExecutor');
         $idx->output()->willReturn(new StreamOutput(fopen('php://memory', 'r+')));
         $idx = $idx->reveal();
         return $idx;

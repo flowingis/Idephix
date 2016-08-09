@@ -4,11 +4,11 @@ namespace Idephix\Test;
 use Idephix\Config;
 use Idephix\Context;
 use Idephix\Extension;
-use Idephix\IdephixInterface;
+use Idephix\TaskExecutor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InspectableIdephix implements IdephixInterface
+class InspectableIdephix implements Builder, TaskExecutor
 {
 
     private $executedCommands = array();
@@ -45,7 +45,7 @@ class InspectableIdephix implements IdephixInterface
      *
      * @param string $name
      * @param \Closure $code
-     * @return IdephixInterface
+     * @return Builder
      */
     public function add($name, \Closure $code = null)
     {
@@ -54,11 +54,6 @@ class InspectableIdephix implements IdephixInterface
     public function output()
     {
         return $this->output;
-    }
-
-    public function input()
-    {
-        return $this->input;
     }
 
     public function sshClient()
@@ -143,5 +138,15 @@ class InspectableIdephix implements IdephixInterface
     public function getExecutedCommands()
     {
         return $this->executedCommands;
+    }
+
+    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
+    {
+        $this->output()->write($messages, $newline, $type);
+    }
+
+    public function writeln($messages, $type = self::OUTPUT_NORMAL)
+    {
+        $this->output()->writeln($messages, $type);
     }
 }

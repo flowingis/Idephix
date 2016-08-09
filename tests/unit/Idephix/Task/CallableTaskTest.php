@@ -3,7 +3,7 @@ namespace Idephix\Task;
 
 use Idephix\Config;
 use Idephix\Idephix;
-use Idephix\IdephixInterface;
+use Idephix\TaskExecutor;
 
 class CallableTaskTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,12 +14,12 @@ class CallableTaskTest extends \PHPUnit_Framework_TestCase
     {
         /**
          * A fake task
-         * @param IdephixInterface $idx
+         * @param TaskExecutor $idx
          * @param $foo
          * @param bool $go
          * @return mixed
          */
-        $task = function (IdephixInterface $idx, $foo, $go = false) {
+        $task = function (TaskExecutor $idx, $foo, $go = false) {
             return $foo;
         };
         $idx = Idephix::create(TaskCollection::dry(), Config::dry());

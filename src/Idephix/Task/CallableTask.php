@@ -33,7 +33,7 @@ class CallableTask implements Task
         $parser = new DocBlockParser($reflector->getDocComment());
 
         foreach ($reflector->getParameters() as $parameter) {
-            if ($parameter->getClass() && $parameter->getClass()->implementsInterface('\Idephix\IdephixInterface')) {
+            if ($parameter->getClass() && $parameter->getClass()->implementsInterface('\Idephix\TaskExecutor')) {
                 $parameters[] = Idephix::create();
                 continue;
             }

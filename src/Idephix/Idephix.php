@@ -27,7 +27,7 @@ use Idephix\Task\InitIdxFile;
  * @method InitIdxFile initIdxFile()
  * @method SelfUpdate selfUpdate()
  */
-class Idephix implements IdephixInterface
+class Idephix implements Builder, TaskExecutor
 {
     const VERSION = '@package_version@';
     const RELEASE_DATE = '@release_date@';
@@ -107,11 +107,6 @@ class Idephix implements IdephixInterface
     public function output()
     {
         return $this->output;
-    }
-
-    public function input()
-    {
-        return $this->input();
     }
 
     public function __call($name, $arguments = array())
@@ -436,5 +431,15 @@ class Idephix implements IdephixInterface
     public function sshClient()
     {
         return $this->sshClient;
+    }
+
+    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
+    {
+        $this->output()->write($messages, $newline, $type);
+    }
+
+    public function writeln($messages, $type = self::OUTPUT_NORMAL)
+    {
+        $this->output()->writeln($messages, $type);
     }
 }

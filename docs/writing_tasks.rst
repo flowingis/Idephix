@@ -40,7 +40,7 @@ You can even execute a task within another task:
     {
     }
 
-    function myNewTask(\Idephix\IdephixInterface $idx)
+    function myNewTask(\Idephix\TaskExecutor $idx)
     {
         $idx->anotherTask();
     }

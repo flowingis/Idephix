@@ -25,7 +25,7 @@ An Extension is simply a class implementing `\Idephix\Extension` interface. This
 and, TasksCollection and a MethodCollection. If your extension don't need to register new tasks or methods, you can
 simply return an empty collection (`\Idephix\Task\TaskCollection::dry()` or `\Idephix\Extension\MethodCollection::dry()`).
 
-If you need an instance of the current `\Idephix\IdephixInterface` within your extension, simply implement also
+If you need an instance of the current `\Idephix\TaskExecutor` within your extension, simply implement also
 the `\Idephix\Extension\IdephixAwareInterface` and you'll get one at runtime.
 
 Only method registered by `::methods()` will be plugged into Idephix and will be available for other tasks to use:
