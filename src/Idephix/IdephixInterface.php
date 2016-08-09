@@ -2,18 +2,8 @@
 
 namespace Idephix;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
 interface IdephixInterface
 {
-    /**
-     * @param Config $config
-     * @param OutputInterface $output
-     * @param InputInterface $input
-     */
-    public function __construct($config, OutputInterface $output = null, InputInterface $input = null);
-
     /**
      * Add a Command to the application.
      * The "--go" parameters should be defined as "$go = false".
