@@ -16,14 +16,14 @@ class IdephixTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->output = fopen('php://memory', 'r+');
         $output = new StreamOutput($this->output);
-        $currentTarget = Context::fromArray($targets[$targetName]);
+        $currentTarget = Context::configured($targets[$targetName]);
         $sshClient = new SshClient(new StubProxy());
         $sshClient->setParameters($currentTarget->get('ssh_params'));
         $sshClient->setHost(current($currentTarget->get('hosts')));
 
         $idx = new InspectableIdephix(Config::fromArray(array('sshClient' => $sshClient)), $output);
         $idx = $idx
-            ->withCurrentTarget(Context::fromArray($targets[$targetName]), $targetName);
+            ->withCurrentTarget(Context::configured($targets[$targetName]), $targetName);
 
         return $idx;
     }

@@ -168,10 +168,12 @@ class Idephix implements Builder, TaskExecutor
                 );
             }
 
-            $this->currentTarget = Context::fromArray(
-                array_merge(
-                    array('hosts' => array()),
-                    $this->targets[$env]
+            $this->currentTarget = Context::configured(
+                Config::fromArray(
+                    array_merge(
+                        array('hosts' => array()),
+                        $this->targets[$env]
+                    )
                 ),
                 $this
             );

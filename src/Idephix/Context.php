@@ -1,12 +1,12 @@
 <?php
 namespace Idephix;
 
-class Context implements \ArrayAccess, TaskExecutor
+class Context implements Dictionary, TaskExecutor
 {
     private $idx;
-    private $data = array();
+    private $data;
 
-    private function __construct($data, TaskExecutor $idx)
+    private function __construct(Config $data, TaskExecutor $idx)
     {
         $this->data = $data;
         $this->idx = $idx;
@@ -26,88 +26,42 @@ class Context implements \ArrayAccess, TaskExecutor
 
     public static function dry(TaskExecutor $idx)
     {
-        return new static(array(), $idx);
+        return new static(Config::dry(), $idx);
     }
 
-    public static function fromArray($data, TaskExecutor $idx)
+    public static function configured(Config $data, TaskExecutor $idx)
     {
         return new static($data, $idx);
     }
 
     public function offsetExists($offset)
     {
-        return array_key_exists($offset, $this->data);
+        return $this->data->offsetExists($offset);
     }
 
     public function offsetGet($offset)
     {
-        if (array_key_exists($offset, $this->data)) {
-            return $this->resolveElement($this->data[$offset]);
-        }
-
-        $name = explode('.', $offset);
-
-        $element = $this->data;
-
-        foreach ($name as $i => $part) {
-            if (!isset($element[$part])) {
-                return null;
-            }
-
-            $element = $element[$part];
-        }
-
-        return $this->resolveElement($element);
+        return $this->data->offsetGet($offset);
     }
 
     public function offsetSet($offset, $value)
     {
-        if (isset($this->data[$offset])) {
-            $this->data[$offset] = $value;
-            return;
-        }
-
-        $offset = array_reverse(explode('.', $offset));
-
-        $result = $value;
-
-        foreach ($offset as $part) {
-            $result = array($part => $result);
-        }
-
-        $this->data = array_replace_recursive($this->data, $result);
+        $this->data->offsetSet($offset, $value);
     }
 
     public function offsetUnset($offset)
     {
-        unset($this->data[$offset]);
+        $this->data->offsetUnset($offset);
     }
 
     public function get($offset, $default = null)
     {
-        if (is_null($this->offsetGet($offset))) {
-            return $default;
-        }
-
-        return $this->offsetGet($offset);
+        return $this->data->get($offset, $default);
     }
 
     public function set($key, $value)
     {
-        $this->offsetSet($key, $value);
-    }
-
-    /**
-     * @param $element
-     * @return mixed
-     */
-    private function resolveElement($element)
-    {
-        if ($element instanceof \Closure) {
-            $element = $element();
-        }
-
-        return $element;
+        $this->data->offsetSet($key, $value);
     }
 
     /**

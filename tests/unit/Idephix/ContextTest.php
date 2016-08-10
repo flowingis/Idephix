@@ -10,7 +10,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $idx = $this->prophesize('\Idephix\Context')->reveal();
 
-        $context = Context::fromArray(array('foo' => '/var/www', 'bar' => '/var/www/'), $idx);
+        $context = Context::configured(Config::fromArray(array('foo' => '/var/www', 'bar' => '/var/www/')), $idx);
 
         $this->assertEquals('/var/www/', $context->getAsPath('foo'));
         $this->assertEquals('/var/www/', $context->getAsPath('bar'));
