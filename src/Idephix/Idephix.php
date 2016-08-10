@@ -52,6 +52,8 @@ class Idephix implements Builder, TaskExecutor
         OutputInterface $output = null,
         InputInterface $input = null)
     {
+        $this->currentTarget = Context::dry($this);
+        $this->currentTargetName = null;
         $this->tasks = TaskCollection::dry();
         $this->extensionsMethods = MethodCollection::dry();
 
@@ -73,21 +75,12 @@ class Idephix implements Builder, TaskExecutor
         }
         $this->sshClient = $sshClient;
 
-        if (null === $output) {
-            $output = new ConsoleOutput();
-        }
-        $this->output = $output;
+        $this->output = $this->outputOrDefault($output);
+        $this->input = $this->inputOrDefault($input);
 
-        $this->removeIdxCustomFileParams();
-
-        if (null === $input) {
-            $input = new ArgvInput();
-        }
-
-        $this->input = $input;
         $this->addSelfUpdateCommand();
         $this->addInitIdxFileCommand();
-        
+
         foreach ($config->extensions() as $extension) {
             $this->addExtension($extension);
         }
@@ -163,8 +156,6 @@ class Idephix implements Builder, TaskExecutor
      */
     protected function buildEnvironment(InputInterface $input)
     {
-        $this->currentTarget = null;
-        $this->currentTargetName = null;
         $env = $input->getParameterOption(array('--env'));
         if (false !== $env && !empty($env)) {
             if (!isset($this->targets[$env])) {
@@ -188,14 +179,9 @@ class Idephix implements Builder, TaskExecutor
         }
     }
 
-    protected function hasTarget()
-    {
-        return null !== $this->currentTarget;
-    }
-
     protected function openRemoteConnection($host)
     {
-        if ($this->hasTarget()) {
+        if (!is_null($host)) {
             $this->sshClient->setParameters($this->currentTarget['ssh_params']);
             $this->sshClient->setHost($host);
             $this->sshClient->connect();
@@ -204,7 +190,7 @@ class Idephix implements Builder, TaskExecutor
 
     protected function closeRemoteConnection()
     {
-        if ($this->hasTarget()) {
+        if ($this->sshClient->isConnected()) {
             $this->sshClient->disconnect();
         }
     }
@@ -233,8 +219,8 @@ class Idephix implements Builder, TaskExecutor
 
             return;
         }
-
-        $hosts = $this->hasTarget() ? $this->currentTarget['hosts'] : array(null);
+        
+        $hosts = $this->currentTarget['hosts'] ? $this->currentTarget['hosts'] : array(null);
 
         $hasErrors = false;
         foreach ($hosts as $host) {
@@ -293,7 +279,7 @@ class Idephix implements Builder, TaskExecutor
      * @param string $name the name of the task you want to call
      * @param (...)  arbitrary number of parameter matching the target task interface
      * @return integer
-     * @deprecated should call directly tasks as Idephix methods 
+     * @deprecated should call directly tasks as Idephix methods
      */
     public function runTask($name)
     {
@@ -442,5 +428,33 @@ class Idephix implements Builder, TaskExecutor
     public function writeln($messages, $type = self::OUTPUT_NORMAL)
     {
         $this->output()->writeln($messages, $type);
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return ConsoleOutput|OutputInterface
+     */
+    private function outputOrDefault(OutputInterface $output = null)
+    {
+        if (null === $output) {
+            $output = new ConsoleOutput();
+        }
+
+        return $output;
+    }
+
+    /**
+     * @param InputInterface $input
+     * @return ArgvInput|InputInterface
+     */
+    private function inputOrDefault(InputInterface $input = null)
+    {
+        $this->removeIdxCustomFileParams();
+
+        if (null === $input) {
+            $input = new ArgvInput();
+        }
+
+        return $input;
     }
 }

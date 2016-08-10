@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Command extends SymfonyCommand
 {
     private $idxTaskCode;
-    /** @var  Builder */
+    /** @var  \Idephix\Idephix */
     private $idx;
     /** @var  Task */
     private $task;
@@ -79,7 +79,7 @@ class Command extends SymfonyCommand
         /** @var \Idephix\Task\Parameter\UserDefined $parameter */
         foreach ($this->task->parameters() as $parameter) {
             if ($parameter instanceof Idephix) {
-                $args[] = $this->idx;
+                $args[] = $this->idx->getCurrentTarget();
                 continue;
             }
 

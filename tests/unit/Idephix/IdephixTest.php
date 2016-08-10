@@ -131,7 +131,8 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $idx = new Idephix(
             Config::fromArray(
                 array('targets' => $targets, 'sshClient' => $sshClient)
-            ), new StreamOutput($output)
+            ),
+            new StreamOutput($output)
         );
         $idx->getApplication()->setAutoExit(false);
 

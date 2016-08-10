@@ -23,9 +23,9 @@ class CommandTest extends \PHPUnit_Framework_TestCase
             $idx->output()->write('task executed');
         };
 
-        $idx = $this->mockIdephix();
+        $context = $this->mockContext();
         $task = $this->createTaskDefinition($idephixTaskCode);
-        $command = Command::fromTask($task->reveal(), $idx);
+        $command = Command::fromTask($task->reveal(), $this->mockIdephix($context));
 
         $this->assertInstanceOf('\Symfony\Component\Console\Command\Command', $command);
         $this->assertEquals('yell', $command->getName());
@@ -44,10 +44,10 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $testApplication->add($command);
         $command = $testApplication->find('yell');
 
-        $commandTester = new IdephixCommandTester($command, $idx->output());
+        $commandTester = new IdephixCommandTester($command, $context->output());
         $commandTester->execute(array('command' => $command->getName(), 'what' => 'Say my name'));
 
-        $expectedArguments = array($idx, 'Say my name', '!', false);
+        $expectedArguments = array($context, 'Say my name', '!', false);
         $this->assertEquals('task executed', $commandTester->getDisplay());
         $this->assertEquals($expectedArguments, $argumentsSpy->args);
     }
@@ -55,12 +55,13 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @return object|\Prophecy\Prophecy\ObjectProphecy
      */
-    private function mockIdephix()
+    private function mockContext()
     {
-        $idx = $this->prophesize('\Idephix\TaskExecutor');
-        $idx->output()->willReturn(new StreamOutput(fopen('php://memory', 'r+')));
-        $idx = $idx->reveal();
-        return $idx;
+        $context = $this->prophesize('\Idephix\TaskExecutor');
+        $context->output()->willReturn(new StreamOutput(fopen('php://memory', 'r+')));
+        $context = $context->reveal();
+
+        return $context;
     }
 
     /**
@@ -82,5 +83,13 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $task->userDefinedParameters()->willReturn(new UserDefinedCollection($parameters));
         $task->code()->willReturn($idephixTaskCode);
         return $task;
+    }
+
+    private function mockIdephix($context)
+    {
+        $idx = $this->prophesize('\Idephix\Idephix');
+        $idx->getCurrentTarget()->willReturn($context);
+
+        return $idx->reveal();
     }
 }

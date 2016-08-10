@@ -24,6 +24,11 @@ class Context implements \ArrayAccess, TaskExecutor
         return rtrim($this->get($name, $default), '/').'/';
     }
 
+    public static function dry(TaskExecutor $idx)
+    {
+        return new static(array(), $idx);
+    }
+
     public static function fromArray($data, TaskExecutor $idx)
     {
         return new static($data, $idx);
@@ -111,7 +116,7 @@ class Context implements \ArrayAccess, TaskExecutor
      */
     public function runTask($name)
     {
-        return $this->idx->runTask($name);
+        call_user_func_array(array($this->idx, 'runTask'), func_get_args());
     }
 
     /**
