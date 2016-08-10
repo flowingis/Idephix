@@ -40,7 +40,7 @@ class Config implements Dictionary
 
     public function targets()
     {
-        return $this[self::TARGETS];
+        return is_null($this[self::TARGETS]) ? array() : $this[self::TARGETS];
     }
 
     public function extensions()
