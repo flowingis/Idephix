@@ -25,4 +25,15 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $context = Context::dry($idx->reveal());
         $context->runTask('mycommand', 'foo', 'bar');
     }
+
+    /** @test */
+    public function it_should_return_local_output()
+    {
+        $idx = $this->prophesize('\Idephix\Context');
+        $idx->local('foo', false, 60)->willReturn('bar');
+
+        $context = Context::dry($idx->reveal());
+
+        $this->assertEquals('bar', $context->local('foo'));
+    }
 }

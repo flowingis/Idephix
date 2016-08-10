@@ -142,7 +142,7 @@ class Context implements \ArrayAccess, TaskExecutor
      */
     public function local($cmd, $dryRun = false, $timeout = 60)
     {
-        $this->idx->local($cmd, $dryRun, $timeout);
+        return $this->idx->local($cmd, $dryRun, $timeout);
     }
 
     public function output()
