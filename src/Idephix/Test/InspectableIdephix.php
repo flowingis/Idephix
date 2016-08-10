@@ -4,7 +4,6 @@ namespace Idephix\Test;
 use Idephix\Config;
 use Idephix\Context;
 use Idephix\Extension;
-use Idephix\TaskExecutor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

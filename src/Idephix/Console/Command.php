@@ -1,10 +1,9 @@
 <?php
 namespace Idephix\Console;
 
-use Idephix\Task\Parameter\Idephix;
-use Idephix\Task\Parameter\UserDefined;
-use Idephix\Task\Task;
 use Idephix\TaskExecutor;
+use Idephix\Task\Parameter;
+use Idephix\Task\Task;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Command extends SymfonyCommand
 {
     private $idxTaskCode;
-    /** @var  \Idephix\Idephix */
+    /** @var  TaskExecutor */
     private $idx;
     /** @var  Task */
     private $task;
@@ -32,7 +31,7 @@ class Command extends SymfonyCommand
 
         $command->setDescription($task->description());
 
-        /** @var UserDefined $parameter */
+        /** @var Parameter\UserDefined $parameter */
         foreach ($task->userDefinedParameters() as $parameter) {
             if (!$parameter->isOptional()) {
                 $command->addArgument($parameter->name(), InputArgument::REQUIRED, $parameter->description());
@@ -76,9 +75,9 @@ class Command extends SymfonyCommand
     protected function extractArgumentsFrom(InputInterface $input)
     {
         $args = array();
-        /** @var \Idephix\Task\Parameter\UserDefined $parameter */
+        /** @var Parameter\UserDefined $parameter */
         foreach ($this->task->parameters() as $parameter) {
-            if ($parameter instanceof Idephix) {
+            if ($parameter instanceof Parameter\Context) {
                 $args[] = $this->idx->getCurrentTarget();
                 continue;
             }

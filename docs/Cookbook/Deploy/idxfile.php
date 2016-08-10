@@ -1,6 +1,6 @@
 <?php
 
-function deploy(Idephix\TaskExecutor $idx, $go = false)
+function deploy(Idephix\Context $idx, $go = false)
 {
     /** @var \Idephix\Context $config */
     $config = $idx->getCurrentTarget();
@@ -26,7 +26,7 @@ function deploy(Idephix\TaskExecutor $idx, $go = false)
     $idx->switchToNextRelease($remoteBaseDir, $nextRelease, $go);
 }
 
-function prepareArtifact(Idephix\TaskExecutor $idx, $localArtifact, $repository, $deployBranch, $go = false)
+function prepareArtifact(Idephix\Context $idx, $localArtifact, $repository, $deployBranch, $go = false)
 {
     $idx->local(
         "
@@ -41,7 +41,7 @@ function prepareArtifact(Idephix\TaskExecutor $idx, $localArtifact, $repository,
     );
 }
 
-function prepareSharedFilesAndFolders(Idephix\TaskExecutor $idx, $remoteBaseDir, $sharedFolders, $sharedFiles, $go = false)
+function prepareSharedFilesAndFolders(Idephix\Context $idx, $remoteBaseDir, $sharedFolders, $sharedFiles, $go = false)
 {
     $idx->remote(
         "mkdir -p {$remoteBaseDir}/releases && \\
@@ -56,7 +56,7 @@ function prepareSharedFilesAndFolders(Idephix\TaskExecutor $idx, $remoteBaseDir,
         $idx->remote("mkdir -p `dirname '{$sharedFile}'` && touch \"$sharedFile\"", !$go);
     }
 }
-function linkSharedFilesAndFolders(Idephix\TaskExecutor $idx, $sharedFiles, $sharedFolders, $nextRelease, $remoteBaseDir, $go = false)
+function linkSharedFilesAndFolders(Idephix\Context $idx, $sharedFiles, $sharedFolders, $nextRelease, $remoteBaseDir, $go = false)
 {
     foreach (array_merge($sharedFiles, $sharedFolders) as $item) {
         $idx->remote("rm -r $nextRelease/$item", !$go);
@@ -64,7 +64,7 @@ function linkSharedFilesAndFolders(Idephix\TaskExecutor $idx, $sharedFiles, $sha
     }
 }
 
-function switchToNextRelease(Idephix\TaskExecutor $idx, $remoteBaseDir, $nextRelease, $go = false)
+function switchToNextRelease(Idephix\Context $idx, $remoteBaseDir, $nextRelease, $go = false)
 {
     $idx->remote(
         "

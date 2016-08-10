@@ -3,7 +3,7 @@ namespace Idephix\Task;
 
 use Idephix\Config;
 use Idephix\Idephix;
-use Idephix\TaskExecutor;
+use Idephix\Context;
 
 class CallableTaskTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,19 +14,20 @@ class CallableTaskTest extends \PHPUnit_Framework_TestCase
     {
         /**
          * A fake task
-         * @param TaskExecutor $idx
+         * @param Context $context
          * @param $foo
          * @param bool $go
          * @return mixed
          */
-        $task = function (TaskExecutor $idx, $foo, $go = false) {
+        $taskCode = function (Context $context, $foo, $go = false) {
             return $foo;
         };
-        $idx = Idephix::create(TaskCollection::dry(), Config::dry());
+
+        $context = Context::dry(Idephix::create(TaskCollection::dry(), Config::dry()));
 
         $task = CallableTask::buildFromClosure(
             'fooTask',
-            $task
+            $taskCode
         );
 
         $this->assertEquals('fooTask', $task->name());
@@ -36,6 +37,6 @@ class CallableTaskTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $task->userDefinedParameters());
 
         $closure = $task->code();
-        $this->assertEquals('foo', $closure($idx, 'foo'));
+        $this->assertEquals('foo', $closure($context, 'foo'));
     }
 }

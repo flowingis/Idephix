@@ -138,7 +138,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
 
         $idx->add(
             'foo',
-            function (TaskExecutor $idx) {
+            function (Context $idx) {
                 $idx->local('echo "Hello World from ' . $idx->getCurrentTargetHost() . '"');
             }
         );
@@ -160,7 +160,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
 
         $idx->add(
             'foo',
-            function (TaskExecutor $idx) {
+            function (Context $idx) {
                 $idx->local('sleep 2', false, 1);
             }
         );
@@ -183,7 +183,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     {
         $this->idx->add(
             'test',
-            function (TaskExecutor $idx, $what, $go = false) {
+            function (Context $idx, $what, $go = false) {
                 if ($go) {
                     return $what * 2;
                 }

@@ -5,7 +5,7 @@ function _echo($value)
     echo $value;
 }
 
-function greet(\Idephix\TaskExecutor $idx, $name)
+function greet(\Idephix\Context $idx, $name)
 {
     $idx->runTask('echo', 'Ciao ' . $name);
 }

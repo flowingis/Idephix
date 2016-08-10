@@ -16,7 +16,7 @@ use Idephix\Task\TaskCollection;
 class Slack implements IdephixAwareInterface, Extension
 {
     /**
-     * @var \Idephix\TaskExecutor
+     * @var \Idephix\Context
      */
     private $idx;
 

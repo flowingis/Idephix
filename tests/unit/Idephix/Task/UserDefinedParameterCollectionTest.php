@@ -1,7 +1,7 @@
 <?php
 namespace Idephix\Task;
 
-use Idephix\Task\Parameter\Idephix;
+use Idephix\Task\Parameter\Context;
 use Idephix\Task\Parameter\Collection;
 use Idephix\Task\Parameter\UserDefined;
 use Idephix\Task\Parameter\UserDefinedCollection;
@@ -15,7 +15,7 @@ class UserDefinedParameterCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $parameters = Collection::dry();
         $parameters[] = UserDefined::create('foo', 'my foo parameter');
-        $parameters[] = Idephix::create();
+        $parameters[] = Context::create();
         $parameters[] = UserDefined::create('bar', 'my bar paramter');
 
         $filtered = new UserDefinedCollection($parameters);

@@ -1,8 +1,8 @@
 <?php
 /**
- * @param \Idephix\TaskExecutor $idx
+ * @param \Idephix\Context $idx
  */
-function deployPhar(\Idephix\TaskExecutor $idx)
+function deployPhar(\Idephix\Context $idx)
 {
     $idx->output()->writeln('Releasing new phar version...');
 
@@ -50,7 +50,7 @@ function deployPhar(\Idephix\TaskExecutor $idx)
     $idx->local('cd ~/docs && git push -q origin gh-pages');
 };
 
-function createPhar(\Idephix\TaskExecutor $idx)
+function createPhar(\Idephix\Context $idx)
 {
     $idx->output()->writeln('Creating phar...');
 
@@ -73,7 +73,7 @@ function createPhar(\Idephix\TaskExecutor $idx)
     $idx->output()->writeln('All good!');
 };
 
-function buildTravis(\Idephix\TaskExecutor $idx)
+function buildTravis(\Idephix\Context $idx)
 {
     try {
         $idx->local('composer install');
@@ -85,13 +85,13 @@ function buildTravis(\Idephix\TaskExecutor $idx)
     }
 };
 
-function build(\Idephix\TaskExecutor $idx)
+function build(\Idephix\Context $idx)
 {
     $idx->local('composer install --prefer-source');
     $idx->local('bin/phpunit -c tests');
 };
 
-function fixCs(\Idephix\TaskExecutor $idx)
+function fixCs(\Idephix\Context $idx)
 {
     try {
         $idx->local('bin/php-cs-fixer fix');
@@ -99,7 +99,7 @@ function fixCs(\Idephix\TaskExecutor $idx)
     }
 };
 
-function buildDoc(\Idephix\TaskExecutor $idx, $open = false)
+function buildDoc(\Idephix\Context $idx, $open = false)
 {
     $idx->local('cp -r src/Idephix/Cookbook docs/');
     $idx->local('make  -C ./docs html');
@@ -109,7 +109,7 @@ function buildDoc(\Idephix\TaskExecutor $idx, $open = false)
     }
 }
 
-function openDoc(\Idephix\TaskExecutor $idx)
+function openDoc(\Idephix\Context $idx)
 {
     $idx->local('open docs/_build/html/index.html');
 }
