@@ -157,7 +157,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     {
         $_SERVER['argv'] = array('idx', 'myTask', '--env=prod');
 
-
         $idx = new Idephix(
             Config::fromArray(array(
                 Config::SSHCLIENT => new SshClient(new StubProxy()),
@@ -170,14 +169,16 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
             ))),
             new StreamOutput(fopen('php://memory', 'r+'))
         );
-        $idx->add('myTask', function (Context $context) {
-            $this->arguments = func_get_args();
+
+        $spy = new \stdClass();
+        $idx->add('myTask', function (Context $context) use ($spy) {
+            $spy->args = func_get_args();
         });
 
         $idx->run();
 
         /** @var Context $context */
-        $context = $this->arguments[0];
+        $context = $spy->args[0];
 
         $this->assertInstanceOf('\Idephix\Context', $context);
         $this->assertEquals('bar', $context['foo']);
