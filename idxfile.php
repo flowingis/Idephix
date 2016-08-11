@@ -75,7 +75,7 @@ function createPhar(\Idephix\Context $idx)
 
 function updatePhar(\Idephix\Context $idx)
 {
-    $idx->runTask('createPhar');
+    $idx->createPhar();
     $idx->local('cp ./idephix.phar bin/');
 }
 

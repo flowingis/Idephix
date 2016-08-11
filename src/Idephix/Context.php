@@ -5,7 +5,6 @@ class Context implements DictionaryAccess, TaskExecutor
 {
     private $idx;
     private $targetData;
-    private $targetName;
 
     private function __construct(Dictionary $data, TaskExecutor $idx)
     {
@@ -126,5 +125,10 @@ class Context implements DictionaryAccess, TaskExecutor
     public function sshClient()
     {
         return $this->idx->sshClient();
+    }
+
+    public function __call($name, $arguments)
+    {
+        return call_user_func_array(array($this->idx, $name), $arguments);
     }
 }
