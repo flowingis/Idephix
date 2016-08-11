@@ -73,6 +73,12 @@ function createPhar(\Idephix\Context $idx)
     $idx->output()->writeln('All good!');
 };
 
+function updatePhar(\Idephix\Context $idx)
+{
+    $idx->runTask('createPhar');
+    $idx->local('cp ./idephix.phar bin/');
+}
+
 function buildTravis(\Idephix\Context $idx)
 {
     try {
