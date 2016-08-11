@@ -2,8 +2,10 @@
 namespace Idephix;
 
 use Idephix\Exception\FailedCommandException;
+use Idephix\SSH\SshClient;
 use Idephix\Task\Parameter;
 use Idephix\Task\CallableTask;
+use Idephix\Test\SSH\StubProxy;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -54,7 +56,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_should_add_closure()
+    public function it_should_be_able_to_add_task_from_closure()
     {
         $this->idx->add(
             'commandName',
@@ -68,7 +70,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_should_add_task()
+    public function it_should_be_able_to_add_task_from_object()
     {
         $task = new CallableTask('fooCommand', 'A dummy command', function () {}, Parameter\Collection::dry());
         $this->idx->add($task);
@@ -139,7 +141,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $idx->add(
             'foo',
             function (Context $idx) {
-                $idx->local('echo "Hello World from ' . $idx->getCurrentTargetHost() . '"');
+                $idx->local('echo "Hello World from ' . $idx['target.host'] . '"');
             }
         );
 
@@ -148,6 +150,39 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         rewind($output);
 
         $this->assertEquals($expected, stream_get_contents($output));
+    }
+
+    /** @test */
+    public function it_should_inject_context_to_task()
+    {
+        $_SERVER['argv'] = array('idx', 'myTask', '--env=prod');
+
+
+        $idx = new Idephix(
+            Config::fromArray(array(
+                Config::SSHCLIENT => new SshClient(new StubProxy()),
+                Config::TARGETS => array(
+                'prod' => array(
+                    'hosts' => array('127.0.0.1'),
+                    'ssh_params' => array('user' => 'ftassi'),
+                    'foo' => 'bar'
+                )
+            ))),
+            new StreamOutput(fopen('php://memory', 'r+'))
+        );
+        $idx->add('myTask', function (Context $context) {
+            $this->arguments = func_get_args();
+        });
+
+        $idx->run();
+
+        /** @var Context $context */
+        $context = $this->arguments[0];
+
+        $this->assertInstanceOf('\Idephix\Context', $context);
+        $this->assertEquals('bar', $context['foo']);
+        $this->assertEquals('prod', $context['target.name']);
+        $this->assertEquals('127.0.0.1', $context['target.host']);
     }
 
     public function testRunLocalShouldAllowToDefineTimeout()

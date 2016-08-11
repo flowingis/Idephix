@@ -50,14 +50,14 @@ class Rsync implements IdephixAwareInterface, Extension
             $remoteDir .= '/';
         }
 
-        $target = $this->idx->getCurrentTarget();
+        $context = $this->idx->getContext();
 
-        if ($target === null) {
+        if ($context === null) {
             throw new \InvalidArgumentException('Target not provided. Please provide a valid target.');
         }
 
 
-        $port = $target->get('ssh_params.port');
+        $port = $context->get('ssh_params.port');
 
         if (file_exists($exclude)) {
             $extraOpts .= ' --exclude-from='.escapeshellarg($exclude);
@@ -73,7 +73,7 @@ class Rsync implements IdephixAwareInterface, Extension
             $sshCmd .= ' -p ' . $port;
         }
 
-        $remoteConnection = $this->connectionString($this->idx->getCurrentTargetHost(), $target->get('ssh_params.user'));
+        $remoteConnection = $this->connectionString($context['target.host'], $context->get('ssh_params.user'));
 
         $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e '$sshCmd' $localDir $remoteConnection:$remoteDir";
 

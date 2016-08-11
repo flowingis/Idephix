@@ -78,7 +78,7 @@ class Command extends SymfonyCommand
         /** @var Parameter\UserDefined $parameter */
         foreach ($this->task->parameters() as $parameter) {
             if ($parameter instanceof Parameter\Context) {
-                $args[] = $this->idx->getCurrentTarget();
+                $args[] = $this->idx->getContext();
                 continue;
             }
 

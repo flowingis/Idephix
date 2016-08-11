@@ -3,7 +3,7 @@
 function deploy(Idephix\Context $idx, $go = false)
 {
     /** @var \Idephix\Context $config */
-    $config = $idx->getCurrentTarget();
+    $config = $idx->getContext();
     $sharedFiles = $config->get('deploy.shared_files', array());
     $sharedFolders = $config->get('deploy.shared_folders', array());
     $remoteBaseDir = $config->get('deploy.remote_base_dir');

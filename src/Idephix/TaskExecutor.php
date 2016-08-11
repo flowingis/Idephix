@@ -39,13 +39,13 @@ interface TaskExecutor
 
     public function writeln($messages, $type = self::OUTPUT_NORMAL);
 
-    public function sshClient();
-
     /**
      * @return null|Context
      * @deprecated
      */
-    public function getCurrentTarget();
+    public function getContext();
+
+    public function sshClient();
 
     /**
      * @return mixed

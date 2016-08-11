@@ -41,9 +41,9 @@ class Idephix implements Builder, TaskExecutor
     private $output;
     private $sshClient;
     private $targets = array();
-    /** @var  Config */
-    protected $currentTarget;
-    protected $currentTargetName;
+    private $config;
+    /** @var  Context */
+    protected $context;
     protected $currentHost;
     protected $invokerClassName;
 
@@ -52,8 +52,8 @@ class Idephix implements Builder, TaskExecutor
         OutputInterface $output = null,
         InputInterface $input = null)
     {
-        $this->currentTarget = Context::dry($this);
-        $this->currentTargetName = null;
+        $this->config = $config;
+        $this->context = Context::dry($this);
         $this->tasks = TaskCollection::dry();
         $this->extensionsMethods = MethodCollection::dry();
 
@@ -67,7 +67,6 @@ class Idephix implements Builder, TaskExecutor
             self::RELEASE_DATE
             );
 
-        $this->targets = $config->targets();
         $sshClient = $config['sshClient'];
 
         if (null === $sshClient) {
@@ -156,35 +155,38 @@ class Idephix implements Builder, TaskExecutor
      */
     protected function buildEnvironment(InputInterface $input)
     {
+        $targets = $this->config->targets();
+
         $env = $input->getParameterOption(array('--env'));
+
         if (false !== $env && !empty($env)) {
-            if (!isset($this->targets[$env])) {
+            if (!isset($targets[$env])) {
                 throw new \Exception(
                     sprintf(
                         'Wrong environment "%s". Available [%s]',
                         $env,
-                        implode(', ', array_keys($this->targets))
+                        implode(', ', array_keys($targets))
                     )
                 );
             }
 
-            $this->currentTarget = Context::configured(
-                Config::fromArray(
+            $this->context = Context::currentTarget(
+                $env,
+                Dictionary::fromArray(
                     array_merge(
                         array('hosts' => array()),
-                        $this->targets[$env]
+                        $targets[$env]
                     )
                 ),
                 $this
             );
-            $this->currentTargetName = $env;
         }
     }
 
     protected function openRemoteConnection($host)
     {
         if (!is_null($host)) {
-            $this->sshClient->setParameters($this->currentTarget['ssh_params']);
+            $this->sshClient->setParameters($this->context['ssh_params']);
             $this->sshClient->setHost($host);
             $this->sshClient->connect();
         }
@@ -197,9 +199,9 @@ class Idephix implements Builder, TaskExecutor
         }
     }
 
-    public function getCurrentTarget()
+    public function getContext()
     {
-        return $this->currentTarget;
+        return $this->context;
     }
 
     public function getCurrentTargetHost()
@@ -209,7 +211,7 @@ class Idephix implements Builder, TaskExecutor
 
     public function getCurrentTargetName()
     {
-        return $this->currentTargetName;
+        throw new \RuntimeException('This method is deprecated');
     }
 
     public function run()
@@ -222,10 +224,11 @@ class Idephix implements Builder, TaskExecutor
             return;
         }
         
-        $hosts = $this->currentTarget['hosts'] ? $this->currentTarget['hosts'] : array(null);
+        $hosts = $this->context['hosts'] ? $this->context['hosts'] : array(null);
 
         $hasErrors = false;
         foreach ($hosts as $host) {
+            $this->context['target.host'] = $host;
             $this->currentHost = $host;
             $this->openRemoteConnection($host);
             $returnValue = $this->application->run($this->input, $this->output);

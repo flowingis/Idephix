@@ -85,7 +85,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     private function mockIdephix($context)
     {
         $idx = $this->prophesize('\Idephix\Idephix');
-        $idx->getCurrentTarget()->willReturn($context);
+        $idx->getContext()->willReturn($context);
 
         return $idx->reveal();
     }

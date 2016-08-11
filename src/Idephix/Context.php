@@ -4,11 +4,12 @@ namespace Idephix;
 class Context implements DictionaryAccess, TaskExecutor
 {
     private $idx;
-    private $data;
+    private $targetData;
+    private $targetName;
 
-    private function __construct(Config $data, TaskExecutor $idx)
+    private function __construct(Dictionary $data, TaskExecutor $idx)
     {
-        $this->data = $data;
+        $this->targetData = $data;
         $this->idx = $idx;
     }
 
@@ -26,42 +27,50 @@ class Context implements DictionaryAccess, TaskExecutor
 
     public static function dry(TaskExecutor $idx)
     {
-        return new static(Config::dry(), $idx);
+        return new static(Dictionary::dry(), $idx);
     }
 
-    public static function configured(Config $data, TaskExecutor $idx)
+    public static function currentTarget($name, Dictionary $targetData, TaskExecutor $idx)
     {
-        return new static($data, $idx);
+        $targetData['target'] = array('name' => $name);
+
+        return new static($targetData, $idx);
     }
 
+    public static function currentHost($name, $host, $targetData, TaskExecutor $idx)
+    {
+        $targetData['target'] = array('name' => $name, 'host' => $host);
+
+        return new static($targetData, $idx);
+    }
     public function offsetExists($offset)
     {
-        return $this->data->offsetExists($offset);
+        return $this->targetData->offsetExists($offset);
     }
 
     public function offsetGet($offset)
     {
-        return $this->data->offsetGet($offset);
+        return $this->targetData->offsetGet($offset);
     }
 
     public function offsetSet($offset, $value)
     {
-        $this->data->offsetSet($offset, $value);
+        $this->targetData->offsetSet($offset, $value);
     }
 
     public function offsetUnset($offset)
     {
-        $this->data->offsetUnset($offset);
+        $this->targetData->offsetUnset($offset);
     }
 
     public function get($offset, $default = null)
     {
-        return $this->data->get($offset, $default);
+        return $this->targetData->get($offset, $default);
     }
 
     public function set($key, $value)
     {
-        $this->data->offsetSet($key, $value);
+        $this->targetData->offsetSet($key, $value);
     }
 
     /**
@@ -123,9 +132,9 @@ class Context implements DictionaryAccess, TaskExecutor
      * @return null|Context
      * @deprecated
      */
-    public function getCurrentTarget()
+    public function getContext()
     {
-        return $this->idx->getCurrentTarget();
+        return $this->idx->getContext();
     }
 
     /**

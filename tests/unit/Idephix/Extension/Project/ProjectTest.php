@@ -2,8 +2,8 @@
 
 namespace Idephix\Extension\Project;
 
-use Idephix\Config;
 use Idephix\Context;
+use Idephix\Dictionary;
 
 class ProjectTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,10 +17,6 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
              ->method('local')
              ->will($this->returnArgument(0));
 
-        $this->idx->expects($this->exactly(1))
-             ->method('getCurrentTargetHost')
-             ->will($this->returnValue('banana.com'));
-
         $this->project = new Rsync();
         $this->project->setIdephix($this->idx);
     }
@@ -28,10 +24,10 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     public function testRsyncProject()
     {
         $this->idx->expects($this->exactly(1))
-            ->method('getCurrentTarget')
+            ->method('getContext')
             ->will(
                 $this->returnValue(
-                    Context::configured(Config::fromArray(array('ssh_params' => array('user' => 'kea'))), $this->idx)
+                    Context::currentHost('prod', 'banana.com', Dictionary::fromArray(array('hosts' => array('mela.com', 'banana.com'), 'ssh_params' => array('user' => 'kea'))), $this->idx)
                 )
             );
 
@@ -43,9 +39,18 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     public function testRysncWithoutUser()
     {
         $this->idx->expects($this->exactly(1))
-            ->method('getCurrentTarget')
+            ->method('getContext')
             ->will(
-                $this->returnValue(Context::configured(Config::fromArray(array('ssh_params' => array())), $this->idx))
+                $this->returnValue(
+                    Context::currentHost(
+                        'prod',
+                        'banana.com',
+                        Dictionary::fromArray(
+                            array('hosts' => array('mela.com', 'banana.com'), 'ssh_params' => array())
+                        ),
+                        $this->idx
+                    )
+                )
             );
 
         $result = $this->project->rsyncProject('/a/remote', './from');
@@ -56,11 +61,18 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     public function testRsyncProjectWithCustomPort()
     {
         $this->idx->expects($this->exactly(1))
-            ->method('getCurrentTarget')
+            ->method('getContext')
             ->will(
                 $this->returnValue(
-                    Context::configured(
-                        Config::fromArray(array('ssh_params' => array('user' => 'kea', 'port' => 20817))),
+                    Context::currentHost(
+                        'prod',
+                        'banana.com',
+                        Dictionary::fromArray(
+                            array(
+                                'hosts' => array('mela.com', 'banana.com'),
+                                'ssh_params' => array('user' => 'kea', 'port' => 20817)
+                            )
+                        ),
                         $this->idx
                     )
                 )
