@@ -39,23 +39,5 @@ interface TaskExecutor
 
     public function writeln($messages, $type = self::OUTPUT_NORMAL);
 
-    /**
-     * @return null|Context
-     * @deprecated
-     */
-    public function getContext();
-
     public function sshClient();
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getCurrentTargetHost();
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getCurrentTargetName();
 }

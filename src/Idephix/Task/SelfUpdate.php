@@ -4,7 +4,6 @@ namespace Idephix\Task\SelfUpdate;
 
 use Idephix\Task\Parameter;
 use Idephix\Idephix;
-use Idephix\TaskExecutor;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Task\Task;
 
@@ -12,7 +11,7 @@ class SelfUpdate implements IdephixAwareInterface, Task
 {
     private $idx;
 
-    public function setIdephix(TaskExecutor $idx)
+    public function setIdephix(Idephix $idx)
     {
         $this->idx = $idx;
     }

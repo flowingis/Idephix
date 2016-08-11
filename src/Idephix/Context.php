@@ -127,31 +127,4 @@ class Context implements DictionaryAccess, TaskExecutor
     {
         return $this->idx->sshClient();
     }
-
-    /**
-     * @return null|Context
-     * @deprecated
-     */
-    public function getContext()
-    {
-        return $this->idx->getContext();
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getCurrentTargetHost()
-    {
-        return $this->idx->getCurrentTargetHost();
-    }
-
-    /**
-     * @return mixed
-     * @deprecated
-     */
-    public function getCurrentTargetName()
-    {
-        return $this->idx->getCurrentTargetName();
-    }
 }

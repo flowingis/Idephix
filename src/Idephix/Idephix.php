@@ -40,7 +40,6 @@ class Idephix implements Builder, TaskExecutor
     private $input;
     private $output;
     private $sshClient;
-    private $targets = array();
     private $config;
     /** @var  Context */
     protected $context;
@@ -202,16 +201,6 @@ class Idephix implements Builder, TaskExecutor
     public function getContext()
     {
         return $this->context;
-    }
-
-    public function getCurrentTargetHost()
-    {
-        return $this->currentHost;
-    }
-
-    public function getCurrentTargetName()
-    {
-        throw new \RuntimeException('This method is deprecated');
     }
 
     public function run()

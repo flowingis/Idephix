@@ -2,7 +2,7 @@
 namespace Idephix\Task;
 
 use Idephix\Extension\IdephixAwareInterface;
-use Idephix\TaskExecutor;
+use Idephix\Idephix;
 use Idephix\Task\Parameter\Collection;
 use Idephix\Task\Parameter\UserDefinedCollection;
 
@@ -98,9 +98,9 @@ class InitIdxFile implements Task, IdephixAwareInterface
     }
 
     /**
-     * @param TaskExecutor $idx
+     * @param Idephix $idx
      */
-    public function setIdephix(TaskExecutor $idx)
+    public function setIdephix(Idephix $idx)
     {
         $this->idx = $idx;
     }

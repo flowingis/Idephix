@@ -2,12 +2,13 @@
 
 namespace Idephix\Extension;
 
-use Idephix\TaskExecutor;
+use Idephix\Idephix;
 
 interface IdephixAwareInterface
 {
     /**
-     * @param TaskExecutor $idx
+     * @param Idephix $idx
+     * @return
      */
-    public function setIdephix(TaskExecutor $idx);
+    public function setIdephix(Idephix $idx);
 }

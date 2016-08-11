@@ -9,7 +9,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $this->idx = $this->getMockBuilder('\Idephix\TaskExecutor')
+        $this->idx = $this->getMockBuilder('\Idephix\Idephix')
             ->disableOriginalConstructor()
             ->getMock();
 

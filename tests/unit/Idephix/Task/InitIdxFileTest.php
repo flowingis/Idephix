@@ -23,7 +23,7 @@ class InitIdxFileTest extends IdephixTestCase
 
     public function testInitIdxFile()
     {
-        $idx = $this->getMockBuilder('\Idephix\Context')
+        $idx = $this->getMockBuilder('\Idephix\Idephix')
             ->disableOriginalConstructor()
             ->getMock();
         $idx->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
@@ -45,7 +45,7 @@ class InitIdxFileTest extends IdephixTestCase
     {
         vfsStreamWrapper::getRoot()->addChild(new vfsStreamFile('idxfile.php'));
 
-        $idx = $this->getMockBuilder('\Idephix\Context')
+        $idx = $this->getMockBuilder('\Idephix\Idephix')
             ->disableOriginalConstructor()
             ->getMock();
         $idx->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');

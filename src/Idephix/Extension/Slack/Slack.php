@@ -4,7 +4,7 @@ namespace Idephix\Extension\Slack;
 
 use Idephix\Extension;
 use Idephix\Extension\MethodCollection;
-use Idephix\TaskExecutor;
+use Idephix\Idephix;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Task\TaskCollection;
 
@@ -92,7 +92,7 @@ class Slack implements IdephixAwareInterface, Extension
         return $result;
     }
 
-    public function setIdephix(TaskExecutor $idx)
+    public function setIdephix(Idephix $idx)
     {
         $this->idx = $idx;
     }

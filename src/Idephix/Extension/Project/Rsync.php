@@ -5,8 +5,8 @@ namespace Idephix\Extension\Project;
 use Idephix\Extension;
 use Idephix\Extension\MethodCollection;
 use Idephix\Extension\IdephixAwareInterface;
+use Idephix\Idephix;
 use Idephix\Task\TaskCollection;
-use Idephix\TaskExecutor;
 
 /**
  * Provide a basic rsync interface based on current idx target parameters
@@ -18,7 +18,7 @@ class Rsync implements IdephixAwareInterface, Extension
      */
     private $idx;
 
-    public function setIdephix(TaskExecutor $idx)
+    public function setIdephix(Idephix $idx)
     {
         $this->idx = $idx;
     }

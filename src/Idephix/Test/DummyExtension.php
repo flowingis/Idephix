@@ -4,7 +4,7 @@ namespace Idephix\Test;
 
 use Idephix\Extension;
 use Idephix\Extension\IdephixAwareInterface;
-use Idephix\TaskExecutor;
+use Idephix\Idephix;
 use Idephix\Task\Parameter\Collection;
 use Idephix\Task\CallableTask;
 use Idephix\Task\TaskCollection;
@@ -20,7 +20,7 @@ class DummyExtension implements IdephixAwareInterface, Extension
         $this->name = $name;
     }
 
-    public function setIdephix(TaskExecutor $idx)
+    public function setIdephix(Idephix $idx)
     {
         $this->tester->assertTrue(true, 'Set Idephix');
     }
