@@ -1,34 +1,32 @@
 <?php
 
-function deploy(Idephix\Context $idx, $go = false)
+function deploy(Idephix\Context $context, $go = false)
 {
-    /** @var \Idephix\Context $config */
-    $config = $idx->getCurrentTarget();
-    $sharedFiles = $config->get('deploy.shared_files', array());
-    $sharedFolders = $config->get('deploy.shared_folders', array());
-    $remoteBaseDir = $config->get('deploy.remote_base_dir');
-    $rsyncExclude = $config->get('deploy.rsync_exclude');
-    $repository = $config->get('deploy.repository');
-    $deployBranch = $config->get('deploy.branch');
+    $sharedFiles = $context->get('deploy.shared_files', array());
+    $sharedFolders = $context->get('deploy.shared_folders', array());
+    $remoteBaseDir = $context->get('deploy.remote_base_dir');
+    $rsyncExclude = $context->get('deploy.rsync_exclude');
+    $repository = $context->get('deploy.repository');
+    $deployBranch = $context->get('deploy.branch');
     $nextRelease = "$remoteBaseDir/releases/" . time();
     $linkedRelease = "$remoteBaseDir/current";
     $localArtifact = '.deploy';
-    $idx->prepareArtifact($localArtifact, $repository, $deployBranch, $go);
-    $idx->prepareSharedFilesAndFolders($remoteBaseDir, $sharedFolders, $sharedFiles, $go);
+    $context->prepareArtifact($localArtifact, $repository, $deployBranch, $go);
+    $context->prepareSharedFilesAndFolders($remoteBaseDir, $sharedFolders, $sharedFiles, $go);
     try {
-        $idx->remote("cd $remoteBaseDir && cp -pPR `readlink {$linkedRelease}` $nextRelease");
+        $context->remote("cd $remoteBaseDir && cp -pPR `readlink {$linkedRelease}` $nextRelease");
     } catch (\Exception $e) {
-        $idx->output()->writeln('<info>First deploy, sending the whole project</info>');
+        $context->output()->writeln('<info>First deploy, sending the whole project</info>');
     }
     $dryRun = $go ? '' : '--dry-run';
-    $idx->rsyncProject($nextRelease, $localArtifact . '/', $rsyncExclude, $dryRun, $go);
-    $idx->linkSharedFilesAndFolders($sharedFiles, $sharedFolders, $nextRelease, $remoteBaseDir, $go);
-    $idx->switchToNextRelease($remoteBaseDir, $nextRelease, $go);
+    $context->rsyncProject($nextRelease, $localArtifact . '/', $rsyncExclude, $dryRun, $go);
+    $context->linkSharedFilesAndFolders($sharedFiles, $sharedFolders, $nextRelease, $remoteBaseDir, $go);
+    $context->switchToNextRelease($remoteBaseDir, $nextRelease, $go);
 }
 
-function prepareArtifact(Idephix\Context $idx, $localArtifact, $repository, $deployBranch, $go = false)
+function prepareArtifact(Idephix\Context $context, $localArtifact, $repository, $deployBranch, $go = false)
 {
-    $idx->local(
+    $context->local(
         "
         rm -Rf {$localArtifact} && \\
         git clone {$repository} {$localArtifact} && \\
@@ -41,32 +39,32 @@ function prepareArtifact(Idephix\Context $idx, $localArtifact, $repository, $dep
     );
 }
 
-function prepareSharedFilesAndFolders(Idephix\Context $idx, $remoteBaseDir, $sharedFolders, $sharedFiles, $go = false)
+function prepareSharedFilesAndFolders(Idephix\Context $context, $remoteBaseDir, $sharedFolders, $sharedFiles, $go = false)
 {
-    $idx->remote(
+    $context->remote(
         "mkdir -p {$remoteBaseDir}/releases && \\
          mkdir -p {$remoteBaseDir}/shared",
         !$go
     );
     foreach ($sharedFolders as $folder) {
-        $idx->remote("mkdir -p {$remoteBaseDir}/shared/{$folder}", !$go);
+        $context->remote("mkdir -p {$remoteBaseDir}/shared/{$folder}", !$go);
     }
     foreach ($sharedFiles as $file) {
         $sharedFile = "{$remoteBaseDir}/shared/{$file}";
-        $idx->remote("mkdir -p `dirname '{$sharedFile}'` && touch \"$sharedFile\"", !$go);
+        $context->remote("mkdir -p `dirname '{$sharedFile}'` && touch \"$sharedFile\"", !$go);
     }
 }
-function linkSharedFilesAndFolders(Idephix\Context $idx, $sharedFiles, $sharedFolders, $nextRelease, $remoteBaseDir, $go = false)
+function linkSharedFilesAndFolders(Idephix\Context $context, $sharedFiles, $sharedFolders, $nextRelease, $remoteBaseDir, $go = false)
 {
     foreach (array_merge($sharedFiles, $sharedFolders) as $item) {
-        $idx->remote("rm -r $nextRelease/$item", !$go);
-        $idx->remote("ln -nfs $remoteBaseDir/shared/$item $nextRelease/$item", !$go);
+        $context->remote("rm -r $nextRelease/$item", !$go);
+        $context->remote("ln -nfs $remoteBaseDir/shared/$item $nextRelease/$item", !$go);
     }
 }
 
-function switchToNextRelease(Idephix\Context $idx, $remoteBaseDir, $nextRelease, $go = false)
+function switchToNextRelease(Idephix\Context $context, $remoteBaseDir, $nextRelease, $go = false)
 {
-    $idx->remote(
+    $context->remote(
         "
         cd $remoteBaseDir && \\
         ln -nfs $nextRelease current",
