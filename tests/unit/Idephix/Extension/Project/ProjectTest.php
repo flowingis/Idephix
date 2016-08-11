@@ -27,7 +27,16 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             ->method('getContext')
             ->will(
                 $this->returnValue(
-                    Context::currentHost('prod', 'banana.com', Dictionary::fromArray(array('hosts' => array('mela.com', 'banana.com'), 'ssh_params' => array('user' => 'kea'))), $this->idx)
+                    new Context(
+                        Dictionary::fromArray(
+                            array(
+                                'target' => array('name' => 'prod', 'host' => 'banana.com'),
+                                'hosts' => array('mela.com', 'banana.com'),
+                                'ssh_params' => array('user' => 'kea')
+                            )
+                        ),
+                        $this->idx
+                    )
                 )
             );
 
@@ -42,11 +51,13 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             ->method('getContext')
             ->will(
                 $this->returnValue(
-                    Context::currentHost(
-                        'prod',
-                        'banana.com',
+                    new Context(
                         Dictionary::fromArray(
-                            array('hosts' => array('mela.com', 'banana.com'), 'ssh_params' => array())
+                            array(
+                                'target' => array('name' => 'prod', 'host' => 'banana.com'),
+                                'hosts' => array('mela.com', 'banana.com'),
+                                'ssh_params' => array()
+                            )
                         ),
                         $this->idx
                     )
@@ -64,11 +75,10 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             ->method('getContext')
             ->will(
                 $this->returnValue(
-                    Context::currentHost(
-                        'prod',
-                        'banana.com',
+                    new Context(
                         Dictionary::fromArray(
                             array(
+                                'target' => array('name' => 'prod', 'host' => 'banana.com'),
                                 'hosts' => array('mela.com', 'banana.com'),
                                 'ssh_params' => array('user' => 'kea', 'port' => 20817)
                             )

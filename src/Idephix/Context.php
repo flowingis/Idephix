@@ -1,15 +1,39 @@
 <?php
 namespace Idephix;
 
-class Context implements DictionaryAccess, TaskExecutor
+class Context implements DictionaryAccess, TaskExecutor, \Iterator
 {
     private $idx;
     private $targetData;
 
-    private function __construct(Dictionary $data, TaskExecutor $idx)
+    public function __construct(Dictionary $data, TaskExecutor $idx)
     {
         $this->targetData = $data;
         $this->idx = $idx;
+    }
+
+    public static function dry(TaskExecutor $idx)
+    {
+        return new static(Dictionary::dry(), $idx);
+    }
+
+    public function target($name, Dictionary $targetData)
+    {
+        $context = clone $this;
+        $targetData['target'] = array('name' => $name);
+        $context->targetData = $targetData;
+
+        return $context;
+    }
+
+    public function targetName()
+    {
+        return $this->targetData['target.name'];
+    }
+
+    public function targetHost()
+    {
+        return $this->targetData['target.host'];
     }
 
     /**
@@ -24,24 +48,6 @@ class Context implements DictionaryAccess, TaskExecutor
         return rtrim($this->get($name, $default), '/').'/';
     }
 
-    public static function dry(TaskExecutor $idx)
-    {
-        return new static(Dictionary::dry(), $idx);
-    }
-
-    public static function currentTarget($name, Dictionary $targetData, TaskExecutor $idx)
-    {
-        $targetData['target'] = array('name' => $name);
-
-        return new static($targetData, $idx);
-    }
-
-    public static function currentHost($name, $host, $targetData, TaskExecutor $idx)
-    {
-        $targetData['target'] = array('name' => $name, 'host' => $host);
-
-        return new static($targetData, $idx);
-    }
     public function offsetExists($offset)
     {
         return $this->targetData->offsetExists($offset);
@@ -130,5 +136,66 @@ class Context implements DictionaryAccess, TaskExecutor
     public function __call($name, $arguments)
     {
         return call_user_func_array(array($this->idx, $name), $arguments);
+    }
+
+    /**
+     * Return the current element
+     * @link http://php.net/manual/en/iterator.current.php
+     * @return mixed Can return any type.
+     * @since 5.0.0
+     */
+    public function current()
+    {
+        $newContextData = clone $this->targetData;
+        $newContextData['target'] = array('name' => $this['target.name'], 'host' => current($this->hosts));
+        $newContext = new static($newContextData, $this->idx);
+
+        return $newContext;
+    }
+
+    /**
+     * Move forward to next element
+     * @link http://php.net/manual/en/iterator.next.php
+     * @return void Any returned value is ignored.
+     * @since 5.0.0
+     */
+    public function next()
+    {
+        next($this->hosts);
+    }
+
+    /**
+     * Return the key of the current element
+     * @link http://php.net/manual/en/iterator.key.php
+     * @return mixed scalar on success, or null on failure.
+     * @since 5.0.0
+     */
+    public function key()
+    {
+        return key($this->hosts);
+    }
+
+    /**
+     * Checks if current position is valid
+     * @link http://php.net/manual/en/iterator.valid.php
+     * @return boolean The return value will be casted to boolean and then evaluated.
+     * Returns true on success or false on failure.
+     * @since 5.0.0
+     */
+    public function valid()
+    {
+        return $this->key() !== null;
+    }
+
+    /**
+     * Rewind the Iterator to the first element
+     * @link http://php.net/manual/en/iterator.rewind.php
+     * @return void Any returned value is ignored.
+     * @since 5.0.0
+     */
+    public function rewind()
+    {
+        $this->hosts = $this->targetData->get('hosts', array(null));
+        reset($this->hosts);
     }
 }

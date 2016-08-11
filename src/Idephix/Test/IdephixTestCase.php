@@ -4,6 +4,7 @@ namespace Idephix\Test;
 
 use Idephix\Config;
 use Idephix\Context;
+use Idephix\Dictionary;
 use Idephix\SSH\SshClient;
 use Idephix\Test\SSH\StubProxy;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -16,14 +17,13 @@ class IdephixTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->output = fopen('php://memory', 'r+');
         $output = new StreamOutput($this->output);
-        $currentTarget = Context::currentTarget($targets[$targetName]);
         $sshClient = new SshClient(new StubProxy());
-        $sshClient->setParameters($currentTarget->get('ssh_params'));
-        $sshClient->setHost(current($currentTarget->get('hosts')));
+        $sshClient->setParameters($targets[$targetName]['ssh_params']);
+        $sshClient->setHost(current($targets[$targetName]['hosts']));
 
         $idx = new InspectableIdephix(Config::fromArray(array('sshClient' => $sshClient)), $output);
         $idx = $idx
-            ->withCurrentTarget(Context::currentTarget($targets[$targetName]), $targetName);
+            ->withContext(Context::dry($idx)->target($targetName, Dictionary::fromArray($targets[$targetName])));
 
         return $idx;
     }

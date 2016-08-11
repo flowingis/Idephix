@@ -43,7 +43,6 @@ class Idephix implements Builder, TaskExecutor
     private $config;
     /** @var  Context */
     protected $context;
-    protected $currentHost;
     protected $invokerClassName;
 
     public function __construct(
@@ -169,16 +168,16 @@ class Idephix implements Builder, TaskExecutor
                 );
             }
 
-            $this->context = Context::currentTarget(
-                $env,
-                Dictionary::fromArray(
-                    array_merge(
-                        array('hosts' => array()),
-                        $targets[$env]
+            $this->context = Context::dry($this)
+                ->target(
+                    $env,
+                    Dictionary::fromArray(
+                        array_merge(
+                            array('hosts' => array()),
+                            $targets[$env]
+                        )
                     )
-                ),
-                $this
-            );
+                );
         }
     }
 
@@ -213,13 +212,10 @@ class Idephix implements Builder, TaskExecutor
             return;
         }
         
-        $hosts = $this->context['hosts'] ? $this->context['hosts'] : array(null);
-
         $hasErrors = false;
-        foreach ($hosts as $host) {
-            $this->context['target.host'] = $host;
-            $this->currentHost = $host;
-            $this->openRemoteConnection($host);
+        foreach ($this->context as $hostContext) {
+            $this->context = $hostContext;
+            $this->openRemoteConnection($hostContext->targetHost());
             $returnValue = $this->application->run($this->input, $this->output);
             $hasErrors = $hasErrors || !(is_null($returnValue) || ($returnValue == 0));
             $this->closeRemoteConnection();

@@ -11,8 +11,7 @@ class InspectableIdephix implements Builder, TaskExecutor
 {
 
     private $executedCommands = array();
-    private $currentContext;
-    private $currentTargetName;
+    private $context;
     private $sshClient;
     private $input;
     private $output;
@@ -29,11 +28,10 @@ class InspectableIdephix implements Builder, TaskExecutor
         $this->output = $output;
     }
 
-    public function withCurrentTarget(Context $context, $name)
+    public function withContext(Context $context)
     {
         $idx = clone($this);
-        $idx->currentContext = $context;
-        $idx->currentTargetName = $name;
+        $idx->context = $context;
 
         return $idx;
     }
@@ -63,19 +61,9 @@ class InspectableIdephix implements Builder, TaskExecutor
     /**
      * @return null|Context
      */
-    public function getCurrentTarget()
+    public function getContext()
     {
-        return $this->currentContext;
-    }
-
-    public function getCurrentTargetHost()
-    {
-        // TODO: Implement getCurrentTargetHost() method.
-    }
-
-    public function getCurrentTargetName()
-    {
-        return $this->currentTargetName;
+        return $this->context;
     }
 
     /**
