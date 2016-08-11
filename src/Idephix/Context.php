@@ -1,7 +1,7 @@
 <?php
 namespace Idephix;
 
-class Context implements Dictionary, TaskExecutor
+class Context implements DictionaryAccess, TaskExecutor
 {
     private $idx;
     private $data;
