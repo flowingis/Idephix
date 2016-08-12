@@ -3,6 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. toctree::
+   :hidden:
+   :maxdepth: 2
+
+   Getting Started <getting_started>
+   Configuration <configuration>
+   Writing tasks <writing_tasks>
+   Extending Idephix <writing_extensions>
+   Cookbook <cookbook>
+   Migrating your idxfile <migrating_idx_file>
+
 Welcome to Idephix's documentation!
 ===================================
 
@@ -12,17 +23,27 @@ across server or create a build system. The choice is up to you. Idephix is
 still in alpha, so things will change. You can report issues and submit PRs
 (greatly appreciated :-)) on the `github repo <https://github.com/ideatosrl/Idephix>`_
 
-Contents:
+Basically what you're going to do is define a bunch of function in a php file and execute them from the command line.
 
-.. toctree::
-   :maxdepth: 2
+.. code-block:: php
 
-   Getting Started <getting_started>
-   Configuration <configuration>
-   Writing tasks <writing_tasks>
-   Extending Idephix <writing_extensions>
-   Cookbook <cookbook>
-   Migrating your idxfile <migrating_idx_file>
+   /**
+   * This command will yell at you
+   *
+   * @param string $what What you want to yell
+   */
+   function yell(\Idephix\Context $context, $what = 'foo')
+   {
+      $context->writeln(strtoupper($what));
+   }
+
+.. code-block:: bash
+
+   $ bin/idx yell "say my name"
+   SAY MY NAME
+
+Learn more about how configure and define tasks:
+
 
 Requirements
 ============

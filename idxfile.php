@@ -123,10 +123,9 @@ function openDoc(\Idephix\Context $idx)
 /**
  * This command will yell at you
  *
- *
  * @param string $what What you want to yell
  */
-function yell($what = 'foo')
+function yell(\Idephix\Context $context, $what = 'foo')
 {
-    echo $what . PHP_EOL;
+    $context->writeln(strtoupper($what));
 }
