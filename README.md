@@ -30,10 +30,10 @@ Installation / Usage
      * @param string $name the name of the file to be touch-ed
      * @param bool   $go   if not specified the script execute a dry-run
      */
-    function testParams($idx, $name, $go = false)
+    function testParams(\Idephix\Context $context, $name, $go = false)
     {
-         $idx->local('touch /tmp/'.$name);
-         $idx->remote('touch /tmp/'.$name.'_remote');
+         $context->local('touch /tmp/'.$name);
+         $context->remote('touch /tmp/'.$name.'_remote');
     }
 
     $idx->run();
@@ -45,7 +45,8 @@ The returned object will contains all targets info and the SSH client to uso for
 connections.
 
     ```php
-
+    <?php 
+ 
     $targets = array(
         'prod' => array(
             'hosts' => array('127.0.0.1'),
