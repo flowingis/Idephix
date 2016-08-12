@@ -6,10 +6,8 @@ use Idephix\SSH\SshClient;
 use Idephix\Task\Parameter;
 use Idephix\Task\CallableTask;
 use Idephix\Test\SSH\StubProxy;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 
 class IdephixTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,15 +28,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
                 array('targets' => array(), 'sshClient' => new SSH\SshClient(new Test\SSH\StubProxy()))
             ), $output
         );
-    }
-
-    /**
-     * @test
-     * @expectedException  \Idephix\Exception\DeprecatedException
-     */
-    public function it_should_warn_if_not_using_correct_config_object()
-    {
-        $idx = new Idephix(array(), new DummyOutput(), new ArrayInput(array()));
     }
 
     /**

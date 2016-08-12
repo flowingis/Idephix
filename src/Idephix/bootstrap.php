@@ -20,12 +20,9 @@ function run()
 
     if (is_file($idxFile)) {
         try {
-            if (isLegacyIdxFile($idxFile)) {
-                include $idxFile;
-            } else {
-                $idx = Idephix::create(TaskCollection::parseFile($idxFile), Config::parseFile($configFile));
-                $idx->run();
-            }
+            $idx = Idephix::create(TaskCollection::parseFile($idxFile), Config::parseFile($configFile));
+            $idx->run();
+
             return 0;
         } catch (FailedCommandException $e) {
             return 1;
@@ -39,13 +36,4 @@ function run()
 
     $idx = new Idephix(Config::dry());
     return $idx->run();
-}
-
-/**
- * @param $idxFile
- * @return int
- */
-function isLegacyIdxFile($idxFile)
-{
-    return preg_match('/new\sIdephix(\(|\\\\)/', file_get_contents($idxFile), $matches);
 }

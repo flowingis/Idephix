@@ -5,7 +5,6 @@ namespace Idephix;
 use Idephix\Console\Application;
 use Idephix\Console\Command;
 use Idephix\Console\InputFactory;
-use Idephix\Exception\DeprecatedException;
 use Idephix\Exception\FailedCommandException;
 use Idephix\Exception\InvalidTaskException;
 use Idephix\Exception\MissingMethodException;
@@ -46,7 +45,7 @@ class Idephix implements Builder, TaskExecutor
     protected $invokerClassName;
 
     public function __construct(
-        $config,
+        Config $config,
         OutputInterface $output = null,
         InputInterface $input = null)
     {
@@ -54,10 +53,6 @@ class Idephix implements Builder, TaskExecutor
         $this->context = Context::dry($this);
         $this->tasks = TaskCollection::dry();
         $this->extensionsMethods = MethodCollection::dry();
-
-        if (!$config instanceof Config) {
-            throw new DeprecatedException("You're using an old idxfile format, consider updating. http://idephix.readthedocs.io/en/latest/migrating_idx_file.html");
-        }
 
         $this->application = new Application(
             'Idephix',
