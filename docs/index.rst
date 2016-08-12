@@ -42,9 +42,6 @@ Basically what you're going to do is define a bunch of function in a php file an
    $ bin/idx yell "say my name"
    SAY MY NAME
 
-Learn more about how configure and define tasks:
-
-
 Requirements
 ============
 
