@@ -26,6 +26,7 @@ This example of ``idxrc.php`` file will give you and idea of how define targets,
 and extensions:
 
 .. code-block:: php
+    :linenos:
 
     <?php
 

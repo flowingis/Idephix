@@ -8,6 +8,7 @@ To define a new task you just need to define a function within the `idxfile.php`
 it will be automatically mounted as an Idephix command.
 
 .. code-block:: php
+    :linenos:
 
     function myNewTask()
     {
@@ -36,6 +37,7 @@ And you can execute it with:
 You can even execute a task within another task:
 
 .. code-block:: php
+    :linenos:
 
     function anotherTask()
     {
@@ -52,6 +54,7 @@ Adding task arguments
 Function parameters will be used as the task arguments.
 
 .. code-block:: php
+    :linenos:
 
     function yell($what)
     {
@@ -75,6 +78,7 @@ If you want to add optional arguments, just define a defualt value for the
 parameter, as:
 
 .. code-block:: php
+    :linenos:
 
     function yell($what = 'foo')
     {
@@ -88,6 +92,7 @@ A flag is a special parameter with default value false.
 Using flags should be useful to implement a dry-run approach in your script
 
 .. code-block:: php
+    :linenos:
 
     function deploy($go = false){
          if ($go) {
@@ -103,6 +108,7 @@ Tasks and arguments can have a description. You can define descriptions using
 simple and well known phpdoc block.
 
 .. code-block:: php
+    :linenos:
 
     /**
      * This command will yell at you
