@@ -74,7 +74,7 @@ The parameter $name will be a mandatory option to be specified in the command ex
 
 You can add as many arguments as you need, just adding function parameters.
 
-If you want to add optional arguments, just define a defualt value for the
+If you want to add optional arguments, just define a default value for the
 parameter, as:
 
 .. code-block:: php
