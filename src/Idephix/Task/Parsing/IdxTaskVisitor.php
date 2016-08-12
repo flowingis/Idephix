@@ -70,17 +70,4 @@ class IdxTaskVisitor extends NodeVisitorAbstract
         );
         return $closure;
     }
-
-    /**
-     * @param $parameter
-     * @return mixed
-     */
-    private function getDefaultValue(\ReflectionParameter $parameter)
-    {
-        if ($parameter->isDefaultValueAvailable()) {
-            return $parameter->getDefaultValue();
-        }
-
-        return null;
-    }
 }
