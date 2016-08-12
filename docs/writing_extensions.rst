@@ -99,8 +99,10 @@ And the you'll also get to execute it directly from cli:
     $ idx doStuff bar
 
 
-``Check out our `available extensions <https://github.com/ideatosrl/Idephix/tree/master/src/Idephix/Extension>`_
-to see more complex examples ..``
+.. hint::
+
+    Check out our `available extensions <https://github.com/ideatosrl/Idephix/tree/master/src/Idephix/Extension>`_
+    to see more complex examples ..
 
 Execution priority
 ------------------
