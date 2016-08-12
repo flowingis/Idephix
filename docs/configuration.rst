@@ -25,8 +25,7 @@ tasks and extensions only if you want to register some extension.
 This example of ``idxrc.php`` file will give you and idea of how define targets, ssh clients
 and extensions:
 
-.. code-block:: php
-    :linenos:
+::
 
     <?php
 

@@ -3,6 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. highlight:: php
+   :linenothreshold: 3
+
 .. toctree::
    :hidden:
    :maxdepth: 2
@@ -25,9 +28,9 @@ still in alpha, so things will change. You can report issues and submit PRs
 
 Basically what you're going to do is define a bunch of function in a php file and execute them from the command line.
 
-.. code-block:: php
-    :linenos:
+::
 
+   <?php
    /**
    * This command will yell at you
    *

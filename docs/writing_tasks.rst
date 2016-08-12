@@ -1,5 +1,8 @@
 .. _writing_tasks:
 
+.. highlight:: php
+   :linenothreshold: 3
+
 ==============
 Defining Tasks
 ==============
@@ -7,8 +10,9 @@ Defining Tasks
 To define a new task you just need to define a function within the ``idxfile.php`` and
 it will be automatically mounted as an Idephix command.
 
-.. code-block:: php
-    :linenos:
+::
+
+    <?php
 
     function myNewTask()
     {
@@ -36,8 +40,9 @@ And you can execute it with:
 
 You can even execute a task within another task:
 
-.. code-block:: php
-    :linenos:
+::
+
+    <?php
 
     function anotherTask()
     {
@@ -60,8 +65,9 @@ Adding task arguments
 
 Function parameters will be used as the task arguments.
 
-.. code-block:: php
-    :linenos:
+::
+
+    <?php
 
     function yell($what)
     {
@@ -89,8 +95,9 @@ Optional Arguments
 If you want to add optional arguments, just define a default value for the
 parameter, as:
 
-.. code-block:: php
-    :linenos:
+::
+
+    <?php
 
     function yell($what = 'foo')
     {
@@ -103,8 +110,9 @@ Optional arguments as task flags
 A flag is a special parameter with default value false.
 Using flags should be useful to implement a dry-run approach in your script
 
-.. code-block:: php
-    :linenos:
+::
+
+    <?php
 
     function deploy($go = false){
          if ($go) {
@@ -119,8 +127,9 @@ Documenting tasks
 Tasks and arguments can have a description. You can define descriptions using
 simple and well known phpdoc block.
 
-.. code-block:: php
-    :linenos:
+::
+
+    <?php
 
     /**
      * This command will yell at you
@@ -169,6 +178,8 @@ need for a SSH connection, on your local machine.
     :linenos:
     :emphasize-lines: 3,4
 
+    <?php
+
     function buildDoc(\Idephix\Context $context, $open = false)
     {
         $context->local('cp -r src/Idephix/Cookbook docs/');
@@ -185,6 +196,8 @@ If you need so you can execute the command in dry run mode
     :linenos:
     :emphasize-lines: 3
 
+    <?php
+
     function buildDoc(\Idephix\Context $context, $open = false)
     {
         $context->local('cp -r src/Idephix/Cookbook docs/', true);
@@ -198,6 +211,8 @@ For local commands you can also specify a timeout:
 .. code-block:: php
     :linenos:
     :emphasize-lines: 5
+
+    <?php
 
     function buildTravis(\Idephix\Context $context)
     {
@@ -218,8 +233,9 @@ Running remote commands is almost the same as running local commands. You can do
 ``\Idephix\TaskExecutor::remote`` method. Dry run mode works quite the same as for local commands, but mind that
 `at the moment is not possible to specify a timeout for remote commands`.
 
-.. code-block:: php
-    :linenos:
+::
+
+    <?php
 
     function switchToNextRelease(Idephix\Context $context, $remoteBaseDir, $nextRelease, $go = false)
     {
@@ -244,6 +260,8 @@ Mind that you don't have to manually inject the ``Context`` object, Idephix will
     :linenos:
     :emphasize-lines: 7,11
 
+    <?php
+
     function buildDoc(\Idephix\Context $context, $open = false)
     {
         $context->local('cp -r src/Idephix/Cookbook docs/');
@@ -265,7 +283,9 @@ Accessing configuration from tasks
 ``Idephix\Context`` object gives you also access to every configuration defined for the current target.
 Imagine you have defined this configuration:
 
-.. code-block:: php
+::
+
+    <?php
 
     $targets = array(
         'prod' => array(
@@ -289,7 +309,9 @@ While executing a command using ``--env=prod`` option your tasks will receive a 
 you can access to it. ``Context`` allows you to access configuration data implementing php ``\ArrayAccess`` interface or
 through get ``\Idephix\DictionaryAccess::get`` method.
 
-.. code-block:: php
+::
+
+    <?php
 
     function deploy(Idephix\Context $context, $go = false)
     {
@@ -308,7 +330,10 @@ through the ``\Idephix\TaskExecutor::output`` method or you can use the shortcut
 
 Here is an example of you you can send some output to the console.
 
-.. code-block:: php
+::
+
+    <?php
+    
     /**
      * This command will yell at you
      *

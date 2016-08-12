@@ -31,9 +31,9 @@ the `\Idephix\Extension\IdephixAwareInterface` and you'll get one at runtime.
 
 Only method registered by `::methods()` will be plugged into Idephix and will be available for other tasks to use:
 
-.. code-block:: php
-    :linenos:
+::
 
+    <?php
     class DummyExtension implements Extension
     {
 
@@ -55,9 +55,9 @@ Only method registered by `::methods()` will be plugged into Idephix and will be
     //cut
     }
 
-.. code-block:: php
-    :linenos:
+::
 
+    <?php
     //your idxfile.php
 
     function deploy(IdephixInterface $idx, $go = false)
@@ -69,8 +69,9 @@ Only method registered by `::methods()` will be plugged into Idephix and will be
 
 If you want to expose some of your methods as CLI commands you need to define them as a task:
 
-.. code-block:: php
-    :linenos:
+::
+
+    <?php
 
     class DummyExtension implements Extension
     {
