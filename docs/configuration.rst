@@ -1,5 +1,6 @@
 .. _idx_config:
 
+=============
 Configuration
 =============
 

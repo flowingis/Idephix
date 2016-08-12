@@ -1,5 +1,6 @@
 .. _writing_tasks:
 
+==============
 Defining Tasks
 ==============
 
