@@ -6,10 +6,8 @@ use Idephix\Console\Application;
 use Idephix\Console\Command;
 use Idephix\Console\InputFactory;
 use Idephix\Exception\FailedCommandException;
-use Idephix\Exception\InvalidTaskException;
 use Idephix\Exception\MissingMethodException;
 use Idephix\Extension\MethodCollection;
-use Idephix\Task\CallableTask;
 use Idephix\Task\Task;
 use Idephix\Task\TaskCollection;
 use Symfony\Component\Console\Input\InputInterface;
@@ -83,7 +81,7 @@ class Idephix implements Builder, TaskExecutor
         $idephix = new static($config);
 
         foreach ($tasks as $task) {
-            $idephix->add($task);
+            $idephix->addTask($task);
         }
 
         return $idephix;
@@ -127,19 +125,12 @@ class Idephix implements Builder, TaskExecutor
     /**
      * @inheritdoc
      */
-    public function add($task, \Closure $code = null)
+    public function addTask(Task $task)
     {
-        if (is_string($task) && is_callable($code)) {
-            $task = CallableTask::buildFromClosure($task, $code);
-        }
+        $this->tasks[] = $task;
+        $this->application->add(Command::fromTask($task, $this));
 
-        if ($task instanceof Task) {
-            $this->tasks[] = $task;
-            $this->application->add(Command::fromTask($task, $this));
-            return $this;
-        }
-
-        throw new InvalidTaskException('A task must be an instance of Idephix\Task or Callable');
+        return $this;
     }
 
     /**
@@ -234,7 +225,7 @@ class Idephix implements Builder, TaskExecutor
 
         foreach ($extension->tasks() as $task) {
             if (!$this->has($task->name())) {
-                $this->add($task);
+                $this->addTask($task);
             }
         }
     }
@@ -285,7 +276,7 @@ class Idephix implements Builder, TaskExecutor
         if ('phar:' === substr(__FILE__, 0, 5)) {
             $selfUpdate = new SelfUpdate();
             $selfUpdate->setIdephix($this);
-            $this->add($selfUpdate);
+            $this->addTask($selfUpdate);
         }
     }
 
@@ -293,7 +284,7 @@ class Idephix implements Builder, TaskExecutor
     {
         $init = InitIdxFile::fromDeployRecipe();
         $init->setIdephix($this);
-        $this->add($init);
+        $this->addTask($init);
     }
 
     /**

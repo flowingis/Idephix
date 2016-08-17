@@ -2,6 +2,8 @@
 
 namespace Idephix;
 
+use Idephix\Task\Task;
+
 interface Builder
 {
     /**
@@ -10,14 +12,12 @@ interface Builder
     public function run();
 
     /**
-     * Add a Command to the application.
-     * The "--go" parameters should be defined as "$go = false".
+     * Add a Task to the application.
      *
-     * @param string $name
-     * @param \Closure $code
+     * @param Task $task
      * @return Builder
      */
-    public function add($name, \Closure $code = null);
+    public function addTask(Task $task);
 
     /**
      * @param Extension $extension

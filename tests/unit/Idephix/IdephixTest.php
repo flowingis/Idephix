@@ -47,10 +47,12 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_be_able_to_add_task_from_closure()
     {
-        $this->idx->add(
-            'commandName',
-            function () {
-            }
+        $this->idx->addTask(
+            CallableTask::buildFromClosure(
+                'commandName',
+                function () {
+                }
+            )
         );
 
         $this->assertTrue($this->idx->has('commandName'));
@@ -62,7 +64,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     public function it_should_be_able_to_add_task_from_object()
     {
         $task = new CallableTask('fooCommand', 'A dummy command', function () {}, Parameter\Collection::dry());
-        $this->idx->add($task);
+        $this->idx->addTask($task);
 
         $this->assertTrue($this->idx->has('fooCommand'));
 
@@ -70,15 +72,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('fooCommand', $registeredCommands);
         $this->assertInstanceOf('\Idephix\Console\Command', $registeredCommands['fooCommand']);
         $this->assertEquals('fooCommand', $registeredCommands['fooCommand']->getName());
-    }
-
-    /**
-     * @test
-     * @expectedException \Idephix\Exception\InvalidTaskException
-     */
-    public function it_should_throw_exception_for_missing_code()
-    {
-        $this->idx->add('command_name');
     }
     
     public function getArgvAndTargets()
@@ -127,11 +120,13 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         );
         $idx->getApplication()->setAutoExit(false);
 
-        $idx->add(
-            'foo',
-            function (Context $idx) {
-                $idx->local('echo "Hello World from ' . $idx['target.host'] . '"');
-            }
+        $idx->addTask(
+            CallableTask::buildFromClosure(
+                'foo',
+                function (Context $idx) {
+                    $idx->local('echo "Hello World from ' . $idx['target.host'] . '"');
+                }
+            )
         );
 
         $idx->run();
@@ -160,9 +155,14 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         );
 
         $spy = new \stdClass();
-        $idx->add('myTask', function (Context $context) use ($spy) {
-            $spy->args = func_get_args();
-        });
+        $idx->addTask(
+            CallableTask::buildFromClosure(
+                'myTask',
+                function (Context $context) use ($spy) {
+                    $spy->args = func_get_args();
+                }
+            )
+        );
 
         $idx->run();
 
@@ -183,11 +183,13 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $idx = new Idephix(Config::dry(), new StreamOutput($output));
         $idx->getApplication()->setAutoExit(false);
 
-        $idx->add(
-            'foo',
-            function (Context $idx) {
-                $idx->local('sleep 2', false, 1);
-            }
+        $idx->addTask(
+            CallableTask::buildFromClosure(
+                'foo',
+                function (Context $idx) {
+                    $idx->local('sleep 2', false, 1);
+                }
+            )
         );
 
         try {
@@ -206,14 +208,16 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_allow_to_invoke_tasks()
     {
-        $this->idx->add(
-            'test',
-            function (Context $idx, $what, $go = false) {
-                if ($go) {
-                    return $what * 2;
+        $this->idx->addTask(
+            CallableTask::buildFromClosure(
+                'test',
+                function (Context $idx, $what, $go = false) {
+                    if ($go) {
+                        return $what * 2;
+                    }
+                    return 0;
                 }
-                return 0;
-            }
+            )
         );
         $this->assertEquals(84, $this->idx->test(42, true));
         $this->assertEquals(84, $this->idx->runTask('test', 42, true));

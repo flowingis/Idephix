@@ -1,6 +1,7 @@
 <?php
 namespace Idephix;
 
+use Idephix\Task\CallableTask;
 use Idephix\Test\DummyExtension;
 use Symfony\Component\Console\Output\StreamOutput;
 
@@ -52,7 +53,7 @@ class ExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $extension = new DummyExtension($this, 'myExtension');
         $this->idx->addExtension($extension);
-        $this->idx->add('test', function ($what) { return $what * 2;});
+        $this->idx->addTask(CallableTask::buildFromClosure('test', function ($what) { return $what * 2;}));
         $this->assertEquals(84, $this->idx->test(42));
     }
 
