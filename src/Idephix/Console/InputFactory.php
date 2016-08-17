@@ -6,19 +6,27 @@ use Symfony\Component\Console\Input\ArrayInput;
 
 class InputFactory
 {
+    /**
+     * @param $arguments
+     * @param Task $task
+     * @return ArrayInput
+     */
     public function buildFromUserArgsForTask($arguments, Task $task)
     {
-        $argumentsKeys = array('command');
+        $defaultArguments = array('command' => null);
+
         foreach ($task->userDefinedParameters() as $parameter) {
             if ($parameter->isFlagOption()) {
-                $argumentsKeys[] = '--' . $parameter->name();
+                $defaultArguments['--' . $parameter->name()] = $parameter->defaultValue();
             } else {
-                $argumentsKeys[] = $parameter->name();
+                $defaultArguments[$parameter->name()] = $parameter->defaultValue();
             }
         }
-        
-        $arguments = array_combine($argumentsKeys, $arguments);
-        $input = new ArrayInput($arguments);
+
+        $values = array_replace(array_values($defaultArguments), $arguments);
+        $inputArguments = array_combine(array_keys($defaultArguments), $values);
+
+        $input = new ArrayInput($inputArguments);
 
         return $input;
     }
