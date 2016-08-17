@@ -2,7 +2,7 @@
 namespace Idephix\Task;
 
 use Idephix\Exception\InvalidIdxFileException;
-use Idephix\Task\Parsing\IdxTaskVisitor;
+use Idephix\Task\Parsing\TaskCollector;
 use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
@@ -31,7 +31,7 @@ class TaskCollection extends CollectionIterator
         $parser = new Parser(new Lexer());
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new NameResolver());
-        $traverser->addVisitor(new IdxTaskVisitor($collection));
+        $traverser->addVisitor(new TaskCollector($collection));
         $stmts = $parser->parse($idxFileContent);
         $traverser->traverse($stmts);
 

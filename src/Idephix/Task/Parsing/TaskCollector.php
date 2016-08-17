@@ -8,7 +8,7 @@ use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\PrettyPrinter\Standard;
 
-class IdxTaskVisitor extends NodeVisitorAbstract
+class TaskCollector extends NodeVisitorAbstract
 {
     /**
      * @var TaskCollection
