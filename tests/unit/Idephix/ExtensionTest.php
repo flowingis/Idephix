@@ -2,11 +2,12 @@
 namespace Idephix;
 
 use Idephix\Test\DummyExtension;
-use Idephix\Test\IdephixTestCase;
 use Symfony\Component\Console\Output\StreamOutput;
 
-class ExtensionTest extends IdephixTestCase
+class ExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    private $output;
+
     protected function setUp()
     {
         $this->output = fopen('php://memory', 'r+');

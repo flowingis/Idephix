@@ -1,12 +1,11 @@
 <?php
 namespace Idephix\Task;
 
-use Idephix\Test\IdephixTestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use org\bovigo\vfs\vfsStreamWrapper;
 
-class InitIdxFileTest extends IdephixTestCase
+class InitIdxFileTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {

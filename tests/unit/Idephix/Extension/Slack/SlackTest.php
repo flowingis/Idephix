@@ -2,8 +2,6 @@
 
 namespace Idephix\Extension\Slack;
 
-use Idephix\Test\IdephixTestCase;
-
 //mock curl_exec
 function curl_exec($ch, $error = false)
 {
@@ -14,7 +12,7 @@ function curl_exec($ch, $error = false)
     return 'ok';
 }
 
-class SlackTest extends IdephixTestCase
+class SlackTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
