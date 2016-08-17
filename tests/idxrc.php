@@ -1,6 +1,6 @@
 <?php
 
-$targets = array(
+$environments = array(
     'prod' => array(
         'hosts' => array('127.0.0.1', '33.33.33.10'),
         'ssh_params' => array(
@@ -45,4 +45,4 @@ $targets = array(
     ),
 );
 
-return \Idephix\Config::fromArray(array(\Idephix\Config::ENVS => $targets));
+return \Idephix\Config::fromArray(array(\Idephix\Config::ENVS => $environments));
