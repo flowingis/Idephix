@@ -108,10 +108,10 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     public function it_should_run_task_sending_multiple_arguments()
     {
         $idx = $this->prophesize('\Idephix\Context');
-        $idx->runTask('mycommand', 'foo', 'bar')->shouldBeCalled();
+        $idx->execute('mycommand', 'foo', 'bar')->shouldBeCalled();
 
         $context = Context::dry($idx->reveal());
-        $context->runTask('mycommand', 'foo', 'bar');
+        $context->execute('mycommand', 'foo', 'bar');
     }
 
     /** @test */

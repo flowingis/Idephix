@@ -220,7 +220,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->assertEquals(84, $this->idx->test(42, true));
-        $this->assertEquals(84, $this->idx->runTask('test', 42, true));
+        $this->assertEquals(84, $this->idx->execute('test', 42, true));
     }
 
     /**

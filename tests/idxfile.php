@@ -7,7 +7,7 @@ function _echo($value)
 
 function greet(\Idephix\Context $idx, $name)
 {
-    $idx->runTask('echo', 'Ciao ' . $name);
+    $idx->execute('echo', 'Ciao ' . $name);
 }
 
 function testParams($param1, $param2, $param3 = 'default')

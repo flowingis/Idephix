@@ -95,7 +95,7 @@ class Idephix implements Builder, TaskExecutor
     public function __call($name, $arguments = array())
     {
         if ($this->has($name)) {
-            return call_user_func_array(array($this, 'runTask'), array_merge(array($name), $arguments));
+            return call_user_func_array(array($this, 'execute'), array_merge(array($name), $arguments));
         }
 
         try {
@@ -257,7 +257,7 @@ class Idephix implements Builder, TaskExecutor
      * @return integer
      * @deprecated should call directly tasks as Idephix methods
      */
-    public function runTask($name)
+    public function execute($name)
     {
         if (!$this->has($name)) {
             throw new \InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));

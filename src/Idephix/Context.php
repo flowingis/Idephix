@@ -82,9 +82,9 @@ class Context implements DictionaryAccess, TaskExecutor, \Iterator
      * @param $name
      * @return integer 0 success, 1 fail
      */
-    public function runTask($name)
+    public function execute($name)
     {
-        call_user_func_array(array($this->idx, 'runTask'), func_get_args());
+        call_user_func_array(array($this->idx, 'execute'), func_get_args());
     }
 
     /**

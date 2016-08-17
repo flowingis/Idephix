@@ -84,7 +84,7 @@ function buildTravis(\Idephix\Context $idx)
     try {
         $idx->local('composer install');
         $idx->local('bin/phpunit -c tests --coverage-clover=clover.xml', false, 240);
-        $idx->runTask('createPhar');
+        $idx->execute('createPhar');
     } catch (\Exception $e) {
         $idx->output()->writeln(sprintf("<error>Exception: \n%s</error>", $e->getMessage()));
         exit(1);
@@ -111,7 +111,7 @@ function buildDoc(\Idephix\Context $idx, $open = false)
     $idx->local('make  -C ./docs html');
 
     if ($open) {
-        $idx->runTask('openDoc');
+        $idx->execute('openDoc');
     }
 }
 

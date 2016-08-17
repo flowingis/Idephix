@@ -11,7 +11,7 @@ interface TaskExecutor
      * @param $name
      * @return integer 0 success, 1 fail
      */
-    public function runTask($name);
+    public function execute($name);
 
     /**
      * Execute remote command.
