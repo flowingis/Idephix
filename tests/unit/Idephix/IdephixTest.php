@@ -114,7 +114,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $output = fopen('php://memory', 'r+');
         $idx = new Idephix(
             Config::fromArray(
-                array('targets' => $targets, 'sshClient' => $sshClient)
+                array(\Idephix\Config::ENVS => $targets, 'sshClient' => $sshClient)
             ),
             new StreamOutput($output)
         );
@@ -124,7 +124,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
             CallableTask::buildFromClosure(
                 'foo',
                 function (Context $idx) {
-                    $idx->local('echo "Hello World from ' . $idx['target.host'] . '"');
+                    $idx->local('echo "Hello World from ' . $idx['env.host'] . '"');
                 }
             )
         );
@@ -144,7 +144,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $idx = new Idephix(
             Config::fromArray(array(
                 Config::SSHCLIENT => new SshClient(new StubProxy()),
-                Config::TARGETS => array(
+                Config::ENVS => array(
                 'prod' => array(
                     'hosts' => array('127.0.0.1'),
                     'ssh_params' => array('user' => 'ftassi'),
@@ -171,8 +171,8 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\Idephix\Context', $context);
         $this->assertEquals('bar', $context['foo']);
-        $this->assertEquals('prod', $context['target.name']);
-        $this->assertEquals('127.0.0.1', $context['target.host']);
+        $this->assertEquals('prod', $context['env.name']);
+        $this->assertEquals('127.0.0.1', $context['env.host']);
     }
 
     public function testRunLocalShouldAllowToDefineTimeout()

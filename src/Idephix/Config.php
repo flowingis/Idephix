@@ -5,7 +5,7 @@ use Idephix\Exception\InvalidConfigurationException;
 
 class Config implements DictionaryAccess
 {
-    const TARGETS = 'targets';
+    const ENVS = 'envs';
     const SSHCLIENT = 'sshClient';
     const EXTENSIONS = 'extensions';
 
@@ -48,9 +48,9 @@ class Config implements DictionaryAccess
         return $config;
     }
 
-    public function targets()
+    public function environments()
     {
-        return is_null($this[self::TARGETS]) ? array() : $this[self::TARGETS];
+        return is_null($this[self::ENVS]) ? array() : $this[self::ENVS];
     }
 
     public function extensions()

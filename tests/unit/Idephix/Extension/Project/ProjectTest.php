@@ -30,7 +30,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     new Context(
                         Dictionary::fromArray(
                             array(
-                                'target' => array('name' => 'prod', 'host' => 'banana.com'),
+                                'env' => array('name' => 'prod', 'host' => 'banana.com'),
                                 'hosts' => array('mela.com', 'banana.com'),
                                 'ssh_params' => array('user' => 'kea')
                             )
@@ -54,7 +54,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     new Context(
                         Dictionary::fromArray(
                             array(
-                                'target' => array('name' => 'prod', 'host' => 'banana.com'),
+                                'env' => array('name' => 'prod', 'host' => 'banana.com'),
                                 'hosts' => array('mela.com', 'banana.com'),
                                 'ssh_params' => array()
                             )
@@ -78,7 +78,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     new Context(
                         Dictionary::fromArray(
                             array(
-                                'target' => array('name' => 'prod', 'host' => 'banana.com'),
+                                'env' => array('name' => 'prod', 'host' => 'banana.com'),
                                 'hosts' => array('mela.com', 'banana.com'),
                                 'ssh_params' => array('user' => 'kea', 'port' => 20817)
                             )

@@ -139,28 +139,28 @@ class Idephix implements Builder, TaskExecutor
      */
     protected function buildEnvironment(InputInterface $input)
     {
-        $targets = $this->config->targets();
+        $environments = $this->config->environments();
 
-        $env = $input->getParameterOption(array('--env'));
+        $userDefinedEnv = $input->getParameterOption(array('--env'));
 
-        if (false !== $env && !empty($env)) {
-            if (!isset($targets[$env])) {
+        if (false !== $userDefinedEnv && !empty($userDefinedEnv)) {
+            if (!isset($environments[$userDefinedEnv])) {
                 throw new \Exception(
                     sprintf(
                         'Wrong environment "%s". Available [%s]',
-                        $env,
-                        implode(', ', array_keys($targets))
+                        $userDefinedEnv,
+                        implode(', ', array_keys($environments))
                     )
                 );
             }
 
             $this->context = Context::dry($this)
-                ->target(
-                    $env,
+                ->env(
+                    $userDefinedEnv,
                     Dictionary::fromArray(
                         array_merge(
                             array('hosts' => array()),
-                            $targets[$env]
+                            $environments[$userDefinedEnv]
                         )
                     )
                 );
@@ -201,7 +201,7 @@ class Idephix implements Builder, TaskExecutor
         $hasErrors = false;
         foreach ($this->context as $hostContext) {
             $this->context = $hostContext;
-            $this->openRemoteConnection($hostContext->targetHost());
+            $this->openRemoteConnection($hostContext->currentHost());
             $returnValue = $this->application->run($this->input, $this->output);
             $hasErrors = $hasErrors || !(is_null($returnValue) || ($returnValue == 0));
             $this->closeRemoteConnection();

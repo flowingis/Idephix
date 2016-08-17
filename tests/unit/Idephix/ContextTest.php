@@ -8,10 +8,10 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $context = $this->buildContext();
 
-        $this->assertNull($context['target.name']);
-        $this->assertNull($context['target.host']);
-        $this->assertNull($context->targetName());
-        $this->assertNull($context->targetHost());
+        $this->assertNull($context['env.name']);
+        $this->assertNull($context['env.host']);
+        $this->assertNull($context->currentEnvName());
+        $this->assertNull($context->currentHost());
     }
 
     /** @test */
@@ -19,7 +19,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $idx = $this->prophesize('\Idephix\Context')->reveal();
         $context = Context::dry($idx)
-            ->target(
+            ->env(
                 'prod',
                 Dictionary::fromArray(
                     array(
@@ -28,10 +28,10 @@ class ContextTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->assertEquals('prod', $context['target.name']);
-        $this->assertNull($context['target.host']);
-        $this->assertEquals('prod', $context->targetName());
-        $this->assertNull($context->targetHost());
+        $this->assertEquals('prod', $context['env.name']);
+        $this->assertNull($context['env.host']);
+        $this->assertEquals('prod', $context->currentEnvName());
+        $this->assertNull($context->currentHost());
     }
 
     /** @test */
@@ -43,7 +43,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         );
 
         $context = Context::dry($idx)
-            ->target(
+            ->env(
                 'prod',
                 Dictionary::fromArray(
                     $targetData
@@ -53,11 +53,11 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         foreach ($context as $hostCount => $hostRelatedContext) {
             $this->assertInstanceOf('\Idephix\Context', $hostRelatedContext);
 
-            $this->assertEquals('prod', $context['target.name']);
-            $this->assertEquals('prod', $context->targetName());
+            $this->assertEquals('prod', $context['env.name']);
+            $this->assertEquals('prod', $context->currentEnvName());
 
-            $this->assertEquals($targetData['hosts'][$hostCount], $hostRelatedContext['target.host']);
-            $this->assertEquals($targetData['hosts'][$hostCount], $hostRelatedContext->targetHost());
+            $this->assertEquals($targetData['hosts'][$hostCount], $hostRelatedContext['env.host']);
+            $this->assertEquals($targetData['hosts'][$hostCount], $hostRelatedContext->currentHost());
         }
 
         $this->assertEquals(2, $hostCount);
@@ -70,7 +70,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $targetData = array('foo' => 'bar');
 
         $context = Context::dry($idx)
-            ->target(
+            ->env(
                 'prod',
                 Dictionary::fromArray(
                     $targetData
@@ -80,11 +80,11 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         foreach ($context as $hostCount => $hostRelatedContext) {
             $this->assertInstanceOf('\Idephix\Context', $hostRelatedContext);
 
-            $this->assertEquals('prod', $context['target.name']);
-            $this->assertEquals('prod', $context->targetName());
+            $this->assertEquals('prod', $context['env.name']);
+            $this->assertEquals('prod', $context->currentEnvName());
 
-            $this->assertNull($hostRelatedContext['target.host']);
-            $this->assertNull($hostRelatedContext->targetHost());
+            $this->assertNull($hostRelatedContext['env.host']);
+            $this->assertNull($hostRelatedContext->currentHost());
         }
 
         $this->assertEquals(0, $hostCount);
@@ -98,7 +98,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $idx = $this->prophesize('\Idephix\Context')->reveal();
 
         $context = Context::dry($idx)
-            ->target('prod', Dictionary::fromArray(array('foo' => '/var/www', 'bar' => '/var/www/')));
+            ->env('prod', Dictionary::fromArray(array('foo' => '/var/www', 'bar' => '/var/www/')));
 
         $this->assertEquals('/var/www/', $context->getAsPath('foo'));
         $this->assertEquals('/var/www/', $context->getAsPath('bar'));

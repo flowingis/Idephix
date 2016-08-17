@@ -20,15 +20,15 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 use \Idephix\SSH\SshClient;
 
 $targets = array('foo' => 'bar');
-return \Idephix\Config::fromArray(array('targets' => $targets, 'sshClient' => new SshClient()));
+return \Idephix\Config::fromArray(array(\Idephix\Config::ENVS => $targets, 'sshClient' => new SshClient()));
 
 EOD;
 
         $configFile = 'data://text/plain;base64,'.base64_encode($configFileContent);
 
         $config = Config::parseFile($configFile);
-        $this->assertEquals(array('foo' => 'bar'), $config['targets']);
-        $this->assertEquals(array('foo' => 'bar'), $config->targets());
+        $this->assertEquals(array('foo' => 'bar'), $config[\Idephix\Config::ENVS]);
+        $this->assertEquals(array('foo' => 'bar'), $config->environments());
     }
 
     /** @test */

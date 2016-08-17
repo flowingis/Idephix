@@ -1,6 +1,6 @@
 <?php
 
-$targets = array(
+$environments = array(
     'prod' => array(
         'hosts' => array('127.0.0.1'),
         'ssh_params' => array(
@@ -19,7 +19,7 @@ $targets = array(
 
 return \Idephix\Config::fromArray(
     array(
-        \Idephix\Config::TARGETS => $targets,
+        \Idephix\Config::ENVS => $environments,
         \Idephix\Config::SSHCLIENT => new \Idephix\SSH\SshClient(new \Idephix\SSH\CLISshProxy()),
         \Idephix\Config::EXTENSIONS => array(
             'rsync' => new \Idephix\Extension\Project\Rsync(),

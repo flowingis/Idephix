@@ -9,7 +9,7 @@ use Idephix\Idephix;
 use Idephix\Task\TaskCollection;
 
 /**
- * Provide a basic rsync interface based on current idx target parameters
+ * Provide a basic rsync interface based on current Idephix context
  */
 class Rsync implements IdephixAwareInterface, Extension
 {
@@ -52,8 +52,8 @@ class Rsync implements IdephixAwareInterface, Extension
 
         $context = $this->idx->getContext();
 
-        if ($context === null) {
-            throw new \InvalidArgumentException('Target not provided. Please provide a valid target.');
+        if ($context->currentHost() === null) {
+            throw new \InvalidArgumentException('A host must be selected, invalid Context provided');
         }
 
 
@@ -73,7 +73,7 @@ class Rsync implements IdephixAwareInterface, Extension
             $sshCmd .= ' -p ' . $port;
         }
 
-        $remoteConnection = $this->connectionString($context['target.host'], $context->get('ssh_params.user'));
+        $remoteConnection = $this->connectionString($context->currentHost(), $context->get('ssh_params.user'));
 
         $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e '$sshCmd' $localDir $remoteConnection:$remoteDir";
 

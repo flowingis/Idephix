@@ -4,11 +4,11 @@ namespace Idephix;
 class Context implements DictionaryAccess, TaskExecutor, \Iterator
 {
     private $idx;
-    private $targetData;
+    private $data;
 
     public function __construct(Dictionary $data, TaskExecutor $idx)
     {
-        $this->targetData = $data;
+        $this->data = $data;
         $this->idx = $idx;
     }
 
@@ -17,23 +17,23 @@ class Context implements DictionaryAccess, TaskExecutor, \Iterator
         return new static(Dictionary::dry(), $idx);
     }
 
-    public function target($name, Dictionary $targetData)
+    public function env($name, Dictionary $contextData)
     {
         $context = clone $this;
-        $targetData['target'] = array('name' => $name);
-        $context->targetData = $targetData;
+        $contextData['env'] = array('name' => $name);
+        $context->data = $contextData;
 
         return $context;
     }
 
-    public function targetName()
+    public function currentEnvName()
     {
-        return $this->targetData['target.name'];
+        return $this->data['env.name'];
     }
 
-    public function targetHost()
+    public function currentHost()
     {
-        return $this->targetData['target.host'];
+        return $this->data['env.host'];
     }
 
     /**
@@ -50,32 +50,32 @@ class Context implements DictionaryAccess, TaskExecutor, \Iterator
 
     public function offsetExists($offset)
     {
-        return $this->targetData->offsetExists($offset);
+        return $this->data->offsetExists($offset);
     }
 
     public function offsetGet($offset)
     {
-        return $this->targetData->offsetGet($offset);
+        return $this->data->offsetGet($offset);
     }
 
     public function offsetSet($offset, $value)
     {
-        $this->targetData->offsetSet($offset, $value);
+        $this->data->offsetSet($offset, $value);
     }
 
     public function offsetUnset($offset)
     {
-        $this->targetData->offsetUnset($offset);
+        $this->data->offsetUnset($offset);
     }
 
     public function get($offset, $default = null)
     {
-        return $this->targetData->get($offset, $default);
+        return $this->data->get($offset, $default);
     }
 
     public function set($key, $value)
     {
-        $this->targetData->offsetSet($key, $value);
+        $this->data->offsetSet($key, $value);
     }
 
     /**
@@ -146,8 +146,8 @@ class Context implements DictionaryAccess, TaskExecutor, \Iterator
      */
     public function current()
     {
-        $newContextData = clone $this->targetData;
-        $newContextData['target'] = array('name' => $this['target.name'], 'host' => current($this->hosts));
+        $newContextData = clone $this->data;
+        $newContextData['env'] = array('name' => $this->currentEnvName(), 'host' => current($this->hosts));
         $newContext = new static($newContextData, $this->idx);
 
         return $newContext;
@@ -195,7 +195,7 @@ class Context implements DictionaryAccess, TaskExecutor, \Iterator
      */
     public function rewind()
     {
-        $this->hosts = $this->targetData->get('hosts', array(null));
+        $this->hosts = $this->data->get('hosts', array(null));
         reset($this->hosts);
     }
 }
