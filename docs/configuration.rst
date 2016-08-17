@@ -11,25 +11,25 @@ name it whatever you want. If you want to use a custom configuration file
 you need to specify id by using ``-c`` option with Idephix CLI.
 
 The file **must** return an instace of ``\Idephix\Config``, which lets you
-configure the targets and the preferred ssh client.
+configure the environments and the preferred ssh client.
 
 Idephix uses 3 main configuration elements:
 
-- targets
+- environments
 - sshClient
 - extensions
 
-None of them are mandatory, you'll need targets and sshClient only to execute remote
+None of them are mandatory, you'll need environments (at least one) and sshClient only to execute remote
 tasks and extensions only if you want to register some extension.
 
-This example of ``idxrc.php`` file will give you and idea of how define targets, ssh clients
+This example of ``idxrc.php`` file will give you and idea of how define environments, ssh clients
 and extensions:
 
 ::
 
     <?php
 
-    $targets = array(
+    $environments = array(
         'prod' => array(
             'hosts' => array('127.0.0.1', '33.33.33.10'),
             'ssh_params' => array(
@@ -50,7 +50,7 @@ and extensions:
 
     return \Idephix\Config::fromArray(
         array(
-            \Idephix\Config::TARGETS => $targets,
+            \Idephix\Config::ENVS => $environments,
             \Idephix\Config::SSHCLIENT => new \Idephix\SSH\SshClient(),
             \Idephix\Config::EXTENSIONS => array(),
         )
@@ -60,5 +60,5 @@ Idephix use ssh-agent to authenticate to remote computers without password.
 Otherwise you can specify the password in your script or use ``CLISshProxy``
 (instead of the default ``PeclSsh2Proxy``) that ask you the password.
 
-Once you have defined several targets you can specify which one you want to run
+Once you have defined several environments you can specify which one you want to run
 your remote task against, using ``--env`` CLI option.

@@ -247,7 +247,7 @@ Running remote commands is almost the same as running local commands. You can do
         );
     }
 
-In order to execute a remote command you must specify a target environment using ``--env`` option. If you fail to
+In order to execute a remote command you must specify an environment using ``--env`` option. If you fail to
 specify a valid env name you will get an error and the command will not be executed.
 
 Executing user defined tasks
@@ -280,14 +280,14 @@ Mind that you don't have to manually inject the ``Context`` object, Idephix will
 Accessing configuration from tasks
 ----------------------------------
 
-``Idephix\Context`` object gives you also access to every configuration defined for the current target.
+``Idephix\Context`` object gives you also access to every configuration defined for the current environment.
 Imagine you have defined this configuration:
 
 ::
 
     <?php
 
-    $targets = array(
+    $environments = array(
         'prod' => array(
             'hosts' => array('127.0.0.1'),
             'ssh_params' => array(

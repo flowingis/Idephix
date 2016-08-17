@@ -45,7 +45,7 @@ This will generate an ``idxfile.php`` and a ``idxrc.php`` file that you can
 use as a boiler plate for your automated tasks.
 
 Basically Idephix is a tool for running tasks either remote or local. Remote tasks
-can be run against a chosen target (usually a specific server or environment) connecting
-to it through ssh (see :ref:`idx_config` for more information on ssh connection and targets).
+can be run against a chosen environment connecting
+to it through ssh (see :ref:`idx_config` for more information on ssh connection and environments).
 
 Local tasks are run on the local host without any need to establish an ssh connection.
