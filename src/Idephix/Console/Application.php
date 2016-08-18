@@ -4,7 +4,7 @@ namespace Idephix\Console;
 
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputOption;
-use Idephix\Console\Command\HelpCommand;
+use Symfony\Component\Console\Command\HelpCommand;
 use Idephix\Console\Command\ListCommand;
 
 class Application extends BaseApplication

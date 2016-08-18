@@ -180,7 +180,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_allow_to_define_custom_timeout()
     {
-
         $output = fopen('php://memory', 'r+');
         $idx = new Idephix(
             Config::dry(),
@@ -244,8 +243,8 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
             new StringInput('')
         );
 
-        $idx->addTask(CallableTask::buildFromClosure('custom1', function() {}));
-        $idx->addTask(CallableTask::buildFromClosure('custom2', function() {}));
+        $idx->addTask(CallableTask::buildFromClosure('custom1', function () {}));
+        $idx->addTask(CallableTask::buildFromClosure('custom2', function () {}));
 
         $idx->run();
 
