@@ -7,19 +7,21 @@
 Idephix - Automation and Deploy tool
 ====================================
 
-Idephix is a PHP tool for building automated scripts
+Idephix is a PHP automation tool useful to perform remote and local tasks. It can be used to deploy applications, rotate logs, synchronize data repository across server or create a build system. If you want to learn more about how to use it
+[read the docs][rd].
 
 Installation / Usage
 --------------------
 
-1. Download the [`idephix.phar`](http://getidephix.com/idephix.phar) executable.
+1. Download the [`idephix.phar`](http://getidephix.com/idephix.phar) executable and init your idxfile.
 
     ``` sh
-    $ curl http://getidephix.com/idephix.phar > idephix.phar
+    $ curl -LSs http://getidephix.com/idephix.phar > idephix.phar
+    $ chmod a+x idephix.phar
+    $ idx init-idx-file
     ```
 
-
-2. Create a idxfile.php in the root directory of your project. Define your tasks.
+2. Now you can define tasks just defining php functions in your `idxfile.php`
 
     ```php
     <?php
@@ -35,53 +37,17 @@ Installation / Usage
          $context->remote('touch /tmp/'.$name.'_remote');
     }
 
-    $idx->run();
-
     ```
     
-3. Create a idxrc.php in the root directory of your project. The file must return a `Config` Dictionary. 
-The returned object will contains all targets info and the SSH client to uso for remote
-connections.
-
-    ```php
-    <?php 
- 
-    $targets = array(
-        'prod' => array(
-            'hosts' => array('127.0.0.1'),
-            'ssh_params' => $sshParams,
-            'deploy' => array(
-                'local_base_dir' => $localBaseDir,
-                'remote_base_dir' => "/var/www/myfantasticserver/",
-                // 'rsync_exclude_file' => 'rsync_exclude.txt'
-                // 'rsync_include_file' => 'rsync_include.txt'
-                // 'migrations' => true
-                // 'strategy' => 'Copy'
-            ),
-        ),
-    );
-    return \Idephix\Config::fromArray(
-        array(
-            'targets' => $targets, 
-            'sshClient' => new \Idephix\SSH\SshClient(new \Idephix\SSH\CLISshProxy())
-        )
-    );
-    ```
-
-4. Run Idephix: `php idephix.phar --env=test idephix:test-params Nome_file`
-
+For more information about how to define tasks, configuration for multiple environments and much more [read the docs][rd].
 Global installation of Idephix
-----------------------------------------
 
-You can choose to install idephix wherever you prefer. Idephix use the configuration file in the current path.
+Deploying with Idephix
+----------------------
 
-1. Go to a PATH directory, e.g. `cd /usr/local/bin`
-2. Get Idephix:`curl http://getidephix.com/idephix.phar > idephix.phar`
-3. Make the phar executable `chmod a+x idephix.phar`
-4. Go to a project directory, e.g. `cd /path/to/my/project`
-5. Define your tasks in the idxfile.php file
-5. Just invoke the binary `idephix.phar`
-6. You can optionally rename the idephix.phar to idx to make it easy to use
+Idephix is good for many different jobs, but we like to use it especially for application deployment. In fact 
+out of the box your `idxfile.php` will be initialized using our recipe for [PHP application deployment][idx-deploy] 
+that you can use as a starting point for your projects.
 
 Requirements
 ------------
@@ -101,6 +67,5 @@ License
 
 Idephix is licensed under the MIT License - see the LICENSE file for details
 
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ideatosrl/idephix/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
+[rd]: http://idephix.readthedocs.io/en/latest/
+[idx-deploy]: http://idephix.readthedocs.io/en/latest/recipes/deploy.html
