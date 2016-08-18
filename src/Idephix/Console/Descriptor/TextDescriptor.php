@@ -40,8 +40,8 @@ class TextDescriptor extends SymfonyTextDescriptior
                 $this->writeText('<comment>Available commands:</comment>', $options);
             }
 
-            $default_cmds = [];
-            $user_cmds = [];
+            $default_cmds = array();
+            $user_cmds = array();
 
             // add commands by namespace
             foreach ($description->getNamespaces() as $namespace) {
