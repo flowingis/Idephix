@@ -2,7 +2,6 @@
 [![Gitter](https://badges.gitter.im/ideatosrl/Idephix.svg)](https://gitter.im/ideatosrl/Idephix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Build Status](https://travis-ci.org/ideatosrl/Idephix.svg)](https://travis-ci.org/ideatosrl/Idephix)
 [![Read the docs](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](http://idephix.readthedocs.io/en/latest/)
-[![Code Climate](https://codeclimate.com/github/ideatosrl/Idephix/badges/gpa.svg)](https://codeclimate.com/github/ideatosrl/Idephix)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/47596bd6-4ac9-4314-b79a-1f2e50292c1f/mini.png)](https://insight.sensiolabs.com/projects/47596bd6-4ac9-4314-b79a-1f2e50292c1f)
 
 Idephix - Automation and Deploy tool
