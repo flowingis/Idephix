@@ -1,6 +1,6 @@
 <?php
 
-namespace Idephix\Task\SelfUpdate;
+namespace Idephix\Task\Builtin;
 
 use Idephix\Task\Parameter;
 use Idephix\Idephix;

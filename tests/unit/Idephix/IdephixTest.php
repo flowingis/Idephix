@@ -8,6 +8,7 @@ use Idephix\Task\CallableTask;
 use Idephix\Test\SSH\StubProxy;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Input\StringInput;
 
 class IdephixTest extends \PHPUnit_Framework_TestCase
 {
@@ -73,7 +74,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Idephix\Console\Command', $registeredCommands['fooCommand']);
         $this->assertEquals('fooCommand', $registeredCommands['fooCommand']->getName());
     }
-    
+
     public function getArgvAndTargets()
     {
         return array(
@@ -139,8 +140,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_should_inject_context_to_task()
     {
-        $_SERVER['argv'] = array('idx', 'myTask', '--env=prod');
-
         $idx = new Idephix(
             Config::fromArray(array(
                 Config::SSHCLIENT => new SshClient(new StubProxy()),
@@ -151,7 +150,8 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
                     'foo' => 'bar'
                 )
             ))),
-            new StreamOutput(fopen('php://memory', 'r+'))
+            new StreamOutput(fopen('php://memory', 'r+')),
+            new StringInput('myTask --env=prod')
         );
 
         $spy = new \stdClass();
@@ -175,12 +175,19 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('127.0.0.1', $context['env.host']);
     }
 
-    public function testRunLocalShouldAllowToDefineTimeout()
+    /**
+     * @test
+     */
+    public function it_should_allow_to_define_custom_timeout()
     {
-        $_SERVER['argv'] = array('idx', 'foo');
 
         $output = fopen('php://memory', 'r+');
-        $idx = new Idephix(Config::dry(), new StreamOutput($output));
+        $idx = new Idephix(
+            Config::dry(),
+            new StreamOutput($output),
+            new StringInput('foo')
+        );
+
         $idx->getApplication()->setAutoExit(false);
 
         $idx->addTask(
@@ -224,6 +231,32 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $this->idx->test(42));
         $this->assertEquals(0, $this->idx->execute('test', 42));
     }
+
+    /**
+     * @test
+     */
+    public function it_should_print_user_tasks_separately()
+    {
+        $output = fopen('php://memory', 'r+');
+        $idx = new Idephix(
+            Config::dry(),
+            new StreamOutput($output),
+            new StringInput('')
+        );
+
+        $idx->addTask(CallableTask::buildFromClosure('custom1', function() {}));
+        $idx->addTask(CallableTask::buildFromClosure('custom2', function() {}));
+
+        $idx->run();
+
+        rewind($output);
+
+        $out = stream_get_contents($output);
+
+        $this->assertContains('Available commands', $out);
+        $this->assertContains('User tasks', $out);
+    }
+
 
     /**
      * Exception: Remote function need a valid environment. Specify --env parameter.

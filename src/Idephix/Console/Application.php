@@ -4,16 +4,22 @@ namespace Idephix\Console;
 
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputOption;
+use Idephix\Console\Command\HelpCommand;
+use Idephix\Console\Command\ListCommand;
 
 class Application extends BaseApplication
 {
-    private $logo = '  ___    _            _     _
+    private $logo = <<<'EOD'
+
+  ___    _            _     _
  |_ _|__| | ___ _ __ | |__ (_)_  __
-  | |/ _` |/ _ \ \'_ \| \'_ \| \ \/ /
+  | |/ _` |/ _ \  _ \|  _  | \ \/ /
   | | (_| |  __/ |_) | | | | |>  <
  |___\__,_|\___| .__/|_| |_|_/_/\_\
                |_|
-';
+
+
+EOD;
 
     private $releaseDate;
 
@@ -35,7 +41,7 @@ class Application extends BaseApplication
 
     public function getHelp()
     {
-        return $this->logo.parent::getHelp();
+        return $this->logo . parent::getHelp();
     }
 
     public function getLongVersion()
@@ -53,5 +59,10 @@ class Application extends BaseApplication
         );
 
         return $version;
+    }
+
+    protected function getDefaultCommands()
+    {
+        return array(new HelpCommand(), new ListCommand());
     }
 }

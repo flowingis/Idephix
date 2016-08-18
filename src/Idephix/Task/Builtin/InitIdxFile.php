@@ -1,8 +1,9 @@
 <?php
-namespace Idephix\Task;
+namespace Idephix\Task\Builtin;
 
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Idephix;
+use Idephix\Task\Task;
 use Idephix\Task\Parameter\Collection;
 use Idephix\Task\Parameter\UserDefinedCollection;
 
