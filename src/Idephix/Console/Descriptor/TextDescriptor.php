@@ -46,7 +46,7 @@ class TextDescriptor extends SymfonyTextDescriptior
             // add commands by namespace
             foreach ($description->getNamespaces() as $namespace) {
                 foreach ($namespace['commands'] as $name) {
-                    if (in_array($name, ['help', 'list', 'initFile', 'selfupdate'])) {
+                    if (in_array($name, array('help', 'list', 'initFile', 'selfupdate'))) {
                         $default_cmds[] = $name;
                     } else {
                         $user_cmds[] = $name;
