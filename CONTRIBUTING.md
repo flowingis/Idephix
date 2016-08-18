@@ -10,7 +10,7 @@ Feel free to use what you're more comfortable with, either the kanban board or g
 
 Fork, then clone the repo:
 
-    git clone git@github.com:your-username/factory_girl_rails.git
+    git clone git clone git@github.com:your-username/Idephix.git
     
 Make sure the tests pass:
 
