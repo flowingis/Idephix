@@ -16,8 +16,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Idephix\SSH\SshClient;
 use Idephix\Extension\IdephixAwareInterface;
-use Idephix\Task\SelfUpdate\SelfUpdate;
-use Idephix\Task\InitIdxFile;
+use Idephix\Task\Builtin\SelfUpdate;
+use Idephix\Task\Builtin\InitIdxFile;
 
 /**
  * Class Idephix
@@ -197,7 +197,7 @@ class Idephix implements Builder, TaskExecutor
 
             return;
         }
-        
+
         $hasErrors = false;
         foreach ($this->context as $hostContext) {
             $this->context = $hostContext;

@@ -4,6 +4,7 @@ namespace Idephix\Task;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use org\bovigo\vfs\vfsStreamWrapper;
+use Idephix\Task\Builtin\InitIdxFile;
 
 class InitIdxFileTest extends \PHPUnit_Framework_TestCase
 {

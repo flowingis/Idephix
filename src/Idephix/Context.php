@@ -147,7 +147,11 @@ class Context implements DictionaryAccess, TaskExecutor, \Iterator
     public function current()
     {
         $newContextData = clone $this->data;
-        $newContextData['env'] = array('name' => $this->currentEnvName(), 'host' => current($this->hosts));
+        $newContextData['env'] = array(
+            'name' => $this->currentEnvName(),
+            'host' => current($this->hosts)
+        );
+
         $newContext = new static($newContextData, $this->idx);
 
         return $newContext;
