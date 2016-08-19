@@ -16,10 +16,10 @@ configure the environments and the preferred ssh client.
 Idephix uses 3 main configuration elements:
 
 - environments
-- sshClient
+- ssh_client
 - extensions
 
-None of them are mandatory, you'll need environments (at least one) and sshClient only to execute remote
+None of them are mandatory, you'll need environments (at least one) and ssh_client only to execute remote
 tasks and extensions only if you want to register some extension.
 
 This example of ``idxrc.php`` file will give you and idea of how define environments, ssh clients

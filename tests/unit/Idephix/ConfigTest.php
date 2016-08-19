@@ -1,11 +1,54 @@
 <?php
 namespace Idephix;
 
-use Idephix\SSH\SshClient;
-
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
 
+    /** @test */
+    public function it_should_have_defaults_for_config()
+    {
+        $config = Config::dry();
+        $this->assertInstanceOf('Idephix\SSH\SshClient', $config['ssh_client']);
+        $this->assertEquals(array(), $config['envs']);
+        $this->assertEquals(array(), $config['extensions']);
+    }
+
+    /**
+     * @test
+     * @expectedException \Idephix\Exception\InvalidConfigurationException
+     */
+    public function it_should_accept_only_ssh_client_instances()
+    {
+        $config = Config::fromArray(array('ssh_client' => 'foo'));
+    }
+
+    /**
+     * @test
+     * @expectedException \Idephix\Exception\InvalidConfigurationException
+     */
+    public function it_should_only_accept_array_as_envs()
+    {
+        $config = Config::fromArray(array('envs' => 'foo'));
+    }
+
+    /**
+     * @test
+     * @expectedException \Idephix\Exception\InvalidConfigurationException
+     */
+    public function it_should_only_accept_array_as_extensions()
+    {
+        $config = Config::fromArray(array('extensions' => 'foo'));
+    }
+
+    /**
+     * @test
+     * @expectedException \Idephix\Exception\InvalidConfigurationException
+     * @expectedExceptionMessageRegExp /.*foo.*(does not exist)/
+     */
+    public function it_should_throw_exceptions_for_invalid_key()
+    {
+        $config = Config::fromArray(array('foo' => 'bar'));
+    }
 
     /** @test */
     public function it_should_create_from_file()
@@ -20,7 +63,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 use \Idephix\SSH\SshClient;
 
 $targets = array('foo' => 'bar');
-return \Idephix\Config::fromArray(array(\Idephix\Config::ENVS => $targets, 'sshClient' => new SshClient()));
+return \Idephix\Config::fromArray(array(\Idephix\Config::ENVS => $targets, \Idephix\Config::SSHCLIENT => new SshClient()));
 
 EOD;
 
@@ -53,7 +96,7 @@ EOD;
 use \Idephix\SSH\SshClient;
 
 $targets = array('foo' => 'bar');
-return array('targets' => $targets, 'sshClient' => new SshClient());
+return array('envs' => $targets, \Idephix\Config::SSHCLIENT => new SshClient());
 
 EOD;
 

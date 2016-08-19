@@ -58,12 +58,7 @@ class Idephix implements Builder, TaskExecutor
             self::RELEASE_DATE
             );
 
-        $sshClient = $config['sshClient'];
-
-        if (null === $sshClient) {
-            $sshClient = new SshClient();
-        }
-        $this->sshClient = $sshClient;
+        $this->sshClient = $config['ssh_client'];
 
         $this->output = $this->outputOrDefault($output);
         $this->input = $this->inputOrDefault($input);

@@ -2,11 +2,15 @@
 namespace Idephix;
 
 use Idephix\Exception\InvalidConfigurationException;
+use Idephix\SSH\SshClient;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class Config implements DictionaryAccess
 {
     const ENVS = 'envs';
-    const SSHCLIENT = 'sshClient';
+    const SSHCLIENT = 'ssh_client';
     const EXTENSIONS = 'extensions';
 
     private $dictionary;
@@ -18,12 +22,29 @@ class Config implements DictionaryAccess
 
     public static function fromArray($data)
     {
-        return new static(Dictionary::fromArray($data));
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults(array(
+            self::ENVS => array(),
+            self::EXTENSIONS => array(),
+            self::SSHCLIENT => new SshClient(),
+        ));
+
+        $resolver->setAllowedTypes(self::SSHCLIENT, '\Idephix\SSH\SshClient');
+        $resolver->setAllowedTypes(self::ENVS, 'array');
+        $resolver->setAllowedTypes(self::EXTENSIONS, 'array');
+
+        try {
+            return new static(Dictionary::fromArray($resolver->resolve($data)));
+        } catch (UndefinedOptionsException $e) {
+            throw new InvalidConfigurationException($e->getMessage());
+        } catch (InvalidOptionsException $e) {
+            throw new InvalidConfigurationException($e->getMessage());
+        }
     }
 
     public static function dry()
     {
-        return new static(Dictionary::dry());
+        return self::fromArray(array());
     }
 
     public static function parseFile($configFile)

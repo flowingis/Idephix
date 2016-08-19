@@ -21,9 +21,9 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_allow_default_value()
     {
-        $context = Dictionary::fromArray(array('foo' => 'bar', 'targets' => array('host' => 'localhost')));
+        $context = Dictionary::fromArray(array('foo' => 'bar', 'envs' => array('host' => 'localhost')));
         $this->assertEquals('i-am-default', $context->get('not-present', 'i-am-default'));
-        $this->assertEquals('localhost', $context->get('targets.host', 'i-am-default'));
+        $this->assertEquals('localhost', $context->get('envs.host', 'i-am-default'));
     }
 
     /**
@@ -33,7 +33,7 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
     {
         $context = Dictionary::fromArray(
             array(
-                'targets' => array(
+                'envs' => array(
                     'prod' => array(
                         'release_dir' => '/var/www'
                     )
@@ -41,8 +41,8 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertEquals(array('release_dir' => '/var/www'), $context['targets.prod']);
-        $this->assertEquals('/var/www', $context['targets.prod.release_dir']);
+        $this->assertEquals(array('release_dir' => '/var/www'), $context['envs.prod']);
+        $this->assertEquals('/var/www', $context['envs.prod.release_dir']);
     }
 
     /**
@@ -51,9 +51,9 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
     public function it_should_allow_to_set_data_using_dot_notation()
     {
         $context = Dictionary::fromArray(array());
-        $context['targets'] = array('prod' => array('release_dir' => '/var/www'));
+        $context['envs'] = array('prod' => array('release_dir' => '/var/www'));
 
-        $this->assertEquals('/var/www', $context['targets.prod.release_dir']);
+        $this->assertEquals('/var/www', $context['envs.prod.release_dir']);
     }
 
     /**
@@ -61,9 +61,9 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_return_null_for_non_existing_key()
     {
-        $context = Dictionary::fromArray(array('targets' => array('prod' => array('release_dir' => '/var/www'))));
+        $context = Dictionary::fromArray(array('envs' => array('prod' => array('release_dir' => '/var/www'))));
 
-        $this->assertNull($context['sshClient']);
+        $this->assertNull($context['ssh_client']);
     }
 
     /**

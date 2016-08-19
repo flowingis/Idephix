@@ -16,7 +16,7 @@ class ExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->idx = new Idephix(
             Config::fromArray(
-                array('targets' => array(), 'sshClient' => new SSH\SshClient(new Test\SSH\StubProxy()))
+                array('envs' => array(), 'ssh_client' => new SSH\SshClient(new Test\SSH\StubProxy()))
             ), $output
         );
     }
