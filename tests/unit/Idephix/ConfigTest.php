@@ -50,6 +50,38 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $config = Config::fromArray(array('foo' => 'bar'));
     }
 
+    /**
+     * @test
+     * @expectedException \Idephix\Exception\InvalidConfigurationException
+     * @expectedExceptionMessageRegExp /Each env must be an array/
+     */
+    public function an_env_must_be_an_array_of_data()
+    {
+        $config = Config::fromArray(array('envs' => array('prod' => 'bar')));
+    }
+
+    /** @test */
+    public function an_env_should_have_default_values()
+    {
+        $defaultEnvData = array(
+            'hosts' => array(null),
+            'ssh_params' => array(
+                'user' => '',
+                'password' => '',
+                'public_key_file' => '',
+                'private_key_file' => '',
+                'private_key_file_pwd' => '',
+                'ssh_port' => '22'
+            )
+        );
+
+        $config = Config::fromArray(array('envs' => array('prod' => array())));
+        $this->assertEquals($defaultEnvData, $config['envs.prod']);
+
+        $config = Config::fromArray(array('envs' => array('prod' => array('hosts' => array()))));
+        $this->assertEquals($defaultEnvData, $config['envs.prod']);
+    }
+
     /** @test */
     public function it_should_create_from_file()
     {
@@ -62,7 +94,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
 use \Idephix\SSH\SshClient;
 
-$targets = array('foo' => 'bar');
+$targets = array('prod' => array());
 return \Idephix\Config::fromArray(array(\Idephix\Config::ENVS => $targets, \Idephix\Config::SSHCLIENT => new SshClient()));
 
 EOD;
@@ -70,8 +102,25 @@ EOD;
         $configFile = 'data://text/plain;base64,'.base64_encode($configFileContent);
 
         $config = Config::parseFile($configFile);
-        $this->assertEquals(array('foo' => 'bar'), $config[\Idephix\Config::ENVS]);
-        $this->assertEquals(array('foo' => 'bar'), $config->environments());
+        $defaultEnvData = array(
+            'prod' => array(
+                'hosts' => array(null),
+                'ssh_params' => array(
+                    'user' => '',
+                    'password' => '',
+                    'public_key_file' => '',
+                    'private_key_file' => '',
+                    'private_key_file_pwd' => '',
+                    'ssh_port' => '22'
+                )
+            )
+        );
+        $this->assertEquals(
+            $defaultEnvData,
+            $config[\Idephix\Config::ENVS]
+        );
+
+        $this->assertEquals($defaultEnvData, $config->environments());
     }
 
     /** @test */

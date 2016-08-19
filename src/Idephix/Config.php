@@ -34,12 +34,44 @@ class Config implements DictionaryAccess
         $resolver->setAllowedTypes(self::EXTENSIONS, 'array');
 
         try {
-            return new static(Dictionary::fromArray($resolver->resolve($data)));
+            $resolvedConfig = $resolver->resolve($data);
         } catch (UndefinedOptionsException $e) {
             throw new InvalidConfigurationException($e->getMessage());
         } catch (InvalidOptionsException $e) {
             throw new InvalidConfigurationException($e->getMessage());
         }
+
+        $resolvedConfig['envs'] = array_map(
+            function ($envData) {
+                if (!is_array($envData)) {
+                    throw new InvalidConfigurationException("Each env must be an array \"$envData\" given'");
+                }
+
+                $envData['hosts'] = empty($envData['hosts']) ? array(null) : $envData['hosts'];
+
+                $sshParamsResolver = new OptionsResolver();
+                $sshParamsResolver->setDefaults(
+                    array(
+                        'user' => '',
+                        'password' => '',
+                        'public_key_file' => '',
+                        'private_key_file' => '',
+                        'private_key_file_pwd' => '',
+                        'ssh_port' => '22'
+                    )
+                );
+                
+                $envData['ssh_params'] = $sshParamsResolver->resolve(
+                    empty($envData['ssh_params']) ? array() : $envData['ssh_params']
+                );
+
+                return $envData;
+            },
+
+            $resolvedConfig['envs']
+        );
+
+        return new static(Dictionary::fromArray($resolvedConfig));
     }
 
     public static function dry()
