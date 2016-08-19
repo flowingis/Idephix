@@ -3,8 +3,6 @@
 idxfile_custom.php
 junit.xml
 phpunit.xml
-bin/phpunit
-bin/box
 bin/coveralls
 bin/jsonlint
 bin/test-reporter
