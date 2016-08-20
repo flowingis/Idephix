@@ -50,9 +50,9 @@ and extensions:
 
     return \Idephix\Config::fromArray(
         array(
-            \Idephix\Config::ENVS => $environments,
-            \Idephix\Config::SSHCLIENT => new \Idephix\SSH\SshClient(),
-            \Idephix\Config::EXTENSIONS => array(),
+            'envs' => $environments,
+            'ssh_client' => new \Idephix\SSH\SshClient(),
+            'extensions' => array(),
         )
     );
 

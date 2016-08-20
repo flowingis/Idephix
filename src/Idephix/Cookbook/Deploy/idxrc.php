@@ -4,7 +4,12 @@ $environments = array(
     'prod' => array(
         'hosts' => array('127.0.0.1'),
         'ssh_params' => array(
-            'user' => 'ideato'
+            'user' => 'ideato',
+//            'password'             => '',
+//            'public_key_file'      => '',
+//            'private_key_file'     => '',
+//            'private_key_file_pwd' => '',
+//            'ssh_port'             => '22'
         ),
         'deploy' => array(
             'repository' => './',
@@ -19,9 +24,9 @@ $environments = array(
 
 return \Idephix\Config::fromArray(
     array(
-        \Idephix\Config::ENVS => $environments,
-        \Idephix\Config::SSHCLIENT => new \Idephix\SSH\SshClient(new \Idephix\SSH\CLISshProxy()),
-        \Idephix\Config::EXTENSIONS => array(
+        'envs' => $environments,
+        'ssh_client' => new \Idephix\SSH\SshClient(new \Idephix\SSH\CLISshProxy()),
+        'extensions' => array(
             'rsync' => new \Idephix\Extension\Project\Rsync(),
         ),
     )
