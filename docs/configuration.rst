@@ -10,10 +10,7 @@ directory of your project, but you can store it wherever you want and
 name it whatever you want. If you want to use a custom configuration file
 you need to specify id by using ``-c`` option with Idephix CLI.
 
-The file **must** return an instace of ``\Idephix\Config``, which lets you
-configure the environments and the preferred ssh client.
-
-Idephix uses 3 main configuration elements:
+The file **must** return an array of configurations. Idephix uses 3 main configuration elements:
 
 - environments
 - ssh_client
@@ -48,12 +45,10 @@ and extensions:
         ),
     );
 
-    return \Idephix\Config::fromArray(
-        array(
-            'envs' => $environments,
-            'ssh_client' => new \Idephix\SSH\SshClient(),
-            'extensions' => array(),
-        )
+    return array(
+        'envs' => $environments,
+        'sshClient' => new \Idephix\SSH\SshClient(),
+        'extensions' => array(),
     );
 
 Idephix use ssh-agent to authenticate to remote computers without password.
