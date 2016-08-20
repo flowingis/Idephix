@@ -30,7 +30,7 @@ As a composer dependency
 Globally using homebrew
 -----------------------
 
-.. code-block: bash
+.. code-block:: bash
 
     $ brew tap ideatosrl/php
     $ brew install idephix
