@@ -22,12 +22,11 @@ $environments = array(
     ),
 );
 
-return \Idephix\Config::fromArray(
+return
     array(
         'envs' => $environments,
         'ssh_client' => new \Idephix\SSH\SshClienti(),
         'extensions' => array(
             'rsync' => new \Idephix\Extension\Project\Rsync(),
         ),
-    )
-);
+    );
