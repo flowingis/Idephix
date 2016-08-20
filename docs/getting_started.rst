@@ -27,6 +27,15 @@ As a composer dependency
 
     $ composer require ideato/idephix --dev
 
+Globally using homebrew
+-----------------------
+
+.. code-block: bash
+
+    $ brew tap ideatosrl/php
+    $ brew install idephix
+
+
 Basic Usage
 ***********
 
