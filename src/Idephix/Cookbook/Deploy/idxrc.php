@@ -25,7 +25,7 @@ $environments = array(
 return \Idephix\Config::fromArray(
     array(
         'envs' => $environments,
-        'ssh_client' => new \Idephix\SSH\SshClient(new \Idephix\SSH\CLISshProxy()),
+        'ssh_client' => new \Idephix\SSH\SshClienti(),
         'extensions' => array(
             'rsync' => new \Idephix\Extension\Project\Rsync(),
         ),
