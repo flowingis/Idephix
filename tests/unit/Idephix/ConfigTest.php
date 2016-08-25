@@ -94,8 +94,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
 use \Idephix\SSH\SshClient;
 
-$targets = array('prod' => array());
-return \Idephix\Config::fromArray(array(\Idephix\Config::ENVS => $targets, \Idephix\Config::SSHCLIENT => new SshClient()));
+return array(
+    'envs' => array('foo' => 'bar'),
+    'ssh_client' => new SshClient()
+);
 
 EOD;
 
@@ -144,8 +146,7 @@ EOD;
 
 use \Idephix\SSH\SshClient;
 
-$targets = array('foo' => 'bar');
-return array('envs' => $targets, \Idephix\Config::SSHCLIENT => new SshClient());
+return new stdClass();
 
 EOD;
 

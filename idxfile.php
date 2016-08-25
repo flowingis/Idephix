@@ -1,6 +1,6 @@
 <?php
 /**
- * @param \Idephix\Context $idx
+ * Deploys a phar on github pages
  */
 function deployPhar(\Idephix\Context $idx)
 {
@@ -50,6 +50,9 @@ function deployPhar(\Idephix\Context $idx)
     $idx->local('cd ~/docs && git push -q origin gh-pages');
 };
 
+/**
+ * Creates a new phar
+ */
 function createPhar(\Idephix\Context $idx)
 {
     $idx->output()->writeln('Creating phar...');
@@ -73,12 +76,18 @@ function createPhar(\Idephix\Context $idx)
     $idx->output()->writeln('All good!');
 };
 
+/**
+ * Updates the idephix phar in this project.
+ */
 function updatePhar(\Idephix\Context $idx)
 {
     $idx->createPhar();
     $idx->local('cp ./idephix.phar bin/');
 }
 
+/**
+ * Build for continuous integration
+ */
 function buildTravis(\Idephix\Context $idx)
 {
     try {
@@ -91,12 +100,18 @@ function buildTravis(\Idephix\Context $idx)
     }
 };
 
+/**
+ * Build for local development
+ */
 function build(\Idephix\Context $idx)
 {
     $idx->local('composer install --prefer-source');
     $idx->local('bin/phpunit -c tests');
 };
 
+/**
+ * Runs php-cs-fixer for coding standard fixes
+ */
 function fixCs(\Idephix\Context $idx)
 {
     try {
@@ -105,6 +120,9 @@ function fixCs(\Idephix\Context $idx)
     }
 };
 
+/**
+ * Rebuilds project documentation
+ */
 function buildDoc(\Idephix\Context $idx, $open = false)
 {
     $idx->local('cp -r src/Idephix/Cookbook docs/');
@@ -115,6 +133,9 @@ function buildDoc(\Idephix\Context $idx, $open = false)
     }
 }
 
+/**
+ * Opens documentaion in browser
+ */
 function openDoc(\Idephix\Context $idx)
 {
     $idx->local('open docs/_build/html/index.html');

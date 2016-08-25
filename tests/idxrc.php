@@ -45,4 +45,4 @@ $environments = array(
     ),
 );
 
-return \Idephix\Config::fromArray(array(\Idephix\Config::ENVS => $environments));
+return array(\Idephix\Config::ENVS => $environments);

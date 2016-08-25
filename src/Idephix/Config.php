@@ -94,11 +94,11 @@ class Config implements DictionaryAccess
         /** @var Config $config */
         $config = require_once $configFile;
 
-        if (!$config instanceof Config) {
-            throw new InvalidConfigurationException('The config must be an instance of Idephix\Config');
+        if (!is_array($config)) {
+            throw new InvalidConfigurationException('The config file must return an array');
         }
 
-        return $config;
+        return static::fromArray($config);
     }
 
     public function environments()
