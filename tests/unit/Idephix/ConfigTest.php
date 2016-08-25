@@ -96,7 +96,7 @@ use \Idephix\SSH\SshClient;
 
 return array(
     'envs' => array('foo' => 'bar'),
-    'sshClient' => new SshClient()
+    'ssh_client' => new SshClient()
 );
 
 EOD;

@@ -47,7 +47,7 @@ and extensions:
 
     return array(
         'envs' => $environments,
-        'sshClient' => new \Idephix\SSH\SshClient(),
+        'ssh_client' => new \Idephix\SSH\SshClient(),
         'extensions' => array(),
     );
 
