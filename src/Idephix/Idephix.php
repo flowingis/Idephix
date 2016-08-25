@@ -40,28 +40,36 @@ class Idephix implements Builder, TaskExecutor
     private $config;
     /** @var  Context */
     protected $context;
-    protected $invokerClassName;
 
     public function __construct(
         Config $config,
+        TaskCollection $tasks,
         OutputInterface $output = null,
         InputInterface $input = null)
     {
         $this->config = $config;
-        $this->context = Context::dry($this);
         $this->tasks = TaskCollection::dry();
         $this->extensionsMethods = MethodCollection::dry();
+
+        $sshClient = $config['ssh_client'];
+
+        $output = $this->outputOrDefault($output);
+        $input = $this->inputOrDefault($input);
 
         $this->application = new Application(
             'Idephix',
             self::VERSION,
-            self::RELEASE_DATE
-            );
+            self::RELEASE_DATE,
+            $output,
+            $input
+        );
 
-        $this->sshClient = $config['ssh_client'];
+        foreach ($tasks as $task) {
+            $this->application->addTask($task);
+        }
 
-        $this->output = $this->outputOrDefault($output);
-        $this->input = $this->inputOrDefault($input);
+        $this->operations = new Operations($sshClient, $output);
+        $this->context = Context::create($this, $config, $this->operations);
 
         $this->addSelfUpdateCommand();
         $this->addInitIdxFileCommand();
@@ -71,140 +79,16 @@ class Idephix implements Builder, TaskExecutor
         }
     }
 
-    public static function create(TaskCollection $tasks, Config $config)
+    public static function create(TaskCollection $tasks, Config $config, TaskExecutor $executor)
     {
-        $idephix = new static($config);
-
-        foreach ($tasks as $task) {
-            $idephix->addTask($task);
-        }
+        $idephix = new static($config, $tasks);
 
         return $idephix;
     }
 
-    public function output()
-    {
-        return $this->output;
-    }
-
-    public function __call($name, $arguments = array())
-    {
-        if ($this->has($name)) {
-            return call_user_func_array(array($this, 'execute'), array_merge(array($name), $arguments));
-        }
-
-        try {
-            return $this->extensionsMethods->execute($name, $arguments);
-        } catch (MissingMethodException $e) {
-            throw new \BadMethodCallException('Call to undefined method: "' . $name . '"');
-        }
-    }
-
-    public function __get($name)
-    {
-        if ($name === 'output' || $name === 'sshClient') {
-            return $this->$name;
-        }
-
-        $trace = debug_backtrace();
-        trigger_error(
-            'Undefined property: '.$name.
-            ' in '.$trace[0]['file'].
-            ' on line '.$trace[0]['line'],
-            E_USER_NOTICE
-        );
-
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function addTask(Task $task)
-    {
-        $this->tasks[] = $task;
-        $this->application->add(Command::fromTask($task, $this));
-
-        return $this;
-    }
-
-    /**
-     * @param InputInterface $input
-     * @throws \Exception
-     */
-    protected function buildEnvironment(InputInterface $input)
-    {
-        $environments = $this->config->environments();
-
-        $userDefinedEnv = $input->getParameterOption(array('--env'));
-
-        if (false !== $userDefinedEnv && !empty($userDefinedEnv)) {
-            if (!isset($environments[$userDefinedEnv])) {
-                throw new \Exception(
-                    sprintf(
-                        'Wrong environment "%s". Available [%s]',
-                        $userDefinedEnv,
-                        implode(', ', array_keys($environments))
-                    )
-                );
-            }
-
-            $this->context = Context::dry($this)
-                ->env(
-                    $userDefinedEnv,
-                    Dictionary::fromArray(
-                        array_merge(
-                            array('hosts' => array()),
-                            $environments[$userDefinedEnv]
-                        )
-                    )
-                );
-        }
-    }
-
-    protected function openRemoteConnection($host)
-    {
-        if (!is_null($host)) {
-            $this->sshClient->setParameters($this->context['ssh_params']);
-            $this->sshClient->setHost($host);
-            $this->sshClient->connect();
-        }
-    }
-
-    protected function closeRemoteConnection()
-    {
-        if ($this->sshClient->isConnected()) {
-            $this->sshClient->disconnect();
-        }
-    }
-
-    public function getContext()
-    {
-        return $this->context;
-    }
-
     public function run()
     {
-        try {
-            $this->buildEnvironment($this->input);
-        } catch (\Exception $e) {
-            $this->output->writeln('<error>'.$e->getMessage().'</error>');
-
-            return;
-        }
-
-        $hasErrors = false;
-        foreach ($this->context as $hostContext) {
-            $this->context = $hostContext;
-            $this->openRemoteConnection($hostContext->currentHost());
-            $returnValue = $this->application->run($this->input, $this->output);
-            $hasErrors = $hasErrors || !(is_null($returnValue) || ($returnValue == 0));
-            $this->closeRemoteConnection();
-        }
-
-        if ($hasErrors) {
-            throw new FailedCommandException();
-        }
+        $this->application->run($this->context);
     }
 
     /**
@@ -225,47 +109,6 @@ class Idephix implements Builder, TaskExecutor
         }
     }
 
-    /**
-     * @param $name
-     * @param $extension
-     * @deprecated should use addExtension instead
-     */
-    public function addLibrary($name, $extension)
-    {
-        $this->addExtension($name, $extension);
-    }
-
-    /**
-     * @param string $name
-     * @return bool
-     */
-    public function has($name)
-    {
-        return $this->tasks->has($name) && $this->application->has($name);
-    }
-
-    /**
-     * RunTask.
-     *
-     * @param string $name the name of the task you want to call
-     * @param (...)  arbitrary number of parameter matching the target task interface
-     * @return integer
-     * @deprecated should call directly tasks as Idephix methods
-     */
-    public function execute($name)
-    {
-        if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));
-        }
-
-        $inputFactory = new InputFactory();
-
-        return $this->application->get($name)->run(
-            $inputFactory->buildFromUserArgsForTask(func_get_args(), $this->tasks->get($name)),
-            $this->output
-        );
-    }
-
     public function addSelfUpdateCommand()
     {
         if ('phar:' === substr(__FILE__, 0, 5)) {
@@ -282,94 +125,6 @@ class Idephix implements Builder, TaskExecutor
         $this->addTask($init);
     }
 
-    /**
-     * Execute remote command.
-     *
-     * @param string $cmd command
-     * @param boolean $dryRun
-     * @throws \Exception
-     */
-    public function remote($cmd, $dryRun = false)
-    {
-        if (!$this->sshClient->isConnected()) {
-            throw new \Exception('Remote function need a valid environment. Specify --env parameter.');
-        }
-        $this->output->writeln('<info>Remote</info>: '.$cmd);
-
-        if (!$dryRun && !$this->sshClient->exec($cmd)) {
-            throw new \Exception('Remote command fail: '.$this->sshClient->getLastError());
-        }
-        $this->output->writeln($this->sshClient->getLastOutput());
-    }
-
-    /**
-     * Execute local command.
-     *
-     * @param string $cmd Command
-     * @param bool $dryRun
-     * @param int $timeout
-     *
-     * @return string the command output
-     * @throws \Exception
-     */
-    public function local($cmd, $dryRun = false, $timeout = 600)
-    {
-        $output = $this->output;
-        $output->writeln("<info>Local</info>: $cmd");
-
-        if ($dryRun) {
-            return $cmd;
-        }
-
-        $process = $this->buildInvoker($cmd, null, null, null, $timeout);
-
-        $result = $process->run(function ($type, $buffer) use ($output) {
-            $output->write($buffer);
-        });
-        if (0 != $result) {
-            throw new \Exception('Local command fail: '.$process->getErrorOutput());
-        }
-
-        return $process->getOutput();
-    }
-
-    /**
-     * Set local command invoker
-     * @param string $invokerClassName class name of the local command invoker
-     */
-    public function setInvoker($invokerClassName)
-    {
-        $this->invokerClassName = $invokerClassName;
-    }
-
-    /**
-     * Build command invoker
-     * @param string  $cmd     The command line to run
-     * @param string  $cwd     The working directory
-     * @param array   $env     The environment variables or null to inherit
-     * @param string  $stdin   The STDIN content
-     * @param integer $timeout The timeout in seconds
-     * @param array   $options An array of options for proc_open
-     *
-     * @return string cmd output
-     */
-    public function buildInvoker($cmd, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
-    {
-        $invoker = $this->invokerClassName ?: '\Symfony\Component\Process\Process';
-
-        return new $invoker($cmd, $cwd, $env, $stdin, $timeout, $options);
-    }
-
-    /**
-     * Get application
-     *
-     * @return Application
-     */
-    public function getApplication()
-    {
-        return $this->application;
-    }
-
     protected function removeIdxCustomFileParams()
     {
         while ($argument = current($_SERVER['argv'])) {
@@ -381,24 +136,6 @@ class Idephix implements Builder, TaskExecutor
 
             next($_SERVER['argv']);
         }
-    }
-
-    /**
-     * @return SshClient
-     */
-    public function sshClient()
-    {
-        return $this->sshClient;
-    }
-
-    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
-    {
-        $this->output()->write($messages, $newline, $type);
-    }
-
-    public function writeln($messages, $type = self::OUTPUT_NORMAL)
-    {
-        $this->output()->writeln($messages, $type);
     }
 
     /**

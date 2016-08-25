@@ -1,81 +1,54 @@
 <?php
 namespace Idephix;
 
-class Context implements DictionaryAccess, TaskExecutor, \Iterator
+class Context implements TaskExecutor
 {
-    private $idx;
-    private $data;
+    private $operations;
+    private $config;
 
-    public function __construct(Dictionary $data, TaskExecutor $idx)
+    private $currentEnv = null;
+
+    public function __construct(TaskExecutor $idx, Operations $op = null, Config $config = null)
     {
-        $this->data = $data;
         $this->idx = $idx;
+        $this->operations = $op;
+        $this->config = $config;
     }
 
-    public static function dry(TaskExecutor $idx)
+    public static function create(TaskExecutor $idx, Config $config, Operations $op)
     {
-        return new static(Dictionary::dry(), $idx);
+        return new static($idx, $config, $op);
     }
 
-    public function env($name, Dictionary $contextData)
+    public function setEnv($env)
     {
-        $context = clone $this;
-        $contextData['env'] = array('name' => $name);
-        $context->data = $contextData;
-
-        return $context;
+        $this->currentEnv = $env;
     }
 
-    public function currentEnvName()
+    public function getEnv()
     {
-        return $this->data['env.name'];
+        return $this->currentEnv;
     }
 
-    public function currentHost()
+    public function getHosts()
     {
-        return $this->data['env.host'];
+        return $this->config['envs'][$this->currentEnv]['hosts'];
     }
 
-    /**
-     * Add trailing slash to the path if it is omitted
-     *
-     * @param string $name
-     * @param string $default
-     * @return string fixed path
-     */
-    public function getAsPath($name, $default = '')
+    public function openRemoteConnection($host)
     {
-        return rtrim($this->get($name, $default), '/').'/';
+        if (!is_null($host)) {
+            $this->sshClient->setParameters($this->config['ssh_params']);
+            $this->sshClient->setHost($host);
+            $this->sshClient->connect();
+        }
     }
 
-    public function offsetExists($offset)
+    public function closeRemoteConnection()
     {
-        return $this->data->offsetExists($offset);
-    }
-
-    public function offsetGet($offset)
-    {
-        return $this->data->offsetGet($offset);
-    }
-
-    public function offsetSet($offset, $value)
-    {
-        $this->data->offsetSet($offset, $value);
-    }
-
-    public function offsetUnset($offset)
-    {
-        $this->data->offsetUnset($offset);
-    }
-
-    public function get($offset, $default = null)
-    {
-        return $this->data->get($offset, $default);
-    }
-
-    public function set($key, $value)
-    {
-        $this->data->offsetSet($key, $value);
+        if ($this->sshClient->isConnected()) {
+            $this->sshClient->disconnect();
+        }
     }
 
     /**
@@ -96,7 +69,7 @@ class Context implements DictionaryAccess, TaskExecutor, \Iterator
      */
     public function remote($cmd, $dryRun = false)
     {
-        $this->idx->remote($cmd, $dryRun);
+        $this->operations->remote($cmd, $dryRun);
     }
 
     /**
@@ -110,96 +83,28 @@ class Context implements DictionaryAccess, TaskExecutor, \Iterator
      */
     public function local($cmd, $dryRun = false, $timeout = 60)
     {
-        return $this->idx->local($cmd, $dryRun, $timeout);
+        return $this->operations->local($cmd, $dryRun, $timeout);
     }
 
     public function output()
     {
-        return $this->idx->output();
+        return $this->operations->output();
     }
 
     public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
     {
-        $this->idx->write($messages, $newline, $type);
+        $this->operations->write($messages, $newline, $type);
     }
 
     public function writeln($messages, $type = self::OUTPUT_NORMAL)
     {
-        $this->idx->writeln($messages, $type);
+        $this->operations->writeln($messages, $type);
     }
 
-    public function sshClient()
-    {
-        return $this->idx->sshClient();
-    }
 
     public function __call($name, $arguments)
     {
         return call_user_func_array(array($this->idx, $name), $arguments);
     }
 
-    /**
-     * Return the current element
-     * @link http://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
-     * @since 5.0.0
-     */
-    public function current()
-    {
-        $newContextData = clone $this->data;
-        $newContextData['env'] = array(
-            'name' => $this->currentEnvName(),
-            'host' => current($this->hosts)
-        );
-
-        $newContext = new static($newContextData, $this->idx);
-
-        return $newContext;
-    }
-
-    /**
-     * Move forward to next element
-     * @link http://php.net/manual/en/iterator.next.php
-     * @return void Any returned value is ignored.
-     * @since 5.0.0
-     */
-    public function next()
-    {
-        next($this->hosts);
-    }
-
-    /**
-     * Return the key of the current element
-     * @link http://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
-     * @since 5.0.0
-     */
-    public function key()
-    {
-        return key($this->hosts);
-    }
-
-    /**
-     * Checks if current position is valid
-     * @link http://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns true on success or false on failure.
-     * @since 5.0.0
-     */
-    public function valid()
-    {
-        return $this->key() !== null;
-    }
-
-    /**
-     * Rewind the Iterator to the first element
-     * @link http://php.net/manual/en/iterator.rewind.php
-     * @return void Any returned value is ignored.
-     * @since 5.0.0
-     */
-    public function rewind()
-    {
-        $this->hosts = $this->data->get('hosts', array(null));
-        reset($this->hosts);
-    }
 }

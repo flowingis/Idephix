@@ -47,7 +47,7 @@ class Config implements DictionaryAccess
                     throw new InvalidConfigurationException("Each env must be an array \"$envData\" given'");
                 }
 
-                $envData['hosts'] = empty($envData['hosts']) ? array(null) : $envData['hosts'];
+                $envData['hosts'] = empty($envData['hosts']) ? array() : $envData['hosts'];
 
                 $sshParamsResolver = new OptionsResolver();
                 $sshParamsResolver->setDefaults(
@@ -60,7 +60,7 @@ class Config implements DictionaryAccess
                         'ssh_port' => '22'
                     )
                 );
-                
+
                 $envData['ssh_params'] = $sshParamsResolver->resolve(
                     empty($envData['ssh_params']) ? array() : $envData['ssh_params']
                 );
@@ -84,7 +84,7 @@ class Config implements DictionaryAccess
         if (is_null($configFile)) {
             return static::dry();
         }
-        
+
         try {
             new \SplFileObject($configFile);
         } catch (\RuntimeException $e) {
@@ -134,6 +134,18 @@ class Config implements DictionaryAccess
     public function get($offset, $default = null)
     {
         return $this->dictionary->get($offset, $default);
+    }
+
+    /**
+     * Add trailing slash to the path if it is omitted
+     *
+     * @param string $name
+     * @param string $default
+     * @return string fixed path
+     */
+    public function getAsPath($name, $default = '')
+    {
+        return rtrim($this->get($name, $default), '/').'/';
     }
 
     public function set($key, $value)
