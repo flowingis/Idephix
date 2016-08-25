@@ -1,90 +1,91 @@
 <?php
 namespace Idephix;
 
-class Context implements DictionaryAccess, TaskExecutor, \Iterator
+use Symfony\Component\Console\Output\OutputInterface;
+
+class Context
 {
-    private $idx;
-    private $data;
+    private $operations;
+    private $config;
+    private $executor;
 
-    public function __construct(Dictionary $data, TaskExecutor $idx)
+    private $currentEnv = null;
+
+    public function __construct(TaskExecutor $executor, Operations $op = null, Config $config = null)
     {
-        $this->data = $data;
-        $this->idx = $idx;
+        $this->executor = $executor;
+        $this->operations = $op;
+        $this->config = $config;
     }
 
-    public static function dry(TaskExecutor $idx)
+    public static function create(TaskExecutor $executor, Config $config, Operations $op)
     {
-        return new static(Dictionary::dry(), $idx);
+        return new static($executor, $config, $op);
     }
 
-    public function env($name, Dictionary $contextData)
+    public function getConfig()
     {
-        $context = clone $this;
-        $contextData['env'] = array('name' => $name);
-        $context->data = $contextData;
-
-        return $context;
+        return $this->config;
     }
 
-    public function currentEnvName()
+    public function setEnv($env)
     {
-        return $this->data['env.name'];
+        $this->currentEnv = $env;
     }
 
-    public function currentHost()
+    public function getEnv()
     {
-        return $this->data['env.host'];
+        return $this->currentEnv;
     }
 
-    /**
-     * Add trailing slash to the path if it is omitted
-     *
-     * @param string $name
-     * @param string $default
-     * @return string fixed path
-     */
-    public function getAsPath($name, $default = '')
+    public function getHosts()
     {
-        return rtrim($this->get($name, $default), '/').'/';
+        $this->assertEnv();
+
+        return $this->config
+                    ->get("envs.{$this->currentEnv}.hosts");
     }
 
-    public function offsetExists($offset)
+    public function getCurrentHost()
     {
-        return $this->data->offsetExists($offset);
+        $this->assertEnv();
+
+        return $this->config
+                    ->get("envs.{$this->currentEnv}.hosts")
+                    ->current();
     }
 
-    public function offsetGet($offset)
+    public function getSshParams()
     {
-        return $this->data->offsetGet($offset);
+        $this->assertEnv();
+
+        return $this->config
+                    ->get("envs.{$this->currentEnv}.hosts")
+                    ->current();
     }
 
-    public function offsetSet($offset, $value)
+    public function openRemoteConnection($host)
     {
-        $this->data->offsetSet($offset, $value);
+        $this->assertEnv();
+
+        $sshParams = $this->config
+                          ->get("envs.{$this->currentEnv}.ssh_params");
+
+        $this->sshClient->setParameters($sshParams);
+        $this->sshClient->setHost($host);
+        $this->sshClient->connect();
     }
 
-    public function offsetUnset($offset)
+    public function closeRemoteConnection()
     {
-        $this->data->offsetUnset($offset);
+        if ($this->sshClient->isConnected()) {
+            $this->sshClient->disconnect();
+        }
     }
 
-    public function get($offset, $default = null)
+    public function __call($name, $arguments)
     {
-        return $this->data->get($offset, $default);
-    }
-
-    public function set($key, $value)
-    {
-        $this->data->offsetSet($key, $value);
-    }
-
-    /**
-     * @param $name
-     * @return integer 0 success, 1 fail
-     */
-    public function execute($name)
-    {
-        call_user_func_array(array($this->idx, 'execute'), func_get_args());
+        return $this->executor->runTask($name, $arguments);
     }
 
     /**
@@ -96,7 +97,7 @@ class Context implements DictionaryAccess, TaskExecutor, \Iterator
      */
     public function remote($cmd, $dryRun = false)
     {
-        $this->idx->remote($cmd, $dryRun);
+        $this->operations->remote($cmd, $dryRun);
     }
 
     /**
@@ -110,96 +111,28 @@ class Context implements DictionaryAccess, TaskExecutor, \Iterator
      */
     public function local($cmd, $dryRun = false, $timeout = 60)
     {
-        return $this->idx->local($cmd, $dryRun, $timeout);
+        return $this->operations->local($cmd, $dryRun, $timeout);
     }
 
     public function output()
     {
-        return $this->idx->output();
+        return $this->operations->output();
     }
 
-    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
+    public function write($messages, $newline = false, $type = OutputInterface::OUTPUT_NORMAL)
     {
-        $this->idx->write($messages, $newline, $type);
+        $this->operations->write($messages, $newline, $type);
     }
 
-    public function writeln($messages, $type = self::OUTPUT_NORMAL)
+    public function writeln($messages, $type = OutputInterface::OUTPUT_NORMAL)
     {
-        $this->idx->writeln($messages, $type);
+        $this->operations->writeln($messages, $type);
     }
 
-    public function sshClient()
+    private function assertEnv()
     {
-        return $this->idx->sshClient();
-    }
-
-    public function __call($name, $arguments)
-    {
-        return call_user_func_array(array($this->idx, $name), $arguments);
-    }
-
-    /**
-     * Return the current element
-     * @link http://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
-     * @since 5.0.0
-     */
-    public function current()
-    {
-        $newContextData = clone $this->data;
-        $newContextData['env'] = array(
-            'name' => $this->currentEnvName(),
-            'host' => current($this->hosts)
-        );
-
-        $newContext = new static($newContextData, $this->idx);
-
-        return $newContext;
-    }
-
-    /**
-     * Move forward to next element
-     * @link http://php.net/manual/en/iterator.next.php
-     * @return void Any returned value is ignored.
-     * @since 5.0.0
-     */
-    public function next()
-    {
-        next($this->hosts);
-    }
-
-    /**
-     * Return the key of the current element
-     * @link http://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
-     * @since 5.0.0
-     */
-    public function key()
-    {
-        return key($this->hosts);
-    }
-
-    /**
-     * Checks if current position is valid
-     * @link http://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns true on success or false on failure.
-     * @since 5.0.0
-     */
-    public function valid()
-    {
-        return $this->key() !== null;
-    }
-
-    /**
-     * Rewind the Iterator to the first element
-     * @link http://php.net/manual/en/iterator.rewind.php
-     * @return void Any returned value is ignored.
-     * @since 5.0.0
-     */
-    public function rewind()
-    {
-        $this->hosts = $this->data->get('hosts', array(null));
-        reset($this->hosts);
+        if (!$this->currentEnv) {
+            throw new \RunTimeException('Missing env param');
+        }
     }
 }

@@ -5,9 +5,9 @@ function _echo($value)
     echo $value;
 }
 
-function greet(\Idephix\Context $idx, $name)
+function greet(\Idephix\Context $ctx, $name)
 {
-    $idx->execute('echo', 'Ciao ' . $name);
+    $ctx->write('Ciao ' . $name);
 }
 
 function testParams($param1, $param2, $param3 = 'default')

@@ -2,23 +2,19 @@
 
 namespace Idephix\Extension\Slack;
 
-use Idephix\Extension;
+use Idephix\Extension\MethodProvider;
 use Idephix\Extension\MethodCollection;
-use Idephix\Idephix;
-use Idephix\Extension\IdephixAwareInterface;
-use Idephix\Task\TaskCollection;
+use Idephix\Extension\ContextAwareInterface;
+use Idephix\Context;
 
 /**
  * Description of Slack wrapper
  *
  * @author dymissy
  */
-class Slack implements IdephixAwareInterface, Extension
+class Slack implements ContextAwareInterface, MethodProvider
 {
-    /**
-     * @var \Idephix\Context
-     */
-    private $idx;
+    private $ctx;
 
     private $settings;
 
@@ -32,17 +28,6 @@ class Slack implements IdephixAwareInterface, Extension
         );
 
         $this->settings = array_merge($defaults, $args);
-    }
-
-    /** @return TaskCollection */
-    public function tasks()
-    {
-        return TaskCollection::dry();
-    }
-
-    public function name()
-    {
-        return 'slack';
     }
 
     public function sendToSlack($message, $attachments = array(), $channel = '', $icon_url = '', $username = '')
@@ -75,7 +60,7 @@ class Slack implements IdephixAwareInterface, Extension
             throw new \Exception('Unable to send the message to Slack. The error returned is: ' . $response);
         }
 
-        $this->idx->local("echo 'Message sent to slack channel'");
+        $this->ctx->local("echo 'Message sent to slack channel'");
 
         return $response;
     }
@@ -92,9 +77,14 @@ class Slack implements IdephixAwareInterface, Extension
         return $result;
     }
 
-    public function setIdephix(Idephix $idx)
+    public function setContext(Context $ctx)
     {
-        $this->idx = $idx;
+        $this->ctx = $ctx;
+    }
+
+    public function name()
+    {
+        return 'slack';
     }
 
     /** @return MethodCollection */

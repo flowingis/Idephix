@@ -1,15 +1,15 @@
 <?php
 namespace Idephix\Task\Builtin;
 
-use Idephix\Extension\IdephixAwareInterface;
-use Idephix\Idephix;
+use Idephix\Extension\ContextAwareInterface;
+use Idephix\Context;
 use Idephix\Task\Task;
 use Idephix\Task\Parameter\Collection;
 use Idephix\Task\Parameter\UserDefinedCollection;
 
-class InitIdxFile implements Task, IdephixAwareInterface
+class InitIdxFile implements Task, ContextAwareInterface
 {
-    private $idx;
+    private $ctx;
     private $baseDir;
     private $idxFileTemplate;
     private $idxRcTemplate;
@@ -59,9 +59,6 @@ class InitIdxFile implements Task, IdephixAwareInterface
         return array($this, 'initFile');
     }
 
-    /**
-     * Based by composer self-update
-     */
     public function initFile()
     {
         $this->initIdxFile();
@@ -84,7 +81,7 @@ class InitIdxFile implements Task, IdephixAwareInterface
     {
         $idxFile = $this->baseDir . DIRECTORY_SEPARATOR . $filename;
         if (file_exists($idxFile)) {
-            $this->idx->output->writeln("<error>An {$filename} already exists, generation skipped.</error>");
+            $this->ctx->writeln("<error>An {$filename} already exists, generation skipped.</error>");
 
             return;
         }
@@ -95,14 +92,11 @@ class InitIdxFile implements Task, IdephixAwareInterface
             throw new \Exception("Cannot write {$filename}, check your permission configuration.");
         }
 
-        $this->idx->output->writeln("{$filename} file created.");
+        $this->ctx->writeln("{$filename} file created.");
     }
 
-    /**
-     * @param Idephix $idx
-     */
-    public function setIdephix(Idephix $idx)
+    public function setContext(Context $ctx)
     {
-        $this->idx = $idx;
+        $this->ctx = $ctx;
     }
 }

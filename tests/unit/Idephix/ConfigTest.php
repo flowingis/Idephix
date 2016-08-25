@@ -8,6 +8,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function it_should_have_defaults_for_config()
     {
         $config = Config::dry();
+
         $this->assertInstanceOf('Idephix\SSH\SshClient', $config['ssh_client']);
         $this->assertEquals(array(), $config['envs']);
         $this->assertEquals(array(), $config['extensions']);
@@ -64,7 +65,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function an_env_should_have_default_values()
     {
         $defaultEnvData = array(
-            'hosts' => array(null),
+            'hosts' => new \ArrayIterator(),
             'ssh_params' => array(
                 'user' => '',
                 'password' => '',
@@ -76,9 +77,11 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         );
 
         $config = Config::fromArray(array('envs' => array('prod' => array())));
+
         $this->assertEquals($defaultEnvData, $config['envs.prod']);
 
         $config = Config::fromArray(array('envs' => array('prod' => array('hosts' => array()))));
+
         $this->assertEquals($defaultEnvData, $config['envs.prod']);
     }
 
@@ -162,5 +165,25 @@ EOD;
     {
         $configFile = '/tmp/foo-non-existing-file';
         Config::parseFile($configFile);
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_allow_to_retrieve_value_as_path()
+    {
+        $conf = array(
+            'envs' => array(
+                'prod' => array(
+                    'foo' => '/var/www/',
+                    'bar' => '/var/www',
+                )
+            )
+        );
+
+        $config = Config::fromArray($conf);
+
+        $this->assertEquals('/var/www/', $config->getAsPath('envs.prod.foo'));
+        $this->assertEquals('/var/www/', $config->getAsPath('envs.prod.bar'));
     }
 }
