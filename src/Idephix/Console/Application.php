@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Command\HelpCommand;
 use Idephix\Console\Command\ListCommand;
 
-class Application extends BaseApplication
+class Application extends BaseApplicatio implements TaskExecutor
 {
     private $logo = <<<'EOD'
 
@@ -95,13 +95,7 @@ EOD;
 
     public function run($context)
     {
-        try {
-            $this->buildEnvironment($context->getConfig(), $this->input);
-        } catch (\Exception $e) {
-            $this->output->writeln('<error>'.$e->getMessage().'</error>');
-
-            return;
-        }
+        $this->selectEnvironment($context->getConfig());
 
         $hasErrors = false;
         foreach ($context->getHosts() as $host) {
@@ -116,38 +110,41 @@ EOD;
         }
     }
 
-    public function __call($name, $arguments = array())
+    public function runTask($name, $arguments = array())
     {
         $inputFactory = new InputFactory();
 
-        return $this->get($name)->run(
-            $inputFactory->buildFromUserArgsForTask(func_get_args(), $this->tasks->get($name)),
-            $this->output
-        );
+        $input = $inputFactory->buildFromUserArgsForTask(
+            func_get_args(),
+            $this->tasks->get($name)
+        )
+
+        return $this->get($name)->run($input, $this->output);
     }
 
-    /**
-     * @param InputInterface $input
-     * @throws \Exception
-     */
-    protected function buildEnvironment($context, InputInterface $input)
+    protected function selectEnvironment($context)
     {
         $environments = $context->getConfig()->environments();
 
-        $userDefinedEnv = $input->getParameterOption(array('--env'));
-
-        if (false !== $userDefinedEnv && !empty($userDefinedEnv)) {
-            if (!isset($environments[$userDefinedEnv])) {
-                throw new \Exception(
-                    sprintf(
-                        'Wrong environment "%s". Available [%s]',
-                        $userDefinedEnv,
-                        implode(', ', array_keys($environments))
-                    )
-                );
-            }
-
-            $context->setEnv($userDefinedEnv);
+        if (!$this->input->hasParameterOption('--env')) {
+            return;
         }
+
+        $userDefinedEnv = $this->input->getParameterOption(array('--env'));
+
+        if (!isset($environments[$userDefinedEnv])) {
+            $msg = sprintf(
+                'Wrong environment "%s". Available [%s]',
+                $userDefinedEnv,
+                implode(', ', array_keys($environments))
+            );
+
+            $this->output
+                 ->writeln('<error>'.$msg.'</error>');
+
+            exit(1);
+        }
+
+        $context->setEnv($userDefinedEnv);
     }
 }

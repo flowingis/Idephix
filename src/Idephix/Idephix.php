@@ -19,25 +19,16 @@ use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Task\Builtin\SelfUpdate;
 use Idephix\Task\Builtin\InitIdxFile;
 
-/**
- * Class Idephix
- * @method InitIdxFile initIdxFile()
- * @method SelfUpdate selfUpdate()
- */
-class Idephix implements Builder, TaskExecutor
+class Idephix implements Builder
 {
     const VERSION = '@package_version@';
     const RELEASE_DATE = '@release_date@';
 
     private $application;
-    /** @var  TaskCollection */
-    private $tasks;
 
     private $extensionsMethods;
-    private $input;
-    private $output;
-    private $sshClient;
     private $config;
+
     /** @var  Context */
     protected $context;
 
@@ -51,8 +42,6 @@ class Idephix implements Builder, TaskExecutor
         $this->tasks = TaskCollection::dry();
         $this->extensionsMethods = MethodCollection::dry();
 
-        $sshClient = $config['ssh_client'];
-
         $output = $this->outputOrDefault($output);
         $input = $this->inputOrDefault($input);
 
@@ -64,22 +53,22 @@ class Idephix implements Builder, TaskExecutor
             $input
         );
 
+        $this->addSelfUpdateCommand();
+        $this->addInitIdxFileCommand();
+
         foreach ($tasks as $task) {
             $this->application->addTask($task);
         }
 
-        $this->operations = new Operations($sshClient, $output);
-        $this->context = Context::create($this, $config, $this->operations);
-
-        $this->addSelfUpdateCommand();
-        $this->addInitIdxFileCommand();
+        $operations = new Operations($config['ssh_client'], $output);
+        $this->context = Context::create($this->application, $config, $operations);
 
         foreach ($config->extensions() as $extension) {
             $this->addExtension($extension);
         }
     }
 
-    public static function create(TaskCollection $tasks, Config $config, TaskExecutor $executor)
+    public static function create(TaskCollection $tasks, Config $config)
     {
         $idephix = new static($config, $tasks);
 
@@ -114,7 +103,7 @@ class Idephix implements Builder, TaskExecutor
         if ('phar:' === substr(__FILE__, 0, 5)) {
             $selfUpdate = new SelfUpdate();
             $selfUpdate->setIdephix($this);
-            $this->addTask($selfUpdate);
+            $this->application->addTask($selfUpdate);
         }
     }
 
@@ -122,7 +111,7 @@ class Idephix implements Builder, TaskExecutor
     {
         $init = InitIdxFile::fromDeployRecipe();
         $init->setIdephix($this);
-        $this->addTask($init);
+        $this->application->addTask($init);
     }
 
     protected function removeIdxCustomFileParams()
@@ -139,19 +128,6 @@ class Idephix implements Builder, TaskExecutor
     }
 
     /**
-     * @param OutputInterface $output
-     * @return ConsoleOutput|OutputInterface
-     */
-    private function outputOrDefault(OutputInterface $output = null)
-    {
-        if (null === $output) {
-            $output = new ConsoleOutput();
-        }
-
-        return $output;
-    }
-
-    /**
      * @param InputInterface $input
      * @return ArgvInput|InputInterface
      */
@@ -164,5 +140,18 @@ class Idephix implements Builder, TaskExecutor
         }
 
         return $input;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return ConsoleOutput|OutputInterface
+     */
+    private function outputOrDefault(OutputInterface $output = null)
+    {
+        if (null === $output) {
+            $output = new ConsoleOutput();
+        }
+
+        return $output;
     }
 }

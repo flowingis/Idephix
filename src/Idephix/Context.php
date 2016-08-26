@@ -1,23 +1,24 @@
 <?php
 namespace Idephix;
 
-class Context implements TaskExecutor
+class Context
 {
     private $operations;
     private $config;
+    private $executor;
 
     private $currentEnv = null;
 
-    public function __construct(TaskExecutor $idx, Operations $op = null, Config $config = null)
+    public function __construct(TaskExecutor $executor, Operations $op = null, Config $config = null)
     {
-        $this->idx = $idx;
+        $this->executor = $executor;
         $this->operations = $op;
         $this->config = $config;
     }
 
-    public static function create(TaskExecutor $idx, Config $config, Operations $op)
+    public static function create(TaskExecutor $executor, Config $config, Operations $op)
     {
-        return new static($idx, $config, $op);
+        return new static($executor, $config, $op);
     }
 
     public function setEnv($env)
@@ -32,6 +33,8 @@ class Context implements TaskExecutor
 
     public function getHosts()
     {
+        //todo add check on currentEnv
+
         return $this->config['envs'][$this->currentEnv]['hosts'];
     }
 
@@ -51,13 +54,9 @@ class Context implements TaskExecutor
         }
     }
 
-    /**
-     * @param $name
-     * @return integer 0 success, 1 fail
-     */
-    public function execute($name)
+    public function __call($name, $arguments)
     {
-        call_user_func_array(array($this->idx, 'execute'), func_get_args());
+        return $this->executor->runTask($name, $arguments);
     }
 
     /**
@@ -99,12 +98,6 @@ class Context implements TaskExecutor
     public function writeln($messages, $type = self::OUTPUT_NORMAL)
     {
         $this->operations->writeln($messages, $type);
-    }
-
-
-    public function __call($name, $arguments)
-    {
-        return call_user_func_array(array($this->idx, $name), $arguments);
     }
 
 }

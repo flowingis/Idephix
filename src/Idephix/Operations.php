@@ -17,7 +17,7 @@ class Operations
     protected function openRemoteConnection($host, $params)
     {
         if (!is_null($host)) {
-            $this->sshClient->setParameters($params);
+            $this->sshClient->setParameters($this->context['ssh_params']);
             $this->sshClient->setHost($host);
             $this->sshClient->connect();
         }
