@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Command\HelpCommand;
 use Idephix\Console\Command\ListCommand;
 
-class Application extends BaseApplicatio implements TaskExecutor
+class Application extends BaseApplication implements TaskExecutor
 {
     private $logo = <<<'EOD'
 
