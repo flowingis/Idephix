@@ -45,8 +45,8 @@ class Idephix implements Builder
             'Idephix',
             self::VERSION,
             self::RELEASE_DATE,
-            $output,
-            $input
+            $input,
+            $output
         );
 
         $this->context = new Context($this->executor, $operations, $config);
@@ -57,10 +57,9 @@ class Idephix implements Builder
             $this->addTask($task);
         }
 
-
-        // foreach ($config->extensions() as $extension) {
-        //     $this->addExtension($extension);
-        // }
+        foreach ($config->extensions() as $extension) {
+            $this->addExtension($extension, $this->context);
+        }
     }
 
     public static function create(TaskCollection $tasks, Config $config)
@@ -72,30 +71,27 @@ class Idephix implements Builder
 
     public function run()
     {
-        $this->executor->run($this->context);
+        $this->executor->runContext($this->context);
     }
 
     public function addTask(Task $task)
     {
-        $this->executor->addTask($task);
+        $this->executor->addTask($task, $this->context);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function addExtension(Extension $extension)
     {
-        //     if ($extension instanceof IdephixAwareInterface) {
-    //         $extension->setIdephix($this);
-    //     }
+        if ($extension instanceof ContextAwareInterface) {
+            $extension->setContext($this->context);
+        }
 
     //     $this->extensionsMethods = $this->extensionsMethods->merge($extension->methods());
 
-    //     foreach ($extension->tasks() as $task) {
-    //         if (!$this->has($task->name())) {
-    //             $this->addTask($task);
-    //         }
-    //     }
+        foreach ($extension->tasks() as $task) {
+            if (!$this->has($task->name())) {
+                $this->addTask($task, $this->context);
+            }
+        }
     }
 
     public function addSelfUpdateCommand($ctx)
@@ -104,7 +100,7 @@ class Idephix implements Builder
             $selfUpdate = new SelfUpdate();
             $selfUpdate->setContext($ctx);
 
-            $this->executor->addTask($selfUpdate);
+            $this->executor->addTask($selfUpdate, $ctx);
         }
     }
 
@@ -113,7 +109,7 @@ class Idephix implements Builder
         $init = InitIdxFile::fromDeployRecipe();
         $init->setContext($ctx);
 
-        $this->executor->addTask($init);
+        $this->executor->addTask($init, $ctx);
     }
 
     protected function removeIdxCustomFileParams()

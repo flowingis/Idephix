@@ -65,7 +65,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function an_env_should_have_default_values()
     {
         $defaultEnvData = array(
-            'hosts' => array(null),
+            'hosts' => new \ArrayIterator(),
             'ssh_params' => array(
                 'user' => '',
                 'password' => '',

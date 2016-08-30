@@ -23,6 +23,11 @@ class Context
         return new static($executor, $config, $op);
     }
 
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
     public function setEnv($env)
     {
         $this->currentEnv = $env;

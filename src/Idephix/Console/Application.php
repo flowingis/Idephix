@@ -4,6 +4,9 @@ namespace Idephix\Console;
 
 use Idephix\Context;
 use Idephix\TaskExecutor;
+use Idephix\Task\Task;
+use Idephix\Task\TaskCollection;
+use Idephix\Exception\FailedCommandException;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Command\HelpCommand;
@@ -42,6 +45,8 @@ EOD;
 
         $this->input = $input;
         $this->output = $output;
+        $this->tasks = TaskCollection::dry();
+
         $this->releaseDate = $releaseDate;
 
         $this->setAutoExit(false);
@@ -78,35 +83,43 @@ EOD;
         return array(new HelpCommand(), new ListCommand());
     }
 
-    public function addTask(Task $task)
+    public function addTask(Task $task, Context $ctx)
     {
         $this->tasks[] = $task;
-        $this->add(Command::fromTask($task, $this));
+        $this->add(Command::fromTask($task, $ctx));
 
         return $this;
     }
 
-    /**
-     * @param string $name
-     * @return bool
-     */
     public function hasTask($name)
     {
         return $this->tasks->has($name) && $this->has($name);
     }
 
-    public function run(Context $ctx)
+    public function runContext(Context $ctx)
     {
-        $this->selectEnvironment($ctx->getConfig());
+        $this->selectEnvironment($ctx);
 
-        if ($ctx->getHosts()->count() == 0) {
-            return $this->runNoHost();
+        if (!$ctx->getEnv()) {
+            return $this->runNoEnv();
         }
 
-        return $this->runHost($ctx);
+        return $this->runEnv($ctx);
     }
 
-    private function runNoHost()
+    public function runTask($name, $arguments = array())
+    {
+        $inputFactory = new InputFactory();
+
+        $input = $inputFactory->buildFromUserArgsForTask(
+            func_get_args(),
+            $this->tasks->get($name)
+        );
+
+        return $this->get($name)->run($input, $this->output);
+    }
+
+    private function runNoEnv()
     {
         $returnValue = $this->run($this->input, $this->output);
 
@@ -117,7 +130,7 @@ EOD;
         }
     }
 
-    private function runHost(Context $ctx)
+    private function runEnv(Context $ctx)
     {
         $hosts = $ctx->getHosts();
 
@@ -137,19 +150,7 @@ EOD;
         }
     }
 
-    public function runTask($name, $arguments = array())
-    {
-        $inputFactory = new InputFactory();
-
-        $input = $inputFactory->buildFromUserArgsForTask(
-            func_get_args(),
-            $this->tasks->get($name)
-        );
-
-        return $this->get($name)->run($input, $this->output);
-    }
-
-    protected function selectEnvironment($context)
+    protected function selectEnvironment(Context $context)
     {
         $environments = $context->getConfig()->environments();
 

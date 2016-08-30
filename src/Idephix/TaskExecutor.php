@@ -3,7 +3,7 @@ namespace Idephix;
 
 interface TaskExecutor
 {
-    public function run(Context $ctx);
+    public function runContext(Context $ctx);
 
     public function runTask($name, $arguments = array());
 
