@@ -1,11 +1,11 @@
 <?php
 namespace Idephix;
 
-use Idephix\Task\Task;
-
 interface TaskExecutor
 {
-    public function run($name, $arguments = array());
+    public function run(Context $ctx);
 
-    public function has($name);
+    public function runTask($name, $arguments = array());
+
+    public function hasTask($name);
 }

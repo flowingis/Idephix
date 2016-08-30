@@ -2,6 +2,8 @@
 
 namespace Idephix\Console;
 
+use Idephix\Context;
+use Idephix\TaskExecutor;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Command\HelpCommand;
@@ -88,21 +90,46 @@ EOD;
      * @param string $name
      * @return bool
      */
-    public function has($name)
+    public function hasTask($name)
     {
         return $this->tasks->has($name) && $this->has($name);
     }
 
-    public function run($context)
+    public function run(Context $ctx)
     {
-        $this->selectEnvironment($context->getConfig());
+        $this->selectEnvironment($ctx->getConfig());
+
+        if ($ctx->getHosts()->count() == 0) {
+            return $this->runNoHost();
+        }
+
+        return $this->runHost($ctx);
+    }
+
+    private function runNoHost()
+    {
+        $returnValue = $this->run($this->input, $this->output);
+
+        $hasErrors = !(is_null($returnValue) || ($returnValue == 0));
+
+        if ($hasErrors) {
+            throw new FailedCommandException();
+        }
+    }
+
+    private function runHost(Context $ctx)
+    {
+        $hosts = $ctx->getHosts();
 
         $hasErrors = false;
-        foreach ($context->getHosts() as $host) {
-            $context->openRemoteConnection($host);
+
+        while ($hosts->isValid()) {
+            $ctx->openRemoteConnection($hosts->current());
             $returnValue = $this->run($this->input, $this->output);
             $hasErrors = $hasErrors || !(is_null($returnValue) || ($returnValue == 0));
-            $context->closeRemoteConnection();
+            $ctx->closeRemoteConnection();
+
+            $hosts->next();
         }
 
         if ($hasErrors) {
@@ -117,7 +144,7 @@ EOD;
         $input = $inputFactory->buildFromUserArgsForTask(
             func_get_args(),
             $this->tasks->get($name)
-        )
+        );
 
         return $this->get($name)->run($input, $this->output);
     }

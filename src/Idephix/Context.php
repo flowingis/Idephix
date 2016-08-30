@@ -1,6 +1,8 @@
 <?php
 namespace Idephix;
 
+use Symfony\Component\Console\Output\OutputInterface;
+
 class Context
 {
     private $operations;
@@ -33,18 +35,40 @@ class Context
 
     public function getHosts()
     {
-        //todo add check on currentEnv
+        $this->assertEnv();
 
-        return $this->config['envs'][$this->currentEnv]['hosts'];
+        return $this->config
+                    ->get("envs.{$this->currentEnv}.hosts");
+    }
+
+    public function getCurrentHost()
+    {
+        $this->assertEnv();
+
+        return $this->config
+                    ->get("envs.{$this->currentEnv}.hosts")
+                    ->current();
+    }
+
+    public function getSshParams()
+    {
+        $this->assertEnv();
+
+        return $this->config
+                    ->get("envs.{$this->currentEnv}.hosts")
+                    ->current();
     }
 
     public function openRemoteConnection($host)
     {
-        if (!is_null($host)) {
-            $this->sshClient->setParameters($this->config['ssh_params']);
-            $this->sshClient->setHost($host);
-            $this->sshClient->connect();
-        }
+        $this->assertEnv();
+
+        $sshParams = $this->config
+                          ->get("envs.{$this->currentEnv}.ssh_params");
+
+        $this->sshClient->setParameters($sshParams);
+        $this->sshClient->setHost($host);
+        $this->sshClient->connect();
     }
 
     public function closeRemoteConnection()
@@ -90,14 +114,20 @@ class Context
         return $this->operations->output();
     }
 
-    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
+    public function write($messages, $newline = false, $type = OutputInterface::OUTPUT_NORMAL)
     {
         $this->operations->write($messages, $newline, $type);
     }
 
-    public function writeln($messages, $type = self::OUTPUT_NORMAL)
+    public function writeln($messages, $type = OutputInterface::OUTPUT_NORMAL)
     {
         $this->operations->writeln($messages, $type);
     }
 
+    private function assertEnv()
+    {
+        if (!$this->currentEnv) {
+            throw new \RunTimeException('Missing env param');
+        }
+    }
 }

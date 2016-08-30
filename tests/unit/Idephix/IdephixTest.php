@@ -32,18 +32,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error
-     * @expectedExceptionMessage Undefined property: application in
-     */
-    public function test__get()
-    {
-        $this->assertInstanceOf('\Idephix\SSH\SshClient', $this->idx->sshClient);
-        $this->assertInstanceOf('\Symfony\Component\Console\Output\OutputInterface', $this->idx->output);
-
-        $this->idx->application;
-    }
-
-    /**
      * @test
      */
     public function it_should_be_able_to_add_task_from_closure()
@@ -65,6 +53,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     public function it_should_be_able_to_add_task_from_object()
     {
         $task = new CallableTask('fooCommand', 'A dummy command', function () {}, Parameter\Collection::dry());
+
         $this->idx->addTask($task);
 
         $this->assertTrue($this->idx->has('fooCommand'));

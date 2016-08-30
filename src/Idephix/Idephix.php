@@ -3,19 +3,15 @@
 namespace Idephix;
 
 use Idephix\Console\Application;
-use Idephix\Console\Command;
-use Idephix\Console\InputFactory;
-use Idephix\Exception\FailedCommandException;
-use Idephix\Exception\MissingMethodException;
 use Idephix\Extension\MethodCollection;
-use Idephix\Task\Task;
 use Idephix\Task\TaskCollection;
+use Idephix\Task\Task;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Idephix\SSH\SshClient;
 use Idephix\Extension\IdephixAwareInterface;
+
 use Idephix\Task\Builtin\SelfUpdate;
 use Idephix\Task\Builtin\InitIdxFile;
 
@@ -24,7 +20,7 @@ class Idephix implements Builder
     const VERSION = '@package_version@';
     const RELEASE_DATE = '@release_date@';
 
-    private $application;
+    private $executor;
 
     private $extensionsMethods;
     private $config;
@@ -38,14 +34,14 @@ class Idephix implements Builder
         OutputInterface $output = null,
         InputInterface $input = null)
     {
-        $this->config = $config;
-        $this->tasks = TaskCollection::dry();
-        $this->extensionsMethods = MethodCollection::dry();
-
         $output = $this->outputOrDefault($output);
         $input = $this->inputOrDefault($input);
 
-        $this->application = new Application(
+        $this->config = $config;
+        $this->extensionsMethods = MethodCollection::dry();
+        $operations = new Operations($config['ssh_client'], $output);
+
+        $this->executor = new Application(
             'Idephix',
             self::VERSION,
             self::RELEASE_DATE,
@@ -53,19 +49,18 @@ class Idephix implements Builder
             $input
         );
 
-        $this->addSelfUpdateCommand();
-        $this->addInitIdxFileCommand();
+        $this->context = new Context($this->executor, $operations, $config);
+        $this->addSelfUpdateCommand($this->context);
+        $this->addInitIdxFileCommand($this->context);
 
         foreach ($tasks as $task) {
-            $this->application->addTask($task);
+            $this->addTask($task);
         }
 
-        $operations = new Operations($config['ssh_client'], $output);
-        $this->context = Context::create($this->application, $config, $operations);
 
-        foreach ($config->extensions() as $extension) {
-            $this->addExtension($extension);
-        }
+        // foreach ($config->extensions() as $extension) {
+        //     $this->addExtension($extension);
+        // }
     }
 
     public static function create(TaskCollection $tasks, Config $config)
@@ -77,7 +72,12 @@ class Idephix implements Builder
 
     public function run()
     {
-        $this->application->run($this->context);
+        $this->executor->run($this->context);
+    }
+
+    public function addTask(Task $task)
+    {
+        $this->executor->addTask($task);
     }
 
     /**
@@ -85,33 +85,35 @@ class Idephix implements Builder
      */
     public function addExtension(Extension $extension)
     {
-        if ($extension instanceof IdephixAwareInterface) {
-            $extension->setIdephix($this);
-        }
+        //     if ($extension instanceof IdephixAwareInterface) {
+    //         $extension->setIdephix($this);
+    //     }
 
-        $this->extensionsMethods = $this->extensionsMethods->merge($extension->methods());
+    //     $this->extensionsMethods = $this->extensionsMethods->merge($extension->methods());
 
-        foreach ($extension->tasks() as $task) {
-            if (!$this->has($task->name())) {
-                $this->addTask($task);
-            }
-        }
+    //     foreach ($extension->tasks() as $task) {
+    //         if (!$this->has($task->name())) {
+    //             $this->addTask($task);
+    //         }
+    //     }
     }
 
-    public function addSelfUpdateCommand()
+    public function addSelfUpdateCommand($ctx)
     {
         if ('phar:' === substr(__FILE__, 0, 5)) {
             $selfUpdate = new SelfUpdate();
-            $selfUpdate->setIdephix($this);
-            $this->application->addTask($selfUpdate);
+            $selfUpdate->setContext($ctx);
+
+            $this->executor->addTask($selfUpdate);
         }
     }
 
-    public function addInitIdxFileCommand()
+    public function addInitIdxFileCommand($ctx)
     {
         $init = InitIdxFile::fromDeployRecipe();
-        $init->setIdephix($this);
-        $this->application->addTask($init);
+        $init->setContext($ctx);
+
+        $this->executor->addTask($init);
     }
 
     protected function removeIdxCustomFileParams()

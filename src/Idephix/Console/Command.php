@@ -1,9 +1,9 @@
 <?php
 namespace Idephix\Console;
 
-use Idephix\TaskExecutor;
 use Idephix\Task\Parameter;
 use Idephix\Task\Task;
+use Idephix\Context;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,22 +12,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Command extends SymfonyCommand
 {
-    private $idxTaskCode;
-    /** @var  TaskExecutor */
-    private $idx;
-    /** @var  Task */
     private $task;
 
-    /**
-     * @param Task $task
-     * @param TaskExecutor $idx
-     * @return Command
-     */
-    public static function fromTask(Task $task, TaskExecutor $idx)
+    private $ctx;
+
+    public static function fromTask(Task $task, Context $ctx)
     {
         $command = new static($task->name());
         $command->task = $task;
-        $command->idx = $idx;
+        $command->ctx = $ctx;
 
         $command->setDescription($task->description());
 
@@ -51,14 +44,15 @@ class Command extends SymfonyCommand
             );
         }
 
-        $command->idxTaskCode = $task->code();
-
         return $command;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return call_user_func_array($this->idxTaskCode, $this->extractArgumentsFrom($input));
+        return call_user_func_array(
+            $this->task->code(),
+            $this->extractArgumentsFrom($input)
+        );
     }
 
     /**
@@ -78,7 +72,7 @@ class Command extends SymfonyCommand
         /** @var Parameter\UserDefined $parameter */
         foreach ($this->task->parameters() as $parameter) {
             if ($parameter instanceof Parameter\Context) {
-                $args[] = $this->idx->getContext();
+                $args[] = $this->ctx;
                 continue;
             }
 

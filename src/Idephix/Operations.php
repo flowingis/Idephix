@@ -2,6 +2,8 @@
 
 namespace Idephix;
 
+use Symfony\Component\Console\Output\OutputInterface;
+
 class Operations
 {
     private $sshClient;
@@ -17,7 +19,7 @@ class Operations
     protected function openRemoteConnection($host, $params)
     {
         if (!is_null($host)) {
-            $this->sshClient->setParameters($this->context['ssh_params']);
+            $this->sshClient->setParameters($params);
             $this->sshClient->setHost($host);
             $this->sshClient->connect();
         }
@@ -108,14 +110,13 @@ class Operations
         return new $invoker($cmd, $cwd, $env, $stdin, $timeout, $options);
     }
 
-    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
+    public function write($messages, $newline = false, $type = OutputInterface::OUTPUT_NORMAL)
     {
         $this->output->write($messages, $newline, $type);
     }
 
-    public function writeln($messages, $type = self::OUTPUT_NORMAL)
+    public function writeln($messages, $type = OutputInterface::OUTPUT_NORMAL)
     {
         $this->output->writeln($messages, $type);
     }
-
 }

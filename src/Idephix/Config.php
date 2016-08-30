@@ -20,7 +20,7 @@ class Config implements DictionaryAccess
         $this->dictionary = $dictionary;
     }
 
-    public static function fromArray($data)
+    public static function fromArray(array $data)
     {
         $resolver = new OptionsResolver();
         $resolver->setDefaults(array(
@@ -47,7 +47,11 @@ class Config implements DictionaryAccess
                     throw new InvalidConfigurationException("Each env must be an array \"$envData\" given'");
                 }
 
-                $envData['hosts'] = empty($envData['hosts']) ? array() : $envData['hosts'];
+                if (empty($envData['hosts'])) {
+                    $envData['hosts'] = new \ArrayIterator();
+                } else {
+                    $envData['hosts'] = new \ArrayIterator($envData['hosts']);
+                }
 
                 $sshParamsResolver = new OptionsResolver();
                 $sshParamsResolver->setDefaults(

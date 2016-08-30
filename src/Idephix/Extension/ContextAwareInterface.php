@@ -6,5 +6,5 @@ use Idephix\Context;
 
 interface ContextAwareInterface
 {
-    public function setContext(Context $idx);
+    public function setContext(Context $ctx);
 }
