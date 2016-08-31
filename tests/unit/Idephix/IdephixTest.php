@@ -36,15 +36,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $tasks = TaskCollection::dry();
 
         $this->idx = new Idephix($config, $tasks, $output);
-
-        $this->context = $this->prophesize('\Idephix\Context');
-        $this->executor = new Application(
-            null,
-            null,
-            null,
-            $input,
-            $output
-        );
     }
 
     /**
@@ -52,56 +43,27 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
      *
      * @todo  move to TaskExecutor test
      */
-    public function it_should_be_able_to_add_task_from_closure()
-    {
-        $task = CallableTask::buildFromClosure('commandName', function () {});
-
-        $this->executor->addTask($task, $this->context->reveal());
-
-        $this->assertTrue($this->executor->has('commandName'));
-    }
-
-    /**
-     * @test
-     *
-     * @todo  move to TaskExecutor test
-     */
-    public function it_should_be_able_to_add_task_from_object()
-    {
-        $task = new CallableTask('fooCommand', 'A dummy command', function () {}, Parameter\Collection::dry());
-
-        $this->executor->addTask($task, $this->context->reveal());
-
-        $this->assertTrue($this->executor->has('fooCommand'));
-
-        $registeredCommands = $this->executor->all();
-
-        $this->assertArrayHasKey('fooCommand', $registeredCommands);
-        $this->assertInstanceOf('\Idephix\Console\Command', $registeredCommands['fooCommand']);
-        $this->assertEquals('fooCommand', $registeredCommands['fooCommand']->getName());
-    }
-
-    /**
-     * @test
-     *
-     * @todo  move to TaskExecutor test
-     */
-    public function it_should_allow_to_invoke_tasks()
+    public function it_should_allow_to_define_custom_timeout()
     {
         $task = CallableTask::buildFromClosure(
-                'test',
-                function (Context $idx, $what, $go = false) {
-                    if ($go) {
-                        return $what * 2;
-                    }
-                    return 0;
+                'foo',
+                function (Context $ctx) {
+                    $ctx->local('sleep 2', false, 1);
                 }
         );
 
+        $this->context->local('sleep 2', false, 1)->shouldBeCalled();
+
         $this->executor->addTask($task, $this->context->reveal());
 
-        $this->assertEquals(84, $this->executor->runTask('test', array(42, true)));
-        $this->assertEquals(0, $this->executor->runTask('test', array(42)));
+
+        try {
+            $this->executor->runTask('foo', array());
+        } catch (FailedCommandException $e) {
+
+        }
+
+        $this->fail();
     }
 
     public function getArgvAndTargets()
@@ -165,82 +127,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, stream_get_contents($output));
     }
-
-    /** @test */
-    public function it_should_inject_context_to_task()
-    {
-        $idx = new Idephix(
-            Config::fromArray(array(
-                Config::SSHCLIENT => new SshClient(new StubProxy()),
-                Config::ENVS => array(
-                'prod' => array(
-                    'hosts' => array('127.0.0.1'),
-                    'ssh_params' => array('user' => 'ftassi'),
-                    'foo' => 'bar'
-                )
-            ))),
-            new StreamOutput(fopen('php://memory', 'r+')),
-            new StringInput('myTask --env=prod')
-        );
-
-        $spy = new \stdClass();
-        $idx->addTask(
-            CallableTask::buildFromClosure(
-                'myTask',
-                function (Context $context) use ($spy) {
-                    $spy->args = func_get_args();
-                }
-            )
-        );
-
-        $idx->run();
-
-        /** @var Context $context */
-        $context = $spy->args[0];
-
-        $this->assertInstanceOf('\Idephix\Context', $context);
-        $this->assertEquals('bar', $context['foo']);
-        $this->assertEquals('prod', $context['env.name']);
-        $this->assertEquals('127.0.0.1', $context['env.host']);
-    }
-
-    /**
-     * @test
-     *
-     * @todo  move to TaskExecutor test
-     */
-    public function it_should_allow_to_define_custom_timeout()
-    {
-        $output = fopen('php://memory', 'r+');
-        $idx = new Idephix(
-            Config::dry(),
-            new StreamOutput($output),
-            new StringInput('foo')
-        );
-
-        $idx->getApplication()->setAutoExit(false);
-
-        $idx->addTask(
-            CallableTask::buildFromClosure(
-                'foo',
-                function (Context $idx) {
-                    $idx->local('sleep 2', false, 1);
-                }
-            )
-        );
-
-        try {
-            $idx->run();
-        } catch (FailedCommandException $e) {
-            // do nothing, is expected to fail
-        }
-
-        rewind($output);
-
-        $this->assertContains('ProcessTimedOutException', stream_get_contents($output));
-    }
-
-
 
     /**
      * @test
