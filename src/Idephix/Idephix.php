@@ -4,6 +4,8 @@ namespace Idephix;
 
 use Idephix\Console\Application;
 use Idephix\Extension\MethodCollection;
+use Idephix\Extension\TaskProvider;
+use Idephix\Extension\MethodProvider;
 use Idephix\Task\TaskCollection;
 use Idephix\Task\Task;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,9 +25,9 @@ class Idephix implements Builder
     private $executor;
 
     private $extensionsMethods;
+
     private $config;
 
-    /** @var  Context */
     protected $context;
 
     public function __construct(
@@ -50,6 +52,7 @@ class Idephix implements Builder
         );
 
         $this->context = new Context($this->executor, $operations, $config);
+
         $this->addSelfUpdateCommand($this->context);
         $this->addInitIdxFileCommand($this->context);
 
@@ -60,13 +63,6 @@ class Idephix implements Builder
         foreach ($config->extensions() as $extension) {
             $this->addExtension($extension, $this->context);
         }
-    }
-
-    public static function create(TaskCollection $tasks, Config $config)
-    {
-        $idephix = new static($config, $tasks);
-
-        return $idephix;
     }
 
     public function run()
@@ -85,12 +81,14 @@ class Idephix implements Builder
             $extension->setContext($this->context);
         }
 
-    //     $this->extensionsMethods = $this->extensionsMethods->merge($extension->methods());
-
-        foreach ($extension->tasks() as $task) {
-            if (!$this->has($task->name())) {
+        if ($extension instanceof TaskProvider) {
+            foreach ($extension->tasks() as $task) {
                 $this->addTask($task, $this->context);
             }
+        }
+
+        if ($extension instanceof MethodProvider) {
+            $this->operations->addMethods($extension->methods());
         }
     }
 

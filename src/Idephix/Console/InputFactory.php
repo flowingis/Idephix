@@ -13,9 +13,10 @@ class InputFactory
      */
     public function buildFromUserArgsForTask($arguments, Task $task)
     {
-        $defaultArguments = array('command' => null);
+        // $defaultArguments = array('command' => null);
 
         foreach ($task->userDefinedParameters() as $parameter) {
+
             if ($parameter->isFlagOption()) {
                 $defaultArguments['--' . $parameter->name()] = $parameter->defaultValue();
             } else {

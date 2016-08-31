@@ -112,7 +112,7 @@ EOD;
         $inputFactory = new InputFactory();
 
         $input = $inputFactory->buildFromUserArgsForTask(
-            func_get_args(),
+            $arguments,
             $this->tasks->get($name)
         );
 

@@ -25,6 +25,7 @@ class ExtensionTest extends \PHPUnit_Framework_TestCase
     public function it_should_register_extensions_from_config()
     {
         $extension = new DummyExtension($this, 'deploy');
+
         $idx = new Idephix(
             Config::fromArray(
                 array(
