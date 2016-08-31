@@ -3,12 +3,15 @@ namespace Idephix;
 
 use Idephix\Exception\FailedCommandException;
 use Idephix\SSH\SshClient;
+use Idephix\Task\TaskCollection;
 use Idephix\Task\Parameter;
 use Idephix\Task\CallableTask;
 use Idephix\Test\SSH\StubProxy;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Input\StringInput;
+
+use Idephix\Console\Application;
 
 class IdephixTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,46 +25,83 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->output = fopen('php://memory', 'r+');
-        $output = new StreamOutput($this->output);
 
-        $this->idx = new Idephix(
-            Config::fromArray(
-                array('envs' => array(), 'ssh_client' => new SSH\SshClient(new Test\SSH\StubProxy()))
-            ), $output
+        $output = new StreamOutput($this->output);
+        $input = new StringInput('');
+
+        $config = Config::fromArray(array(
+            'envs' => array(),
+            'ssh_client' => new SSH\SshClient(new Test\SSH\StubProxy()))
+        );
+        $tasks = TaskCollection::dry();
+
+        $this->idx = new Idephix($config, $tasks, $output);
+
+        $this->context = $this->prophesize('\Idephix\Context');
+        $this->executor = new Application(
+            null,
+            null,
+            null,
+            $input,
+            $output
         );
     }
 
     /**
      * @test
+     *
+     * @todo  move to TaskExecutor test
      */
     public function it_should_be_able_to_add_task_from_closure()
     {
-        $this->idx->addTask(
-            CallableTask::buildFromClosure(
-                'commandName',
-                function () {
-                }
-            )
-        );
+        $task = CallableTask::buildFromClosure('commandName', function () {});
 
-        $this->assertTrue($this->idx->has('commandName'));
+        $this->executor->addTask($task, $this->context->reveal());
+
+        $this->assertTrue($this->executor->has('commandName'));
     }
 
     /**
      * @test
+     *
+     * @todo  move to TaskExecutor test
      */
     public function it_should_be_able_to_add_task_from_object()
     {
         $task = new CallableTask('fooCommand', 'A dummy command', function () {}, Parameter\Collection::dry());
 
-        $this->idx->addTask($task);
+        $this->executor->addTask($task, $this->context->reveal());
 
-        $this->assertTrue($this->idx->has('fooCommand'));
+        $this->assertTrue($this->executor->has('fooCommand'));
 
-        $registeredCommands = $this->idx->getApplication()->all();
+        $registeredCommands = $this->executor->all();
+
         $this->assertArrayHasKey('fooCommand', $registeredCommands);
         $this->assertInstanceOf('\Idephix\Console\Command', $registeredCommands['fooCommand']);
         $this->assertEquals('fooCommand', $registeredCommands['fooCommand']->getName());
+    }
+
+    /**
+     * @test
+     *
+     * @todo  move to TaskExecutor test
+     */
+    public function it_should_allow_to_invoke_tasks()
+    {
+        $task = CallableTask::buildFromClosure(
+                'test',
+                function (Context $idx, $what, $go = false) {
+                    if ($go) {
+                        return $what * 2;
+                    }
+                    return 0;
+                }
+        );
+
+        $this->executor->addTask($task, $this->context->reveal());
+
+        $this->assertEquals(84, $this->executor->runTask('test', array(42, true)));
+        $this->assertEquals(0, $this->executor->runTask('test', array(42)));
     }
 
     public function getArgvAndTargets()
@@ -166,6 +206,8 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
+     * @todo  move to TaskExecutor test
      */
     public function it_should_allow_to_define_custom_timeout()
     {
@@ -198,27 +240,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('ProcessTimedOutException', stream_get_contents($output));
     }
 
-    /**
-     * @test
-     */
-    public function it_should_allow_to_invoke_tasks()
-    {
-        $this->idx->addTask(
-            CallableTask::buildFromClosure(
-                'test',
-                function (Context $idx, $what, $go = false) {
-                    if ($go) {
-                        return $what * 2;
-                    }
-                    return 0;
-                }
-            )
-        );
-        $this->assertEquals(84, $this->idx->test(42, true));
-        $this->assertEquals(84, $this->idx->execute('test', 42, true));
-        $this->assertEquals(0, $this->idx->test(42));
-        $this->assertEquals(0, $this->idx->execute('test', 42));
-    }
+
 
     /**
      * @test
@@ -248,6 +270,9 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Exception: Remote function need a valid environment. Specify --env parameter.
+     *
+     *  @todo  move to operations test
+     *
      */
     public function testRemote()
     {
@@ -271,6 +296,8 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Exception
      * @expectedExceptionMessage Remote function need a valid environment. Specify --env parameter.
+     *
+     * @todo  move to operations test
      */
     public function testRemoteException()
     {
@@ -283,6 +310,9 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->idx->remote('echo foo');
     }
 
+    /**
+     * @todo move to operation test
+     */
     public function testLocal()
     {
         $this->idx->local('echo foo');

@@ -2,14 +2,15 @@
 
 namespace Idephix\Test;
 
-use Idephix\Extension;
-use Idephix\Extension\IdephixAwareInterface;
-use Idephix\Idephix;
+use Idephix\Extension\MethodProvider;
+use Idephix\Extension\TaskProvider;
+use Idephix\Extension\ContextAwareInterface;
+use Idephix\Context;
 use Idephix\Task\Parameter\Collection;
 use Idephix\Task\CallableTask;
 use Idephix\Task\TaskCollection;
 
-class DummyExtension implements IdephixAwareInterface, Extension
+class DummyExtension implements ContextAwareInterface, MethodProvider, TaskProvider
 {
     private $tester;
     private $name;
@@ -20,9 +21,9 @@ class DummyExtension implements IdephixAwareInterface, Extension
         $this->name = $name;
     }
 
-    public function setIdephix(Idephix $idx)
+    public function setContext(Context $idx)
     {
-        $this->tester->assertTrue(true, 'Set Idephix');
+        $this->tester->assertTrue(true, 'Set Context');
     }
 
     public function test($return)
@@ -35,10 +36,6 @@ class DummyExtension implements IdephixAwareInterface, Extension
         return $this->doTest($what);
     }
 
-    /**
-     * @param $return
-     * @return mixed
-     */
     private function doTest($return)
     {
         return $return;

@@ -20,7 +20,11 @@ function run()
 
     if (is_file($idxFile)) {
         try {
-            $idx = Idephix::create(TaskCollection::parseFile($idxFile), Config::parseFile($configFile));
+            $idx = new Idephix(
+                Config::parseFile($configFile),
+                TaskCollection::parseFile($idxFile)
+            );
+
             $idx->run();
 
             return 0;
@@ -34,6 +38,7 @@ function run()
         return 1;
     }
 
-    $idx = new Idephix(Config::dry());
+    $idx = new Idephix(Config::dry(), TaskCollection::dry());
+
     return $idx->run();
 }
