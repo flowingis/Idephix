@@ -2,7 +2,7 @@
 
 namespace Idephix\Extension;
 
-interface MethodProvider
+interface MethodProvider extends Extension
 {
     /** @return MethodCollection */
     public function methods();

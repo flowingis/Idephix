@@ -12,6 +12,7 @@ class InitIdxFileTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         @include_once 'vfsStream/vfsStream.php';
+
         $structure = array(
             'Deploy' => array(
                 'idxfile.php' => 'function foo(){ echo "bar"};',
@@ -22,17 +23,22 @@ class InitIdxFileTest extends \PHPUnit_Framework_TestCase
         vfsStream::setup('root', null, $structure);
     }
 
-    public function testInitIdxFile()
+    /**
+     * @test
+     */
+    public function it_should_create_files()
     {
-        $idx = $this->getMockBuilder('\Idephix\Idephix')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $idx->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
-        $idx->output->expects($this->exactly(4))
-            ->method('writeln');
+        $context = $this->prophesize('\Idephix\Context');
+        $context->writeln(\Prophecy\Argument::any())->shouldBeCalled();
 
-        $initIdxFile = new InitIdxFile('vfs://root', 'vfs://root/Deploy/idxfile.php', 'vfs://root/Deploy/idxrc.php');
-        $initIdxFile->setIdephix($idx);
+
+        $initIdxFile = new InitIdxFile(
+            'vfs://root',
+            'vfs://root/Deploy/idxfile.php',
+            'vfs://root/Deploy/idxrc.php'
+        );
+
+        $initIdxFile->setContext($context->reveal());
         $initIdxFile->initFile();
 
         $this->assertTrue(file_exists('vfs://root/idxfile.php'));
@@ -42,21 +48,26 @@ class InitIdxFileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('return \Idephix\Config::dry();', file_get_contents('vfs://root/idxrc.php'));
     }
 
-    public function testInitWithExistingIdxFile()
+    /**
+     * @test
+     */
+    public function it_should_return_error_if_file_exists()
     {
         vfsStreamWrapper::getRoot()->addChild(new vfsStreamFile('idxfile.php'));
 
-        $idx = $this->getMockBuilder('\Idephix\Idephix')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $idx->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
-        $idx->output->expects($this->at(0))
-            ->method('writeln')
-            ->with('<error>An idxfile.php already exists, generation skipped.</error>')
-            ;
+        $context = $this->prophesize('\Idephix\Context');
+        $context->writeln('Creating basic idxrc.php file...')->shouldBeCalled();
+        $context->writeln('idxrc.php file created.')->shouldBeCalled();
+        $context->writeln('<error>An idxfile.php already exists, generation skipped.</error>')->shouldBeCalled();
 
-        $initIdxFile = new InitIdxFile('vfs://root', 'vfs://root/Deploy/idxfile.php', 'vfs://root/Deploy/idxrc.php');
-        $initIdxFile->setIdephix($idx);
+
+        $initIdxFile = new InitIdxFile(
+            'vfs://root',
+            'vfs://root/Deploy/idxfile.php',
+            'vfs://root/Deploy/idxrc.php'
+        );
+
+        $initIdxFile->setContext($context->reveal());
         $initIdxFile->initFile();
     }
 

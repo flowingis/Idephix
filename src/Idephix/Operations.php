@@ -3,6 +3,7 @@
 namespace Idephix;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Idephix\Extension\MethodCollection;
 
 class Operations
 {
@@ -10,10 +11,15 @@ class Operations
 
     private $output;
 
+    private $methods;
+
+    private $invokerClassName;
+
     public function __construct($sshClient, $output)
     {
         $this->sshClient = $sshClient;
         $this->output = $output;
+        $this->methods = MethodCollection::dry();
     }
 
     public function openRemoteConnection($host, $params)
@@ -118,5 +124,15 @@ class Operations
     public function writeln($messages, $type = OutputInterface::OUTPUT_NORMAL)
     {
         $this->output->writeln($messages, $type);
+    }
+
+    public function addMethods(MethodCollection $methods)
+    {
+        $this->methods = $this->methods->merge($methods);
+    }
+
+    public function execute($name, $arguments)
+    {
+        return $this->methods->execute($name, $arguments);
     }
 }

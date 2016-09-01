@@ -1,13 +1,12 @@
 <?php
 namespace Idephix\Task\Builtin;
 
-use Idephix\Extension\ContextAwareInterface;
 use Idephix\Context;
+use Idephix\Task\Parameter;
+use Idephix\Extension\ContextAwareInterface;
 use Idephix\Task\Task;
-use Idephix\Task\Parameter\Collection;
-use Idephix\Task\Parameter\UserDefinedCollection;
 
-class InitIdxFile implements Task, ContextAwareInterface
+class InitIdxFile implements ContextAwareInterface, Task
 {
     private $ctx;
     private $baseDir;
@@ -34,6 +33,11 @@ class InitIdxFile implements Task, ContextAwareInterface
         );
     }
 
+    public function setContext(Context $ctx)
+    {
+        $this->ctx = $ctx;
+    }
+
     public function name()
     {
         return 'initFile';
@@ -46,12 +50,12 @@ class InitIdxFile implements Task, ContextAwareInterface
 
     public function parameters()
     {
-        return Collection::dry();
+        return Parameter\Collection::dry();
     }
 
     public function userDefinedParameters()
     {
-        return new UserDefinedCollection($this->parameters());
+        return new Parameter\UserDefinedCollection($this->parameters());
     }
 
     public function code()
@@ -86,17 +90,12 @@ class InitIdxFile implements Task, ContextAwareInterface
             return;
         }
 
-        $this->idx->output->writeln("Creating basic {$filename} file...");
+        $this->ctx->writeln("Creating basic {$filename} file...");
 
         if (!is_writable($this->baseDir) || false === file_put_contents($idxFile, $data)) {
             throw new \Exception("Cannot write {$filename}, check your permission configuration.");
         }
 
         $this->ctx->writeln("{$filename} file created.");
-    }
-
-    public function setContext(Context $ctx)
-    {
-        $this->ctx = $ctx;
     }
 }

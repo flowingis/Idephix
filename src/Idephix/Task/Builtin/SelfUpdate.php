@@ -5,12 +5,14 @@ namespace Idephix\Task\Builtin;
 use Idephix\Task\Parameter;
 use Idephix\Idephix;
 use Idephix\Task\Task;
+use Idephix\Extension\ContextAwareInterface;
+use Idephix\Context;
 
-class SelfUpdate implements IdephixAwareInterface, Task
+class SelfUpdate implements ContextAwareInterface, Task
 {
     private $ctx;
 
-    public function setContext(Idephix $ctx)
+    public function setContext(Context $ctx)
     {
         $this->ctx = $ctx;
     }

@@ -4,7 +4,7 @@ namespace Idephix\Extension;
 
 use Idephix\Context;
 
-interface ContextAwareInterface
+interface ContextAwareInterface extends Extension
 {
     public function setContext(Context $ctx);
 }

@@ -3,16 +3,17 @@
 namespace Idephix;
 
 use Idephix\Console\Application;
+use Idephix\Extension\ContextAwareInterface;
 use Idephix\Extension\MethodCollection;
 use Idephix\Extension\TaskProvider;
 use Idephix\Extension\MethodProvider;
+use Idephix\Extension\Extension;
 use Idephix\Task\TaskCollection;
 use Idephix\Task\Task;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Idephix\Extension\IdephixAwareInterface;
 
 use Idephix\Task\Builtin\SelfUpdate;
 use Idephix\Task\Builtin\InitIdxFile;
@@ -23,8 +24,6 @@ class Idephix implements Builder
     const RELEASE_DATE = '@release_date@';
 
     private $executor;
-
-    private $extensionsMethods;
 
     private $config;
 
@@ -40,8 +39,7 @@ class Idephix implements Builder
         $input = $this->inputOrDefault($input);
 
         $this->config = $config;
-        $this->extensionsMethods = MethodCollection::dry();
-        $operations = new Operations($config['ssh_client'], $output);
+        $this->operations = new Operations($config['ssh_client'], $output);
 
         $this->executor = new Application(
             'Idephix',
@@ -51,7 +49,7 @@ class Idephix implements Builder
             $output
         );
 
-        $this->context = new Context($this->executor, $operations, $config);
+        $this->context = new Context($this->executor, $this->operations, $this->config);
 
         $this->addSelfUpdateCommand($this->context);
         $this->addInitIdxFileCommand($this->context);

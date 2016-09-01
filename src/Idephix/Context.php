@@ -60,8 +60,7 @@ class Context
         $this->assertEnv();
 
         return $this->config
-                    ->get("envs.{$this->currentEnv}.hosts")
-                    ->current();
+                    ->get("envs.{$this->currentEnv}.ssh_params");
     }
 
     public function openRemoteConnection($host)
@@ -72,7 +71,7 @@ class Context
                           ->get("envs.{$this->currentEnv}.ssh_params");
 
         $this->operations
-             ->openRemoteConnection($this->currentHost(), $sshParams);
+             ->openRemoteConnection($this->getCurrentHost(), $sshParams);
     }
 
     public function closeRemoteConnection()
@@ -83,7 +82,11 @@ class Context
 
     public function __call($name, $arguments)
     {
-        return $this->executor->runTask($name, $arguments);
+        if ($this->executor->hasTask($name)) {
+            return $this->executor->runTask($name, $arguments);
+        }
+
+        return $this->operations->execute($name, $arguments);
     }
 
     /**

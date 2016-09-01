@@ -55,7 +55,8 @@ class Rsync implements ContextAwareInterface, MethodProvider
         $sshCmd = 'ssh';
 
         $sshParams = $this->ctx->getSshParams();
-        $port = $sshParams['port'];
+        $port = isset($sshParams['port']) ? $sshParams['port'] : 22;
+        $user = isset($sshParams['user']) ? $sshParams['user'] : null;
 
         if ($port) {
             $sshCmd .= ' -p ' . $port;
@@ -63,7 +64,7 @@ class Rsync implements ContextAwareInterface, MethodProvider
 
         $remoteConnection = $this->connectionString(
             $this->ctx->getCurrentHost(),
-            $sshParams['user']
+            $user
         );
 
         $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e '$sshCmd' $localDir $remoteConnection:$remoteDir";

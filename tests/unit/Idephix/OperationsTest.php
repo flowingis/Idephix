@@ -5,6 +5,8 @@ use Idephix\Operations;
 use Idephix\SSH\SshClient;
 use Idephix\Test\SSH\StubProxy;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Idephix\Extension\CallableMethod;
+use Idephix\Extension\MethodCollection;
 
 class OperationsTest extends \PHPUnit_Framework_TestCase
 {
@@ -73,5 +75,24 @@ class OperationsTest extends \PHPUnit_Framework_TestCase
     public function it_should_throw_exception_if_not_connected()
     {
         $this->operations->remote('echo foo');
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_allow_to_register_methods()
+    {
+        $methods = MethodCollection::ofCallables(
+            array(
+                new CallableMethod('mul', function($x, $y) { return $x * $y;}),
+                new CallableMethod('div', function($x, $y) { return $x / $y;}),
+            )
+        );
+
+        $this->operations->addMethods($methods);
+
+        $this->assertEquals(10, $this->operations->execute('mul', array(5, 2)));
+        $this->assertEquals(3, $this->operations->execute('div', array(9, 3)));
+
     }
 }
