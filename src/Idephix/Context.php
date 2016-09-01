@@ -71,16 +71,14 @@ class Context
         $sshParams = $this->config
                           ->get("envs.{$this->currentEnv}.ssh_params");
 
-        $this->sshClient->setParameters($sshParams);
-        $this->sshClient->setHost($host);
-        $this->sshClient->connect();
+        $this->operations
+             ->openRemoteConnection($this->currentHost(), $sshParams);
     }
 
     public function closeRemoteConnection()
     {
-        if ($this->sshClient->isConnected()) {
-            $this->sshClient->disconnect();
-        }
+        $this->operations
+             ->closeRemoteConnection();
     }
 
     public function __call($name, $arguments)
