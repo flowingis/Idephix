@@ -16,7 +16,7 @@ class Operations
         $this->output = $output;
     }
 
-    protected function openRemoteConnection($host, $params)
+    public function openRemoteConnection($host, $params)
     {
         if (!is_null($host)) {
             $this->sshClient->setParameters($params);
@@ -25,7 +25,7 @@ class Operations
         }
     }
 
-    protected function closeRemoteConnection()
+    public function closeRemoteConnection()
     {
         if ($this->sshClient->isConnected()) {
             $this->sshClient->disconnect();

@@ -38,34 +38,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->idx = new Idephix($config, $tasks, $output);
     }
 
-    /**
-     * @test
-     *
-     * @todo  move to TaskExecutor test
-     */
-    public function it_should_allow_to_define_custom_timeout()
-    {
-        $task = CallableTask::buildFromClosure(
-                'foo',
-                function (Context $ctx) {
-                    $ctx->local('sleep 2', false, 1);
-                }
-        );
-
-        $this->context->local('sleep 2', false, 1)->shouldBeCalled();
-
-        $this->executor->addTask($task, $this->context->reveal());
-
-
-        try {
-            $this->executor->runTask('foo', array());
-        } catch (FailedCommandException $e) {
-
-        }
-
-        $this->fail();
-    }
-
     public function getArgvAndTargets()
     {
         return array(
@@ -104,19 +76,23 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
             new Test\SSH\StubProxy()
         );
         $output = fopen('php://memory', 'r+');
+        $tasks = TaskCollection::dry();
+
         $idx = new Idephix(
             Config::fromArray(
                 array(\Idephix\Config::ENVS => $targets, 'ssh_client' => $sshClient)
             ),
+            $tasks,
             new StreamOutput($output)
         );
-        $idx->getApplication()->setAutoExit(false);
+
+        // $idx->getApplication()->setAutoExit(false);
 
         $idx->addTask(
             CallableTask::buildFromClosure(
                 'foo',
-                function (Context $idx) {
-                    $idx->local('echo "Hello World from ' . $idx['env.host'] . '"');
+                function (Context $ctx) {
+                    $ctx->local('echo "Hello World from ' . $ctx->getCurrentHost() . '"');
                 }
             )
         );
@@ -136,6 +112,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $output = fopen('php://memory', 'r+');
         $idx = new Idephix(
             Config::dry(),
+            TaskCollection::dry(),
             new StreamOutput($output),
             new StringInput('')
         );
@@ -154,57 +131,6 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    /**
-     * Exception: Remote function need a valid environment. Specify --env parameter.
-     *
-     *  @todo  move to operations test
-     *
-     */
-    public function testRemote()
-    {
-        $output = new BufferedOutput($this->output);
-        $sshClient = new SSH\SshClient(new Test\SSH\StubProxy('Remote output from '));
-        $this->idx = new Idephix(
-            Config::fromArray(array('envs' => array('test_target' => array()), 'ssh_client' => $sshClient)),
-            $output
-        );
-
-        $this->idx->sshClient->setHost('host');
-        $this->idx->sshClient->connect();
-        $this->idx->remote('echo foo');
-
-        $rows = explode("\n", $output->fetch());
-        $this->assertCount(3, $rows);
-        $this->assertEquals('Remote: echo foo', $rows[0]);
-        $this->assertEquals('Remote output from echo foo', $rows[1]);
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Remote function need a valid environment. Specify --env parameter.
-     *
-     * @todo  move to operations test
-     */
-    public function testRemoteException()
-    {
-        $output = new StreamOutput($this->output);
-        $sshClient = new SSH\SshClient(new Test\SSH\StubProxy());
-        $this->idx = new Idephix(
-            Config::fromArray(array('envs' => array('test_target' => array()), 'ssh_client' => $sshClient)),
-            $output
-        );
-        $this->idx->remote('echo foo');
-    }
-
-    /**
-     * @todo move to operation test
-     */
-    public function testLocal()
-    {
-        $this->idx->local('echo foo');
-        rewind($this->output);
-        $this->assertRegExp('/echo foo/m', stream_get_contents($this->output));
-    }
 }
 
 class TaskSpy

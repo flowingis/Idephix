@@ -136,7 +136,7 @@ EOD;
 
         $hasErrors = false;
 
-        while ($hosts->isValid()) {
+        while ($hosts->valid()) {
             $ctx->openRemoteConnection($hosts->current());
             $returnValue = $this->run($this->input, $this->output);
             $hasErrors = $hasErrors || !(is_null($returnValue) || ($returnValue == 0));
