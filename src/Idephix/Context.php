@@ -72,7 +72,7 @@ class Context
                           ->get("envs.{$this->currentEnv}.ssh_params");
 
         $this->operations
-             ->openRemoteConnection($this->currentHost(), $sshParams);
+             ->openRemoteConnection($this->getCurrentHost(), $sshParams);
     }
 
     public function closeRemoteConnection()

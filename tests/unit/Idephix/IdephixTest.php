@@ -11,48 +11,26 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Input\StringInput;
 
-use Idephix\Console\Application;
-
 class IdephixTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Idephix
-     */
-    protected $idx;
-
-    protected $output;
-
-    protected function setUp()
-    {
-        $this->output = fopen('php://memory', 'r+');
-
-        $output = new StreamOutput($this->output);
-        $input = new StringInput('');
-
-        $config = Config::fromArray(array(
-            'envs' => array(),
-            'ssh_client' => new SSH\SshClient(new Test\SSH\StubProxy()))
-        );
-        $tasks = TaskCollection::dry();
-
-        $this->idx = new Idephix($config, $tasks, $output);
-    }
-
     public function getArgvAndTargets()
     {
         return array(
             array(
-                array('idx', 'foo'),
+                "bar",
                 array(),
-                "Local: echo \"Hello World from \"\nHello World from \n"
+                "Local: echo \"Hello World from bar task\"\nHello World from bar task\n"
             ),
             array(
-                array('idx', 'foo', '--env=env'),
-                array('env' => array('hosts' => array('localhost'), 'ssh_params' => array('user' => 'test'))),
+                "foo --env=env",
+                array('env' => array(
+                    'hosts' => array('localhost'),
+                    'ssh_params' => array('user' => 'test'))
+                ),
                 "Local: echo \"Hello World from localhost\"\nHello World from localhost\n"
             ),
             array(
-                array('idx', 'foo', '--env=env'),
+                "foo --env=env",
                 array(
                     'env' => array(
                         'hosts' => array('localhost', '1.2.3.4'),
@@ -67,41 +45,45 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getArgvAndTargets
+     * @test
      */
-    public function testRunALocalTask($argv, $targets, $expected)
+    public function it_should_run_a_task_on_every_host($args, $targets, $expected)
     {
-        $_SERVER['argv'] = $argv;
-
-        $sshClient = new SSH\SshClient(
-            new Test\SSH\StubProxy()
+        $conf = array(
+            \Idephix\Config::ENVS => $targets,
+            'ssh_client' => new SSH\SshClient(new Test\SSH\StubProxy())
         );
-        $output = fopen('php://memory', 'r+');
-        $tasks = TaskCollection::dry();
+
+        $output = new BufferedOutput(fopen('php://memory', 'r+'));
 
         $idx = new Idephix(
-            Config::fromArray(
-                array(\Idephix\Config::ENVS => $targets, 'ssh_client' => $sshClient)
-            ),
-            $tasks,
-            new StreamOutput($output)
+            Config::fromArray($conf),
+            TaskCollection::dry(),
+            $output,
+            new StringInput($args)
         );
-
-        // $idx->getApplication()->setAutoExit(false);
 
         $idx->addTask(
             CallableTask::buildFromClosure(
                 'foo',
                 function (Context $ctx) {
-                    $ctx->local('echo "Hello World from ' . $ctx->getCurrentHost() . '"');
+                    $ctx->local("echo \"Hello World from {$ctx->getCurrentHost()}\"");
+                }
+            )
+        );
+
+        $idx->addTask(
+            CallableTask::buildFromClosure(
+                'bar',
+                function (Context $ctx) {
+                    $ctx->local("echo \"Hello World from bar task\"");
                 }
             )
         );
 
         $idx->run();
 
-        rewind($output);
-
-        $this->assertEquals($expected, stream_get_contents($output));
+        $this->assertEquals($expected, $output->fetch());
     }
 
     /**
@@ -131,16 +113,4 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
 
-}
-
-class TaskSpy
-{
-    public $executed = false;
-    public $lastCallArguments = array();
-
-    public function execute($myParam)
-    {
-        $this->executed = true;
-        $this->lastCallArguments = func_get_args();
-    }
 }
