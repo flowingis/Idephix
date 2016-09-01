@@ -34,6 +34,11 @@ class InitIdxFile implements Task, ContextAwareInterface
         );
     }
 
+    public function setContext(Context $ctx)
+    {
+        $this->ctx = $ctx;
+    }
+
     public function name()
     {
         return 'initFile';
@@ -86,17 +91,12 @@ class InitIdxFile implements Task, ContextAwareInterface
             return;
         }
 
-        $this->idx->output->writeln("Creating basic {$filename} file...");
+        $this->ctx->writeln("Creating basic {$filename} file...");
 
         if (!is_writable($this->baseDir) || false === file_put_contents($idxFile, $data)) {
             throw new \Exception("Cannot write {$filename}, check your permission configuration.");
         }
 
         $this->ctx->writeln("{$filename} file created.");
-    }
-
-    public function setContext(Context $ctx)
-    {
-        $this->ctx = $ctx;
     }
 }
