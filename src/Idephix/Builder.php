@@ -3,6 +3,7 @@
 namespace Idephix;
 
 use Idephix\Task\Task;
+use Idephix\Extension\Extension;
 
 interface Builder
 {

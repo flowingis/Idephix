@@ -44,6 +44,7 @@ class MethodCollection extends CollectionIterator
     public function execute($methodName, $args = array())
     {
         foreach ($this->getInnerIterator() as $method) {
+
             if ($method->name() == $methodName) {
                 return call_user_func_array($method, $args);
             }
