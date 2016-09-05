@@ -129,7 +129,7 @@ class Operations
         $this->methods = $this->methods->merge($methods);
     }
 
-    public function __call($name, $arguments)
+    public function execute($name, $arguments)
     {
         return $this->methods->execute($name, $arguments);
     }

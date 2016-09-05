@@ -91,8 +91,8 @@ class OperationsTest extends \PHPUnit_Framework_TestCase
 
         $this->operations->addMethods($methods);
 
-        $this->assertEquals(10, $this->operations->mul(5, 2));
-        $this->assertEquals(3, $this->operations->div(9, 3));
+        $this->assertEquals(10, $this->operations->execute('mul', array(5, 2)));
+        $this->assertEquals(3, $this->operations->execute('div', array(9, 3)));
 
     }
 }

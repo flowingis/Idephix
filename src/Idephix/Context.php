@@ -83,7 +83,11 @@ class Context
 
     public function __call($name, $arguments)
     {
-        return $this->executor->runTask($name, $arguments);
+        if ($this->executor->hasTask($name)) {
+            return $this->executor->runTask($name, $arguments);
+        }
+
+        return $this->operations->execute($name, $arguments);
     }
 
     /**

@@ -74,20 +74,4 @@ class ExtensionTest extends \PHPUnit_Framework_TestCase
 
         $ext->setContext(\Prophecy\Argument::any())->shouldHaveBeenCalled();
     }
-
-    /**
-     * @test
-     */
-    public function it_should_allow_to_override_extension_method()
-    {
-        $this->fail();
-
-        // $extension = new DummyExtension($this, 'myExtension');
-
-        // $this->idx->addExtension($extension);
-        // $this->idx->addTask(CallableTask::buildFromClosure('test', function ($what) { return $what * 2;}));
-
-        // $this->assertEquals(84, $this->idx->test(42));
-    }
-
 }

@@ -61,11 +61,19 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_should_run_task_sending_multiple_arguments()
     {
-        $this->context->mycommand('foo', 'bar');
+        $this->executor
+             ->hasTask('mycommand')
+             ->willReturn(true);
+
+        $this->executor
+             ->hasTask('mycommand')
+             ->shouldBeCalled();
 
         $this->executor
              ->runTask('mycommand', array('foo', 'bar'))
-             ->shouldHaveBeenCalled();
+             ->shouldBeCalled();
+
+        $this->context->mycommand('foo', 'bar');
     }
 
     /** @test */
@@ -82,7 +90,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
      * @test
      * @expectedException RunTimeException
      */
-    public function it_should_throw_exception()
+    public function it_should_throw_exception_if_env_not_selected()
     {
         $this->context->getHosts();
     }
@@ -121,5 +129,45 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $hosts->next();
 
         $this->assertNull($context->getCurrentHost());
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_invoke_task()
+    {
+        $this->executor
+             ->hasTask('mycommand')
+             ->shouldBeCalled();
+
+        $this->executor
+             ->hasTask('mycommand')
+             ->willReturn(true);
+
+        $this->executor
+             ->runTask('mycommand', array('foo', 'bar'))
+             ->shouldBeCalled();
+
+        $this->context->mycommand('foo', 'bar');
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_invoke_methods()
+    {
+        $this->executor
+             ->hasTask('mycommand')
+             ->shouldBeCalled();
+
+        $this->executor
+             ->hasTask('mycommand')
+             ->willReturn(false);
+
+        $this->operations
+             ->execute('mycommand', array('foo', 'bar'))
+             ->shouldBeCalled();
+
+        $this->context->mycommand('foo', 'bar');
     }
 }
