@@ -60,8 +60,7 @@ class Context
         $this->assertEnv();
 
         return $this->config
-                    ->get("envs.{$this->currentEnv}.hosts")
-                    ->current();
+                    ->get("envs.{$this->currentEnv}.ssh_params");
     }
 
     public function openRemoteConnection($host)
