@@ -2,10 +2,9 @@
 namespace Idephix\Task\Builtin;
 
 use Idephix\Context;
+use Idephix\Task\Parameter;
 use Idephix\Extension\ContextAwareInterface;
 use Idephix\Task\Task;
-use Idephix\Task\Parameter\Collection;
-use Idephix\Task\Parameter\UserDefinedCollection;
 
 class InitIdxFile implements ContextAwareInterface, Task
 {
