@@ -12,7 +12,7 @@ class SelfUpdate implements ContextAwareInterface, Task
 {
     private $ctx;
 
-    public function setContext(Idephix $ctx)
+    public function setContext(Context $ctx)
     {
         $this->ctx = $ctx;
     }
