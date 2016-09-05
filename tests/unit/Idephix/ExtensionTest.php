@@ -5,7 +5,7 @@ use Idephix\Task\CallableTask;
 use Idephix\Test\DummyExtension;
 use Idephix\Task\TaskCollection;
 use Idephix\Extension\MethodCollection;
-use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\StringInput;
 
 class ExtensionTest extends \PHPUnit_Framework_TestCase
@@ -25,7 +25,7 @@ class ExtensionTest extends \PHPUnit_Framework_TestCase
         $idx = new Idephix(
             Config::fromArray($conf),
             TaskCollection::dry(),
-            $output,
+            new NullOutput(),
             new StringInput('')
         );
 
@@ -47,7 +47,7 @@ class ExtensionTest extends \PHPUnit_Framework_TestCase
         $idx = new Idephix(
             Config::fromArray($conf),
             TaskCollection::dry(),
-            $output,
+            new NullOutput(),
             new StringInput('')
         );
 
@@ -68,7 +68,7 @@ class ExtensionTest extends \PHPUnit_Framework_TestCase
         $idx = new Idephix(
             Config::fromArray($conf),
             TaskCollection::dry(),
-            $output,
+            new NullOutput(),
             new StringInput('')
         );
 

@@ -55,7 +55,7 @@ class Rsync implements ContextAwareInterface, MethodProvider
         $sshCmd = 'ssh';
 
         $sshParams = $this->ctx->getSshParams();
-        $port = $sshParams['port'];
+        $port = isset($sshParams['port']) ? $sshParams['port'] : 22;
 
         if ($port) {
             $sshCmd .= ' -p ' . $port;

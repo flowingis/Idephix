@@ -16,7 +16,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 
     public function testRsyncProject()
     {
-        $expected = "rsync -rlDcz --force --delete --progress  -e 'ssh' ./from kea@banana.com:/a/remote/";
+        $expected = "rsync -rlDcz --force --delete --progress  -e 'ssh -p 22' ./from kea@banana.com:/a/remote/";
 
         $this->context->local($expected)->shouldBeCalled();
         $this->context->getSshParams()->willReturn(array('user' => 'kea'));
@@ -28,7 +28,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 
     public function testRysncWithoutUser()
     {
-        $expected = "rsync -rlDcz --force --delete --progress  -e 'ssh' ./from banana.com:/a/remote/";
+        $expected = "rsync -rlDcz --force --delete --progress  -e 'ssh -p 22' ./from banana.com:/a/remote/";
 
         $this->context->local($expected)->shouldBeCalled();
         $this->context->getSshParams()->willReturn(array());

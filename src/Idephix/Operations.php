@@ -13,6 +13,8 @@ class Operations
 
     private $methods;
 
+    private $invokerClassName;
+
     public function __construct($sshClient, $output)
     {
         $this->sshClient = $sshClient;
