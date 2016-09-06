@@ -3,6 +3,10 @@
 [![Build Status](https://travis-ci.org/ideatosrl/Idephix.svg)](https://travis-ci.org/ideatosrl/Idephix)
 [![Read the docs](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](http://idephix.readthedocs.io/en/latest/)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/47596bd6-4ac9-4314-b79a-1f2e50292c1f/mini.png)](https://insight.sensiolabs.com/projects/47596bd6-4ac9-4314-b79a-1f2e50292c1f)
+[![Latest Stable Version](https://poser.pugx.org/ideato/idephix/version)](https://packagist.org/packages/ideato/idephix)
+[![Total Downloads](https://poser.pugx.org/ideato/idephix/downloads)](https://packagist.org/packages/ideato/idephix)
+[![Monthly Downloads](https://poser.pugx.org/ideato/idephix/d/monthly)](https://packagist.org/packages/ideato/idephix)
+[![License](https://poser.pugx.org/ideato/idephix/license)](https://packagist.org/packages/ideato/idephix)
 
 Idephix - Automation and Deploy tool
 ====================================
