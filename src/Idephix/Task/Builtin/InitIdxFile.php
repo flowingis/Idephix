@@ -29,8 +29,8 @@ class InitIdxFile implements Task, IdephixAwareInterface
     {
         return new static(
             $writeTo,
-            __DIR__ . '/../Cookbook/Deploy/idxfile.php',
-            __DIR__ . '/../Cookbook/Deploy/idxrc.php'
+            __DIR__ . '/../../Cookbook/Deploy/idxfile.php',
+            __DIR__ . '/../../Cookbook/Deploy/idxrc.php'
         );
     }
 
