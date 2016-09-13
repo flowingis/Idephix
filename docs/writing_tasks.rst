@@ -27,7 +27,7 @@ Now running idx you'll get
 
     $ Available commands:
     $ help            Displays help for a command
-    $ init-idx-file   Create an example idxfile.php
+    $ initFile        Init idx configurations and tasks file
     $ list            Lists commands
     $ myNewTask
 

@@ -22,7 +22,7 @@ Installation / Usage
     ``` sh
     $ curl -LSs http://getidephix.com/idephix.phar > idephix.phar
     $ chmod a+x idephix.phar
-    $ idx init-idx-file
+    $ idx initFile
     ```
 
 2. Now you can define tasks just defining php functions in your `idxfile.php`

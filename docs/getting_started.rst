@@ -48,7 +48,7 @@ them for you.
 
 .. code-block:: bash
 
-    $ idx init-idx-file
+    $ idx initFile
 
 This will generate an ``idxfile.php`` and a ``idxrc.php`` file that you can
 use as a boiler plate for your automated tasks.
