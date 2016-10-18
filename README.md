@@ -61,7 +61,7 @@ PHP 5.3.2 or above, >=5.3.12 recommended
 Authors
 -------
 
-* Manuel 'Kea' Baldssarri <mb@ideato.it>
+* Manuel 'Kea' Baldassarri <mb@ideato.it>
 * Michele 'Orso' Orselli <mo@ideato.it>
 * Filippo De Santis <fd@ideato.it>
 * [other contributors](https://github.com/ideatosrl/idephix/graphs/contributors)
