@@ -116,6 +116,11 @@ class Operations
         return new $invoker($cmd, $cwd, $env, $stdin, $timeout, $options);
     }
 
+    public function output()
+    {
+        return $this->output;
+    }
+
     public function write($messages, $newline = false, $type = OutputInterface::OUTPUT_NORMAL)
     {
         $this->output->write($messages, $newline, $type);
