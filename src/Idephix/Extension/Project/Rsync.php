@@ -4,6 +4,7 @@ namespace Idephix\Extension\Project;
 
 use Idephix\Extension\MethodProvider;
 use Idephix\Extension\MethodCollection;
+use Idephix\Extension\CallableMethod;
 use Idephix\Extension\ContextAwareInterface;
 use Idephix\Context;
 
@@ -32,7 +33,7 @@ class Rsync implements ContextAwareInterface, MethodProvider
     {
         return MethodCollection::ofCallables(
             array(
-                new Extension\CallableMethod('rsyncProject', array($this, 'rsyncProject'))
+                new CallableMethod('rsyncProject', array($this, 'rsyncProject'))
             )
         );
     }

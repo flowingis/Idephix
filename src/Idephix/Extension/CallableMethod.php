@@ -12,7 +12,6 @@ class CallableMethod implements Method
         $this->callable = $callable;
     }
 
-
     public function name()
     {
         return $this->name;
