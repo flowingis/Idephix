@@ -28,8 +28,8 @@ class InitIdxFile implements ContextAwareInterface, Task
     {
         return new static(
             $writeTo,
-            __DIR__ . '/../Cookbook/Deploy/idxfile.php',
-            __DIR__ . '/../Cookbook/Deploy/idxrc.php'
+            __DIR__ . '/../../Cookbook/Deploy/idxfile.php',
+            __DIR__ . '/../../Cookbook/Deploy/idxrc.php'
         );
     }
 
