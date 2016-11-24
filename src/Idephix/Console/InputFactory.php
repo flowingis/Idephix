@@ -13,7 +13,8 @@ class InputFactory
      */
     public function buildFromUserArgsForTask($arguments, Task $task)
     {
-        $defaultArguments = array('command' => null);
+        $defaultArguments = array();
+        $inputArguments = array();
 
         foreach ($task->userDefinedParameters() as $parameter) {
             if ($parameter->isFlagOption()) {
@@ -24,7 +25,11 @@ class InputFactory
         }
 
         $values = array_replace(array_values($defaultArguments), $arguments);
-        $inputArguments = array_combine(array_keys($defaultArguments), $values);
+
+        // @todo: remove in php 5.3
+        if (!empty($values)) {
+            $inputArguments = array_combine(array_keys($defaultArguments), $values);
+        }
 
         $input = new ArrayInput($inputArguments);
 

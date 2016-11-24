@@ -1,15 +1,14 @@
 <?php
 namespace Idephix\Task\Builtin;
 
-use Idephix\Extension\IdephixAwareInterface;
-use Idephix\Idephix;
+use Idephix\Context;
+use Idephix\Task\Parameter;
+use Idephix\Extension\ContextAwareInterface;
 use Idephix\Task\Task;
-use Idephix\Task\Parameter\Collection;
-use Idephix\Task\Parameter\UserDefinedCollection;
 
-class InitIdxFile implements Task, IdephixAwareInterface
+class InitIdxFile implements ContextAwareInterface, Task
 {
-    private $idx;
+    private $ctx;
     private $baseDir;
     private $idxFileTemplate;
     private $idxRcTemplate;
@@ -34,6 +33,11 @@ class InitIdxFile implements Task, IdephixAwareInterface
         );
     }
 
+    public function setContext(Context $ctx)
+    {
+        $this->ctx = $ctx;
+    }
+
     public function name()
     {
         return 'initFile';
@@ -46,12 +50,12 @@ class InitIdxFile implements Task, IdephixAwareInterface
 
     public function parameters()
     {
-        return Collection::dry();
+        return Parameter\Collection::dry();
     }
 
     public function userDefinedParameters()
     {
-        return new UserDefinedCollection($this->parameters());
+        return new Parameter\UserDefinedCollection($this->parameters());
     }
 
     public function code()
@@ -59,9 +63,6 @@ class InitIdxFile implements Task, IdephixAwareInterface
         return array($this, 'initFile');
     }
 
-    /**
-     * Based by composer self-update
-     */
     public function initFile()
     {
         $this->initIdxFile();
@@ -84,25 +85,17 @@ class InitIdxFile implements Task, IdephixAwareInterface
     {
         $idxFile = $this->baseDir . DIRECTORY_SEPARATOR . $filename;
         if (file_exists($idxFile)) {
-            $this->idx->output->writeln("<error>An {$filename} already exists, generation skipped.</error>");
+            $this->ctx->writeln("<error>An {$filename} already exists, generation skipped.</error>");
 
             return;
         }
 
-        $this->idx->output->writeln("Creating basic {$filename} file...");
+        $this->ctx->writeln("Creating basic {$filename} file...");
 
         if (!is_writable($this->baseDir) || false === file_put_contents($idxFile, $data)) {
             throw new \Exception("Cannot write {$filename}, check your permission configuration.");
         }
 
-        $this->idx->output->writeln("{$filename} file created.");
-    }
-
-    /**
-     * @param Idephix $idx
-     */
-    public function setIdephix(Idephix $idx)
-    {
-        $this->idx = $idx;
+        $this->ctx->writeln("{$filename} file created.");
     }
 }

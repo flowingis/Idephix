@@ -3,139 +3,171 @@ namespace Idephix;
 
 class ContextTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        $this->executor = $this->prophesize('\Idephix\TaskExecutor');
+        $this->operations = $this->prophesize('\Idephix\Operations');
+        $this->config = $this->prophesize('\Idephix\Config');
+
+        $this->context = new Context(
+            $this->executor->reveal(),
+            $this->operations->reveal(),
+            $this->config->reveal()
+        );
+    }
+
     /** @test */
     public function it_should_not_have_a_default_target_name()
     {
-        $context = $this->buildContext();
-
-        $this->assertNull($context['env.name']);
-        $this->assertNull($context['env.host']);
-        $this->assertNull($context->currentEnvName());
-        $this->assertNull($context->currentHost());
+        $this->assertNull($this->context->currentEnvName());
+        $this->assertNull($this->context->currentHost());
     }
 
     /** @test */
     public function it_should_allow_to_define_a_target_name()
     {
-        $idx = $this->prophesize('\Idephix\Context')->reveal();
-        $context = Context::dry($idx)
-            ->env(
-                'prod',
-                Dictionary::fromArray(
-                    array(
-                        'hosts' => array('127.0.0.1', 'localhost', '10.10.10.10')
-                    )
-                )
-            );
+        $this->context->setEnv('prod');
 
-        $this->assertEquals('prod', $context['env.name']);
-        $this->assertNull($context['env.host']);
-        $this->assertEquals('prod', $context->currentEnvName());
-        $this->assertNull($context->currentHost());
+        $this->assertEquals('prod', $this->context->getEnv());
+        $this->assertNull($this->context->getHosts());
     }
 
     /** @test */
     public function it_should_allow_to_iterate_over_hosts()
     {
-        $idx = $this->prophesize('\Idephix\Context')->reveal();
-        $targetData = array(
-            'hosts' => array('127.0.0.1', 'localhost', '10.10.10.10')
-        );
+        $this->config
+             ->get('envs.prod.hosts')
+             ->willReturn(array('127.0.0.1', 'localhost', '10.10.10.10'));
 
-        $context = Context::dry($idx)
-            ->env(
-                'prod',
-                Dictionary::fromArray(
-                    $targetData
-                )
-            );
+        $this->context
+             ->setEnv('prod');
 
-        foreach ($context as $hostCount => $hostRelatedContext) {
-            $this->assertInstanceOf('\Idephix\Context', $hostRelatedContext);
-
-            $this->assertEquals('prod', $context['env.name']);
-            $this->assertEquals('prod', $context->currentEnvName());
-
-            $this->assertEquals($targetData['hosts'][$hostCount], $hostRelatedContext['env.host']);
-            $this->assertEquals($targetData['hosts'][$hostCount], $hostRelatedContext->currentHost());
-        }
-
-        $this->assertEquals(2, $hostCount);
+        $this->assertCount(3, $this->context->getHosts());
     }
 
     /** @test */
     public function it_should_allow_to_iterate_over_missing_hosts()
     {
-        $idx = $this->prophesize('\Idephix\Context')->reveal();
-        $targetData = array('foo' => 'bar');
+        $this->config
+             ->get('envs.prod.hosts')
+             ->shouldBeCalled();
 
-        $context = Context::dry($idx)
-            ->env(
-                'prod',
-                Dictionary::fromArray(
-                    $targetData
-                )
-            );
+        $this->context
+             ->setEnv('prod');
 
-        foreach ($context as $hostCount => $hostRelatedContext) {
-            $this->assertInstanceOf('\Idephix\Context', $hostRelatedContext);
-
-            $this->assertEquals('prod', $context['env.name']);
-            $this->assertEquals('prod', $context->currentEnvName());
-
-            $this->assertNull($hostRelatedContext['env.host']);
-            $this->assertNull($hostRelatedContext->currentHost());
-        }
-
-        $this->assertEquals(0, $hostCount);
-    }
-
-    /**
-     * @test
-     */
-    public function it_should_allow_to_retrieve_value_as_path()
-    {
-        $idx = $this->prophesize('\Idephix\Context')->reveal();
-
-        $context = Context::dry($idx)
-            ->env('prod', Dictionary::fromArray(array('foo' => '/var/www', 'bar' => '/var/www/')));
-
-        $this->assertEquals('/var/www/', $context->getAsPath('foo'));
-        $this->assertEquals('/var/www/', $context->getAsPath('bar'));
+        $this->assertEquals(0, $this->context->getHosts());
     }
 
     /** @test */
     public function it_should_run_task_sending_multiple_arguments()
     {
-        $idx = $this->prophesize('\Idephix\Context');
-        $idx->execute('mycommand', 'foo', 'bar')->shouldBeCalled();
+        $this->executor
+             ->hasTask('mycommand')
+             ->willReturn(true);
 
-        $context = Context::dry($idx->reveal());
-        $context->execute('mycommand', 'foo', 'bar');
+        $this->executor
+             ->hasTask('mycommand')
+             ->shouldBeCalled();
+
+        $this->executor
+             ->runTask('mycommand', array('foo', 'bar'))
+             ->shouldBeCalled();
+
+        $this->context->mycommand('foo', 'bar');
     }
 
     /** @test */
     public function it_should_return_local_output()
     {
-        $idx = $this->prophesize('\Idephix\Context');
-        $idx->local('foo', false, 60)->willReturn('bar');
+        $this->operations
+             ->local('foo', false, 60)
+             ->willReturn('bar');
 
-        $context = Context::dry($idx->reveal());
-
-        $this->assertEquals('bar', $context->local('foo'));
+        $this->assertEquals('bar', $this->context->local('foo'));
     }
 
     /**
-     * @return Context
+     * @test
+     * @expectedException RunTimeException
      */
-    private function buildContext()
+    public function it_should_throw_exception_if_env_not_selected()
     {
-        $idx = $this->prophesize('\Idephix\Context')->reveal();
-        $contextData = array(
-            'hosts' => array('127.0.0.1', 'localhost', '10.10.10.10')
-        );
-        $context = new Context(Dictionary::fromArray($contextData), $idx);
+        $this->context->getHosts();
+    }
 
-        return $context;
+    /** @test */
+    public function it_should_return_current_host()
+    {
+        $conf = array(
+            'envs' => array(
+                'prod' => array(
+                    'hosts' => array('1', '2', '3')
+                )
+            )
+        );
+
+        $config = Config::fromArray($conf);
+        $executor = $this->prophesize('\Idephix\TaskExecutor');
+        $operations = $this->prophesize('\Idephix\Operations');
+
+        $context = new Context(
+            $executor->reveal(),
+            $operations->reveal(),
+            $config
+        );
+
+        $context->setEnv('prod');
+        $hosts = $context->getHosts();
+
+        $this->assertEquals('1', $context->getCurrentHost());
+        $hosts->next();
+
+        $this->assertEquals('2', $context->getCurrentHost());
+        $hosts->next();
+
+        $this->assertEquals('3', $context->getCurrentHost());
+        $hosts->next();
+
+        $this->assertNull($context->getCurrentHost());
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_invoke_task()
+    {
+        $this->executor
+             ->hasTask('mycommand')
+             ->shouldBeCalled();
+
+        $this->executor
+             ->hasTask('mycommand')
+             ->willReturn(true);
+
+        $this->executor
+             ->runTask('mycommand', array('foo', 'bar'))
+             ->shouldBeCalled();
+
+        $this->context->mycommand('foo', 'bar');
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_invoke_methods()
+    {
+        $this->executor
+             ->hasTask('mycommand')
+             ->shouldBeCalled();
+
+        $this->executor
+             ->hasTask('mycommand')
+             ->willReturn(false);
+
+        $this->operations
+             ->execute('mycommand', array('foo', 'bar'))
+             ->shouldBeCalled();
+
+        $this->context->mycommand('foo', 'bar');
     }
 }

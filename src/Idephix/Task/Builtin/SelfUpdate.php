@@ -4,16 +4,17 @@ namespace Idephix\Task\Builtin;
 
 use Idephix\Task\Parameter;
 use Idephix\Idephix;
-use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Task\Task;
+use Idephix\Extension\ContextAwareInterface;
+use Idephix\Context;
 
-class SelfUpdate implements IdephixAwareInterface, Task
+class SelfUpdate implements ContextAwareInterface, Task
 {
-    private $idx;
+    private $ctx;
 
-    public function setIdephix(Idephix $idx)
+    public function setContext(Context $ctx)
     {
-        $this->idx = $idx;
+        $this->ctx = $ctx;
     }
 
     public function name()
@@ -70,11 +71,11 @@ class SelfUpdate implements IdephixAwareInterface, Task
                 if (!$e instanceof \UnexpectedValueException && !$e instanceof \PharException) {
                     throw $e;
                 }
-                $this->idx->output->writeln('<error>The download is corrupted ('.$e->getMessage().').</error>');
-                $this->idx->output->writeln('<error>Please re-run the self-update command to try again.</error>');
+                $this->ctx->writeln('<error>The download is corrupted ('.$e->getMessage().').</error>');
+                $this->ctx->writeln('<error>Please re-run the self-update command to try again.</error>');
             }
         } else {
-            $this->idx->output->writeln('<info>You are using the latest idephix version.</info>');
+            $this->ctx->writeln('<info>You are using the latest idephix version.</info>');
         }
     }
 }

@@ -2,25 +2,25 @@
 
 namespace Idephix\Extension\Project;
 
-use Idephix\Extension;
+use Idephix\Extension\MethodProvider;
 use Idephix\Extension\MethodCollection;
-use Idephix\Extension\IdephixAwareInterface;
-use Idephix\Idephix;
-use Idephix\Task\TaskCollection;
+use Idephix\Extension\CallableMethod;
+use Idephix\Extension\ContextAwareInterface;
+use Idephix\Context;
 
 /**
  * Provide a basic rsync interface based on current Idephix context
  */
-class Rsync implements IdephixAwareInterface, Extension
+class Rsync implements ContextAwareInterface, MethodProvider
 {
     /**
      * @var \Idephix\Context
      */
-    private $idx;
+    private $ctx;
 
-    public function setIdephix(Idephix $idx)
+    public function setContext(Context $ctx)
     {
-        $this->idx = $idx;
+        $this->ctx = $ctx;
     }
 
     public function name()
@@ -33,15 +33,9 @@ class Rsync implements IdephixAwareInterface, Extension
     {
         return MethodCollection::ofCallables(
             array(
-                new Extension\CallableMethod('rsyncProject', array($this, 'rsyncProject'))
+                new CallableMethod('rsyncProject', array($this, 'rsyncProject'))
             )
         );
-    }
-
-    /** @return TaskCollection */
-    public function tasks()
-    {
-        return TaskCollection::dry();
     }
 
     public function rsyncProject($remoteDir, $localDir = null, $exclude = null, $extraOpts = null)
@@ -49,15 +43,6 @@ class Rsync implements IdephixAwareInterface, Extension
         if (substr($remoteDir, -1) != '/') {
             $remoteDir .= '/';
         }
-
-        $context = $this->idx->getContext();
-
-        if ($context->currentHost() === null) {
-            throw new \InvalidArgumentException('A host must be selected, invalid Context provided');
-        }
-
-
-        $port = $context->get('ssh_params.port');
 
         if (file_exists($exclude)) {
             $extraOpts .= ' --exclude-from='.escapeshellarg($exclude);
@@ -69,15 +54,23 @@ class Rsync implements IdephixAwareInterface, Extension
         }
 
         $sshCmd = 'ssh';
+
+        $sshParams = $this->ctx->getSshParams();
+        $port = isset($sshParams['port']) ? $sshParams['port'] : 22;
+        $user = isset($sshParams['user']) ? $sshParams['user'] : null;
+
         if ($port) {
             $sshCmd .= ' -p ' . $port;
         }
 
-        $remoteConnection = $this->connectionString($context->currentHost(), $context->get('ssh_params.user'));
+        $remoteConnection = $this->connectionString(
+            $this->ctx->getCurrentHost(),
+            $user
+        );
 
         $cmd = "rsync -rlDcz --force --delete --progress $extraOpts -e '$sshCmd' $localDir $remoteConnection:$remoteDir";
 
-        return $this->idx->local($cmd);
+        return $this->ctx->local($cmd);
     }
 
     /**
