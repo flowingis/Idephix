@@ -41,6 +41,7 @@ class Idephix implements Builder, TaskExecutor
     /** @var  Context */
     protected $context;
     protected $invokerClassName;
+    protected $crossContextData;
 
     public function __construct(
         Config $config,
@@ -51,6 +52,7 @@ class Idephix implements Builder, TaskExecutor
         $this->context = Context::dry($this);
         $this->tasks = TaskCollection::dry();
         $this->extensionsMethods = MethodCollection::dry();
+        $this->crossContextData = Dictionary::dry();
 
         $this->application = new Application(
             'Idephix',
@@ -427,5 +429,10 @@ class Idephix implements Builder, TaskExecutor
         }
 
         return $input;
+    }
+
+    public function getCrossContextData()
+    {
+        return $this->crossContextData;
     }
 }
