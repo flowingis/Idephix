@@ -78,6 +78,16 @@ class Context implements DictionaryAccess, TaskExecutor, \Iterator
         $this->data->offsetSet($key, $value);
     }
 
+    public function getCrossContextData($key, $default = null)
+    {
+        return $this->idx->getCrossContextData()->get($key, $default);
+    }
+
+    public function setCrossContextData($key, $value)
+    {
+        $this->idx->getCrossContextData()->offsetSet($key, $value);
+    }
+
     /**
      * @param $name
      * @return integer 0 success, 1 fail

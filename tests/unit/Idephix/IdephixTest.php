@@ -175,6 +175,46 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('127.0.0.1', $context['env.host']);
     }
 
+    /** @test */
+    public function it_should_share_data_between_contexts()
+    {
+        $output = fopen('php://memory', 'r+');
+        $idx = new Idephix(
+            Config::fromArray(array(
+                Config::SSHCLIENT => new SshClient(new StubProxy()),
+                Config::ENVS => array(
+                'prod' => array(
+                    'hosts' => array('127.0.0.1', '127.0.0.2', '127.0.0.3'),
+                    'ssh_params' => array('user' => 'kea')
+                )
+            ))),
+            new StreamOutput($output),
+            new StringInput('myTask --env=prod')
+        );
+
+        $idx->addTask(
+            CallableTask::buildFromClosure(
+                'myTask',
+                function (Context $context) {
+                    $foo = $context->getCrossContextData("foo", "Empty");
+                    $context->local("echo ".$foo."\n");
+                    if ($foo === "Empty") {
+                        $context->setCrossContextData("foo", "Foo");
+                    }
+                }
+            )
+        );
+
+        $idx->run();
+
+        rewind($output);
+
+        $this->assertEquals(
+            "Local: echo Empty\n\nEmpty\n".
+            "Local: echo Foo\n\nFoo\n".
+            "Local: echo Foo\n\nFoo\n", stream_get_contents($output));
+    }
+
     /**
      * @test
      */
