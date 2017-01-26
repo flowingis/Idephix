@@ -88,6 +88,15 @@ class Context implements DictionaryAccess, TaskExecutor, \Iterator
     }
 
     /**
+     * @param $name
+     * @return integer 0 success, 1 fail
+     */
+    public function executeOnce($name)
+    {
+        call_user_func_array(array($this->idx, 'executeOnce'), func_get_args());
+    }
+
+    /**
      * Execute remote command.
      *
      * @param string $cmd command
