@@ -41,6 +41,7 @@ class Idephix implements Builder, TaskExecutor
     /** @var  Context */
     protected $context;
     protected $invokerClassName;
+    protected $executed = array();
 
     public function __construct(
         Config $config,
@@ -264,6 +265,24 @@ class Idephix implements Builder, TaskExecutor
             $inputFactory->buildFromUserArgsForTask(func_get_args(), $this->tasks->get($name)),
             $this->output
         );
+    }
+
+    /**
+     * RunTask only once for multiple context
+     *
+     * @param string $name the name of the task you want to call
+     * @param (...)  arbitrary number of parameter matching the target task interface
+     * @return integer
+     */
+    public function executeOnce($name)
+    {
+        if (isset($this->executed[$name])) {
+            return $this->executed[$name];
+        }
+
+        $this->executed[$name] = call_user_func_array(array($this, 'execute'), func_get_args());
+
+        return $this->executed[$name];
     }
 
     public function addSelfUpdateCommand()

@@ -234,6 +234,66 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_should_allow_to_invoke_tasks_only_once()
+    {
+        $this->idx->addTask(
+            CallableTask::buildFromClosure(
+                'test',
+                function (Context $idx, $what) {
+                    return $what;
+                }
+            )
+        );
+        $this->assertEquals(42, $this->idx->executeOnce('test', 42));
+        $this->assertEquals(42, $this->idx->executeOnce('test', 24));
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_allow_to_invoke_tasks_only_once_cross_context()
+    {
+        $output = fopen('php://memory', 'r+');
+
+        $idx = new Idephix(
+            Config::fromArray(array(
+                Config::SSHCLIENT => new SshClient(new StubProxy()),
+                Config::ENVS => array(
+                    'prod' => array(
+                        'hosts' => array('127.0.0.1', 'localhost'),
+                        'ssh_params' => array('user' => 'kea')
+                    )
+                ))),
+            new StreamOutput($output),
+            new StringInput('test --env=prod')
+        );
+
+        $idx->addTask(
+            CallableTask::buildFromClosure(
+                'test',
+                function (Context $idx) {
+                    $idx->writeln("Always: ".$idx->currentHost());
+                    $idx->executeOnce('testOnce', $idx->currentHost());
+                }
+            )
+        );
+        $idx->addTask(
+            CallableTask::buildFromClosure(
+                'testOnce',
+                function (Context $idx, $what) {
+                    $idx->writeln("Once: $what");
+                }
+            )
+        );
+        $idx->run();
+
+        rewind($output);
+        $this->assertEquals("Always: 127.0.0.1\nOnce: 127.0.0.1\nAlways: localhost\n", stream_get_contents($output));
+    }
+
+    /**
+     * @test
+     */
     public function it_should_print_user_tasks_separately()
     {
         $output = fopen('php://memory', 'r+');
