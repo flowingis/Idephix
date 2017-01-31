@@ -324,7 +324,7 @@ Writing output to the console
 -----------------------------
 
 Idephix is based on Symfony console component so you can send output to the user using the
-``\Symfony\Component\Console\Output\OutputInterface``. You can get the full ``OutputInterface`` component
+``\Symfony\Component\Console\Style\SymfonyStyle``. You can get the full ``SymfonyStyle`` component
 through the ``\Idephix\TaskExecutor::output`` method or you can use the shortcut methods:
 ``\Idephix\TaskExecutor::write`` and ``\Idephix\TaskExecutor::writeln``.
 
@@ -343,11 +343,31 @@ Here is an example of you you can send some output to the console.
     {
         $context->writeln(strtoupper($what));
         $context->write(strtoupper($what) . PHP_EOL);
-        $context->output()->write(strtoupper($what) . PHP_EOL);
-        $context->output()->writeln(strtoupper($what));
+
+        $output = $idx->output();
+
+        // common output elements
+        $output->title($what);
+        $output->section($what);
+        $output->text($what);
+        $output->comment($what);
+        $output->note($what);
+        $output->caution($what);
+        $output->listing([$what, $what, $what]);
+        $output->success($what);
+        $output->error($what);
+        $output->warning($what);
+
+        //table
+        $headers = ['Parameter', 'Value', 'Value 3'];
+        $rows = [
+          ['Param1', 'Value1', 'Value 3'],
+          ['Param2', 'Value2', 'Value 3']
+        ];
+        $output->table($headers, $rows);
     }
 
 .. hint::
 
-    For more information about ``OutputInterface`` read the official
-    component `documentation <http://symfony.com/doc/2.8/components/console.html>`_
+    For more information about ``SymfonyStyle`` read the official
+    component `documentation <http://symfony.com/blog/new-in-symfony-2-8-console-style-guide>`_
