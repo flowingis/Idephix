@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Idephix\SSH\SshClient;
 use Idephix\Extension\IdephixAwareInterface;
 use Idephix\Task\Builtin\SelfUpdate;
@@ -61,8 +62,8 @@ class Idephix implements Builder, TaskExecutor
 
         $this->sshClient = $config['ssh_client'];
 
-        $this->output = $this->outputOrDefault($output);
         $this->input = $this->inputOrDefault($input);
+        $this->output = $this->outputOrDefault($output);
 
         $this->addSelfUpdateCommand();
         $this->addInitIdxFileCommand();
@@ -422,12 +423,12 @@ class Idephix implements Builder, TaskExecutor
 
     /**
      * @param OutputInterface $output
-     * @return ConsoleOutput|OutputInterface
+     * @return SymfonyStyle|OutputInterface
      */
     private function outputOrDefault(OutputInterface $output = null)
     {
         if (null === $output) {
-            $output = new ConsoleOutput();
+            $output = new SymfonyStyle($this->input, new ConsoleOutput());
         }
 
         return $output;
