@@ -4,7 +4,6 @@ namespace Idephix;
 
 use Idephix\Console\Application;
 use Idephix\Extension\ContextAwareInterface;
-use Idephix\Extension\MethodCollection;
 use Idephix\Extension\TaskProvider;
 use Idephix\Extension\MethodProvider;
 use Idephix\Extension\Extension;
@@ -13,6 +12,7 @@ use Idephix\Task\Task;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 use Idephix\Task\Builtin\SelfUpdate;
@@ -35,9 +35,8 @@ class Idephix implements Builder
         OutputInterface $output = null,
         InputInterface $input = null)
     {
-        $output = $this->outputOrDefault($output);
         $input = $this->inputOrDefault($input);
-
+        $output = $this->outputOrDefault($input, $output);
         $this->config = $config;
         $this->operations = new Operations($config['ssh_client'], $output);
 
@@ -138,12 +137,12 @@ class Idephix implements Builder
 
     /**
      * @param OutputInterface $output
-     * @return ConsoleOutput|OutputInterface
+     * @return SymfonyStyle|OutputInterface
      */
-    private function outputOrDefault(OutputInterface $output = null)
+    private function outputOrDefault($input, OutputInterface $output = null)
     {
         if (null === $output) {
-            $output = new ConsoleOutput();
+            $output = new SymfonyStyle($input, new ConsoleOutput());
         }
 
         return $output;
