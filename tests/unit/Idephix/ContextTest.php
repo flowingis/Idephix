@@ -171,6 +171,26 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->mycommand('foo', 'bar');
     }
 
+    /**
+     * @test
+     */
+    public function it_should_invoke_methods_through_execute()
+    {
+        $this->executor
+             ->hasTask('mycommand')
+             ->shouldBeCalled();
+
+        $this->executor
+             ->hasTask('mycommand')
+             ->willReturn(false);
+
+        $this->operations
+             ->execute('mycommand', array('foo', 'bar'))
+             ->shouldBeCalled();
+
+        $this->context->execute('mycommand', 'foo', 'bar');
+    }
+
 
     /**
      * @test
@@ -179,6 +199,10 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $this->executor
             ->hasTask('mycommand')
+            ->willReturn(true);
+
+        $this->executor
+            ->runTask('mycommand', array('foo', 'bar'))
             ->shouldBeCalledTimes(1);
 
         $this->context->executeOnce('mycommand', 'foo', 'bar');

@@ -94,13 +94,26 @@ class Context
      * @param $name
      * @return integer 0 success, 1 fail
      */
+    public function execute($name)
+    {
+        $args = func_get_args();
+        array_shift($args);
+        return call_user_func_array(array($this, '__call'), array($name, $args));
+    }
+
+    /**
+     * @param $name
+     * @return integer 0 success, 1 fail
+     */
     public function executeOnce($name)
     {
         if (array_key_exists($name, $this->executed)) {
             return $this->executed[$name];
         }
 
-        $this->executed[$name] = call_user_func_array(array($this, '__call'), func_get_args());
+        $args = func_get_args();
+        array_shift($args);
+        $this->executed[$name] = call_user_func_array(array($this, '__call'), array($name, $args));
 
         return $this->executed[$name];
     }
