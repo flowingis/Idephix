@@ -5,7 +5,6 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Idephix\Task\Builtin\InitIdxFile;
-use Symfony\Component\Console\Output\NullOutput;
 
 class InitIdxFileTest extends \PHPUnit_Framework_TestCase
 {
@@ -73,20 +72,18 @@ class InitIdxFileTest extends \PHPUnit_Framework_TestCase
 
     public function testInitFromDeployRecipe()
     {
-        $idx = $this->getMockBuilder('\Idephix\Idephix')
+        $context = $this->getMockBuilder('\Idephix\Context')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $idx->output = new NullOutput();
+        
         $initIdxFile = InitIdxFile::fromDeployRecipe('vfs://root');
-        $initIdxFile->setIdephix($idx);
+        $initIdxFile->setContext($context);
         $initIdxFile->initFile();
 
         $this->assertTrue(file_exists('vfs://root/idxfile.php'));
         $this->assertTrue(file_exists('vfs://root/idxrc.php'));
 
-        $this->assertEquals(file_get_contents(__DIR__ . '/../../../../src/Idephix/Cookbook/Deploy/idxfile.php'), file_get_contents('vfs://root/idxfile.php') );
-        $this->assertEquals(file_get_contents(__DIR__ . '/../../../../src/Idephix/Cookbook/Deploy/idxrc.php'), file_get_contents('vfs://root/idxrc.php') );
+        $this->assertEquals(file_get_contents(__DIR__ . '/../../../../src/Idephix/Cookbook/Deploy/idxfile.php'), file_get_contents('vfs://root/idxfile.php'));
+        $this->assertEquals(file_get_contents(__DIR__ . '/../../../../src/Idephix/Cookbook/Deploy/idxrc.php'), file_get_contents('vfs://root/idxrc.php'));
     }
-
 }
