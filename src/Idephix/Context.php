@@ -8,6 +8,7 @@ class Context
     private $operations;
     private $config;
     private $executor;
+    protected $executed = array();
 
     private $currentEnv = null;
 
@@ -87,6 +88,21 @@ class Context
         }
 
         return $this->operations->execute($name, $arguments);
+    }
+
+    /**
+     * @param $name
+     * @return integer 0 success, 1 fail
+     */
+    public function executeOnce($name)
+    {
+        if (array_key_exists($name, $this->executed)) {
+            return $this->executed[$name];
+        }
+
+        $this->executed[$name] = call_user_func_array(array($this, '__call'), func_get_args());
+
+        return $this->executed[$name];
     }
 
     /**

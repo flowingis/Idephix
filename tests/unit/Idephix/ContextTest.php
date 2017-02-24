@@ -170,4 +170,18 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->mycommand('foo', 'bar');
     }
+
+
+    /**
+     * @test
+     */
+    public function it_should_allow_to_invoke_tasks_only_once()
+    {
+        $this->executor
+            ->hasTask('mycommand')
+            ->shouldBeCalledTimes(1);
+
+        $this->context->executeOnce('mycommand', 'foo', 'bar');
+        $this->context->executeOnce('mycommand', 'foo', 'bar');
+    }
 }
