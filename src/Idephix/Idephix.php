@@ -228,16 +228,6 @@ class Idephix implements Builder, TaskExecutor
     }
 
     /**
-     * @param $name
-     * @param $extension
-     * @deprecated should use addExtension instead
-     */
-    public function addLibrary($name, $extension)
-    {
-        $this->addExtension($name, $extension);
-    }
-
-    /**
      * @param string $name
      * @return bool
      */
