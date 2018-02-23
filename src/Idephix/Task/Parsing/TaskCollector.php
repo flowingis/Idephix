@@ -61,7 +61,6 @@ class TaskCollector extends NodeVisitorAbstract
             new Node\Expr\Variable($closureName),
             new Node\Expr\Closure(
                 array(
-                    'params' => $functionNode->params,
                     'stmts' => $functionNode->stmts,
                     'params' => $functionNode->params
                 )
