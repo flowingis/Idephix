@@ -56,7 +56,7 @@ that you can use as a starting point for your projects.
 Requirements
 ------------
 
-PHP 5.3.2 or above, >=5.3.12 recommended
+PHP 5.4 or above
 
 Authors
 -------
