@@ -3,7 +3,7 @@
 
 namespace Idephix;
 
-class GoOptionTest extends \PHPUnit_Framework_TestCase
+class GoOptionTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

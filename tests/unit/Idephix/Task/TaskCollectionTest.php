@@ -3,7 +3,7 @@ namespace Idephix\Task;
 
 use Idephix\Task\Parameter\Collection;
 
-class TaskCollectionTest extends \PHPUnit_Framework_TestCase
+class TaskCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test

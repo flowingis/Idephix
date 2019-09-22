@@ -1,7 +1,7 @@
 <?php
 namespace Idephix;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends \PHPUnit\Framework\TestCase
 {
 
     /** @test */

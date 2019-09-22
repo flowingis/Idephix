@@ -1,7 +1,7 @@
 <?php
 namespace Idephix;
 
-class LoadCustomIdxFileTest extends \PHPUnit_Framework_TestCase
+class LoadCustomIdxFileTest extends \PHPUnit\Framework\TestCase
 {
 
     public function setUp()

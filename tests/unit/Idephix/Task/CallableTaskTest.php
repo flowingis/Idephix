@@ -5,7 +5,7 @@ use Idephix\Config;
 use Idephix\Idephix;
 use Idephix\Context;
 
-class CallableTaskTest extends \PHPUnit_Framework_TestCase
+class CallableTaskTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test

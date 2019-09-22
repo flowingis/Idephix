@@ -6,7 +6,7 @@ use Idephix\Task\Parameter\Collection;
 use Idephix\Task\Parameter\UserDefined;
 use Idephix\Task\Parameter\UserDefinedCollection;
 
-class UserDefinedParameterCollectionTest extends \PHPUnit_Framework_TestCase
+class UserDefinedParameterCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test

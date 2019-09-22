@@ -7,7 +7,7 @@ use org\bovigo\vfs\vfsStreamWrapper;
 use Idephix\Task\Builtin\InitIdxFile;
 use Symfony\Component\Console\Output\NullOutput;
 
-class InitIdxFileTest extends \PHPUnit_Framework_TestCase
+class InitIdxFileTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
@@ -27,7 +27,8 @@ class InitIdxFileTest extends \PHPUnit_Framework_TestCase
         $idx = $this->getMockBuilder('\Idephix\Idephix')
             ->disableOriginalConstructor()
             ->getMock();
-        $idx->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $idx->output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')
+            ->getMock();
         $idx->output->expects($this->exactly(4))
             ->method('writeln');
 
@@ -49,7 +50,8 @@ class InitIdxFileTest extends \PHPUnit_Framework_TestCase
         $idx = $this->getMockBuilder('\Idephix\Idephix')
             ->disableOriginalConstructor()
             ->getMock();
-        $idx->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $idx->output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')
+            ->getMock();
         $idx->output->expects($this->at(0))
             ->method('writeln')
             ->with('<error>An idxfile.php already exists, generation skipped.</error>')

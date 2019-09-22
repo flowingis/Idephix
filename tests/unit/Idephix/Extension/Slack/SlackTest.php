@@ -12,7 +12,7 @@ function curl_exec($ch, $error = false)
     return 'ok';
 }
 
-class SlackTest extends \PHPUnit_Framework_TestCase
+class SlackTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

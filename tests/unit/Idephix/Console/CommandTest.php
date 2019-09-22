@@ -7,7 +7,7 @@ use Idephix\Test\Console\IdephixCommandTester;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\StreamOutput;
 
-class CommandTest extends \PHPUnit_Framework_TestCase
+class CommandTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test

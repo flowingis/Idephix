@@ -4,7 +4,7 @@ namespace Idephix\SSH\Test;
 use Idephix\SSH\SshClient;
 use Idephix\Test\SSH\StubProxy;
 
-class SshClientTest extends \PHPUnit_Framework_TestCase
+class SshClientTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

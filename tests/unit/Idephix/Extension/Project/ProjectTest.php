@@ -5,7 +5,7 @@ namespace Idephix\Extension\Project;
 use Idephix\Context;
 use Idephix\Dictionary;
 
-class ProjectTest extends \PHPUnit_Framework_TestCase
+class ProjectTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

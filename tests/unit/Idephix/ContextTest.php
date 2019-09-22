@@ -1,7 +1,7 @@
 <?php
 namespace Idephix;
 
-class ContextTest extends \PHPUnit_Framework_TestCase
+class ContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @test */
     public function it_should_not_have_a_default_target_name()

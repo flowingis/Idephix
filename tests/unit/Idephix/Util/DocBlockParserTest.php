@@ -3,7 +3,7 @@ namespace Idephix\Util\Test;
 
 use Idephix\Util\DocBlockParser;
 
-class DocBlockParserTest extends \PHPUnit_Framework_TestCase
+class DocBlockParserTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testParse()

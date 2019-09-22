@@ -3,7 +3,7 @@
 
 namespace Idephix;
 
-class ExitStatusCodeTest extends \PHPUnit_Framework_TestCase
+class ExitStatusCodeTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

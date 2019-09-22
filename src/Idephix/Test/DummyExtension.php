@@ -14,7 +14,7 @@ class DummyExtension implements IdephixAwareInterface, Extension
     private $tester;
     private $name;
 
-    public function __construct(\PHPUnit_Framework_TestCase $tester, $name)
+    public function __construct(\PHPUnit\Framework\TestCase $tester, $name)
     {
         $this->tester = $tester;
         $this->name = $name;

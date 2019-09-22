@@ -5,7 +5,7 @@ use Idephix\Task\CallableTask;
 use Idephix\Test\DummyExtension;
 use Symfony\Component\Console\Output\StreamOutput;
 
-class ExtensionTest extends \PHPUnit_Framework_TestCase
+class ExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private $output;
 

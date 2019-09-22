@@ -3,7 +3,7 @@ namespace Idephix\SSH\Test;
 
 use Idephix\SSH\CLISshProxy;
 
-class CLISshProxyTest extends \PHPUnit_Framework_TestCase
+class CLISshProxyTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

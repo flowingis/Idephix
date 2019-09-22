@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Input\StringInput;
 
-class IdephixTest extends \PHPUnit_Framework_TestCase
+class IdephixTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Idephix
@@ -32,7 +32,7 @@ class IdephixTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error
+     * @expectedException \PHPUnit\Framework\Error\Error
      * @expectedExceptionMessage Undefined property: application in
      */
     public function test__get()
