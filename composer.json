@@ -23,7 +23,7 @@
         "symfony/options-resolver": "^2.1"
     },
     "require-dev": {
-        "mikey179/vfsStream": "1.3.*@dev"
+        "mikey179/vfsstream": "1.3.*@dev"
     },
     "bin": [
         "bin/idx"
